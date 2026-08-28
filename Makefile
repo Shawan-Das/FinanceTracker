@@ -1,0 +1,1 @@
+.PHONY: all build generate tools quickbuild
