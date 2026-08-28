@@ -1,0 +1,25 @@
+{
+  "name": "personal-finance-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal Finance Tracker — Track your money, people, and loans",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "build": "cd client && npm run build && cd ../server && npm run build",
+    "start": "cd server && npm start",
+    "test": "cd server && npm test",
+    "db:create": "cd server && npm run db:create",
+    "db:migrate": "cd server && npm run db:migrate",
+    "db:reset": "cd server && npm run db:reset",
+    "db:seed": "cd server && npm run db:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}
