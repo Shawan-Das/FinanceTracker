@@ -299,14 +299,18 @@ function makeRequest(
 ): Promise<HttpResult> {
   return new Promise((resolve, reject) => {
     const addr = server.address() as any;
+    const headers: http.OutgoingHttpHeaders = {
+      'Content-Type': 'application/json',
+    };
+    if (cookie) headers.Cookie = cookie;
+
     const options: http.RequestOptions = {
       hostname: '127.0.0.1',
       port: addr.port,
       path,
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers,
     };
-    if (cookie) options.headers!['Cookie'] = cookie;
 
     const req = http.request(options, (res) => {
       let data = '';
