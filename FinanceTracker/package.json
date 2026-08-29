@@ -1,8 +1,8 @@
 {
-  "name": "personal-finance-tracker",
+  "name": "balqen",
   "version": "1.0.0",
   "private": true,
-  "description": "Personal Finance Tracker — Track your money, people, and loans",
+  "description": "Balqen — Track your money, people, and loans",
   "workspaces": [
     "server",
     "client"
