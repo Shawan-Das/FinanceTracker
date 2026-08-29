@@ -1,0 +1,12 @@
+{
+  "framework": "vite",
+  "installCommand": "cd FinanceTracker/client && npm install",
+  "buildCommand": "cd FinanceTracker/client && npm run build",
+  "outputDirectory": "FinanceTracker/client/dist",
+  "rewrites": [
+    {
+      "source": "/((?!api/|assets/|.*\\..*).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
