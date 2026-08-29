@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
+import QueryError from '../components/QueryError';
 import {
   Wallet,
   TrendingUp,
@@ -45,7 +46,7 @@ const getTransactionColor = (tx: Transaction): string => {
 };
 
 export default function DashboardPage() {
-  const { data: summary, isLoading: summaryLoading } = useQuery({
+  const { data: summary, isLoading: summaryLoading, isError: summaryError, refetch: refetchSummary } = useQuery({
     queryKey: ['dashboard', 'summary'],
     queryFn: () => dashboardApi.summary().then((r) => r.data.data),
   });
@@ -76,6 +77,7 @@ export default function DashboardPage() {
   });
 
   if (summaryLoading) return <LoadingSpinner />;
+  if (summaryError) return <QueryError title="Failed to load dashboard" onRetry={() => refetchSummary()} />;
 
   const s = summary as DashboardSummary;
 

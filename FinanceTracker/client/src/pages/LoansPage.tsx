@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { loansApi, peopleApi, accountsApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import { Plus, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -32,7 +33,7 @@ export default function LoansPage() {
   const [repayAccountId, setRepayAccountId] = useState('');
   const [repayNotes, setRepayNotes] = useState('');
 
-  const { data: loans, isLoading } = useQuery({
+  const { data: loans, isLoading, isError: loansError, refetch: refetchLoans } = useQuery({
     queryKey: ['loans'],
     queryFn: () => loansApi.list().then((r) => r.data.data),
   });
@@ -124,6 +125,7 @@ export default function LoansPage() {
   };
 
   if (isLoading) return <LoadingSpinner />;
+  if (loansError) return <QueryError title="Failed to load loans" onRetry={() => refetchLoans()} />;
 
   const activeLoans = loans?.filter((l: Loan) => l.status === 'ACTIVE') || [];
   const otherLoans = loans?.filter((l: Loan) => l.status !== 'ACTIVE') || [];

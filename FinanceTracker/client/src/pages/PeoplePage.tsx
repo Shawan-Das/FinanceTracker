@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { peopleApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import { Plus, Edit, Trash2, User } from 'lucide-react';
@@ -21,7 +22,7 @@ export default function PeoplePage() {
   const [formEmail, setFormEmail] = useState('');
   const [formNotes, setFormNotes] = useState('');
 
-  const { data: people, isLoading } = useQuery({
+  const { data: people, isLoading, isError, refetch } = useQuery({
     queryKey: ['people'],
     queryFn: () => peopleApi.list().then((r) => r.data.data),
   });
@@ -86,6 +87,7 @@ export default function PeoplePage() {
   };
 
   if (isLoading) return <LoadingSpinner />;
+  if (isError) return <QueryError onRetry={() => refetch()} />;
 
   return (
     <div className="space-y-6">

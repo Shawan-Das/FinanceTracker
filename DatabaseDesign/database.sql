@@ -212,14 +212,22 @@ CREATE INDEX idx_loan_repayments_loan_id ON finance_tracker.loan_repayments (loa
 -- =============================================================================
 
 -- View: Account balances derived from transactions
-CREATE OR REPLACE VIEW finance_tracker.v_account_balances AS
+DROP VIEW IF EXISTS finance_tracker.v_account_balances;
+
+CREATE VIEW finance_tracker.v_account_balances AS
 SELECT
     a.id AS account_id,
     a.user_id,
+    a.name,
     a.name AS account_name,
     a.account_type,
     a.currency,
     a.opening_balance,
+    a.opening_balance_date,
+    a.is_active,
+    a.notes,
+    a.created_at,
+    a.updated_at,
     COALESCE(income.total, 0) AS total_income,
     COALESCE(expense.total, 0) AS total_expense,
     COALESCE(lend.total, 0) AS total_lent,
@@ -293,11 +301,21 @@ LEFT JOIN (
 WHERE a.is_active = TRUE;
 
 -- View: Person balances (receivable and payable)
-CREATE OR REPLACE VIEW finance_tracker.v_person_balances AS
+DROP VIEW IF EXISTS finance_tracker.v_person_balances;
+
+CREATE VIEW finance_tracker.v_person_balances AS
 SELECT
+    p.id,
     t.user_id,
     t.person_id,
+    p.name,
     p.name AS person_name,
+    p.phone,
+    p.email,
+    p.notes,
+    p.is_active,
+    p.created_at,
+    p.updated_at,
     COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0) AS total_lent,
     COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0) AS total_lent_repaid,
     COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0) AS total_borrowed,
@@ -315,7 +333,7 @@ JOIN finance_tracker.people p ON p.id = t.person_id
 WHERE t.person_id IS NOT NULL
   AND t.deleted_at IS NULL
   AND t.transaction_type IN ('LEND', 'LEND_REPAYMENT', 'BORROW', 'BORROW_REPAYMENT')
-GROUP BY t.user_id, t.person_id, p.name;
+GROUP BY t.user_id, t.person_id, p.id, p.name, p.phone, p.email, p.notes, p.is_active, p.created_at, p.updated_at;
 
 -- View: Dashboard summary
 CREATE OR REPLACE VIEW finance_tracker.v_dashboard_summary AS

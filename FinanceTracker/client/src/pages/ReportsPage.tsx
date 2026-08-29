@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { reportsApi, accountsApi, peopleApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
+import QueryError from '../components/QueryError';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts';
@@ -24,42 +25,42 @@ export default function ReportsPage() {
   const dateParams = { ...(dateFrom && { from: dateFrom }), ...(dateTo && { to: dateTo }) };
 
   // Income report
-  const { data: incomeReport, isLoading: incomeLoading } = useQuery({
+  const { data: incomeReport, isLoading: incomeLoading, isError: incomeError, refetch: refetchIncome } = useQuery({
     queryKey: ['reports', 'income', dateParams],
     queryFn: () => reportsApi.income(dateParams).then((r) => r.data.data),
     enabled: activeTab === 'income',
   });
 
   // Expense report
-  const { data: expenseReport, isLoading: expenseLoading } = useQuery({
+  const { data: expenseReport, isLoading: expenseLoading, isError: expenseError, refetch: refetchExpense } = useQuery({
     queryKey: ['reports', 'expense', dateParams],
     queryFn: () => reportsApi.expense(dateParams).then((r) => r.data.data),
     enabled: activeTab === 'expense',
   });
 
   // Financial position
-  const { data: position, isLoading: positionLoading } = useQuery({
+  const { data: position, isLoading: positionLoading, isError: positionError, refetch: refetchPosition } = useQuery({
     queryKey: ['reports', 'position'],
     queryFn: () => reportsApi.financialPosition().then((r) => r.data.data),
     enabled: activeTab === 'position',
   });
 
   // Account statement
-  const { data: accountStatement, isLoading: accountLoading } = useQuery({
+  const { data: accountStatement, isLoading: accountLoading, isError: accountError, refetch: refetchAccount } = useQuery({
     queryKey: ['reports', 'account', selectedAccountId],
     queryFn: () => reportsApi.accountStatement({ account_id: selectedAccountId }).then((r) => r.data.data),
     enabled: activeTab === 'account' && !!selectedAccountId,
   });
 
   // Person statement
-  const { data: personStatement, isLoading: personLoading } = useQuery({
+  const { data: personStatement, isLoading: personLoading, isError: personError, refetch: refetchPerson } = useQuery({
     queryKey: ['reports', 'person', selectedPersonId],
     queryFn: () => reportsApi.personStatement({ person_id: selectedPersonId }).then((r) => r.data.data),
     enabled: activeTab === 'person' && !!selectedPersonId,
   });
 
   // Loan report
-  const { data: loanReport, isLoading: loanLoading } = useQuery({
+  const { data: loanReport, isLoading: loanLoading, isError: loanError, refetch: refetchLoan } = useQuery({
     queryKey: ['reports', 'loan'],
     queryFn: () => reportsApi.loanReport().then((r) => r.data.data),
     enabled: activeTab === 'loan',
@@ -126,7 +127,9 @@ export default function ReportsPage() {
       {/* Financial Position */}
       {activeTab === 'position' && (
         <div>
-          {positionLoading ? <LoadingSpinner /> : position && (
+          {positionLoading ? <LoadingSpinner /> : positionError ? (
+            <QueryError title="Failed to load financial position" onRetry={() => refetchPosition()} />
+          ) : position && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="card">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Net Financial Position</h3>
@@ -174,7 +177,9 @@ export default function ReportsPage() {
       {/* Income Report */}
       {activeTab === 'income' && (
         <div>
-          {incomeLoading ? <LoadingSpinner /> : incomeReport && (
+          {incomeLoading ? <LoadingSpinner /> : incomeError ? (
+            <QueryError title="Failed to load income report" onRetry={() => refetchIncome()} />
+          ) : incomeReport && (
             <div className="space-y-6">
               <div className="card">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Income</h3>
@@ -216,7 +221,9 @@ export default function ReportsPage() {
       {/* Expense Report */}
       {activeTab === 'expense' && (
         <div>
-          {expenseLoading ? <LoadingSpinner /> : expenseReport && (
+          {expenseLoading ? <LoadingSpinner /> : expenseError ? (
+            <QueryError title="Failed to load expense report" onRetry={() => refetchExpense()} />
+          ) : expenseReport && (
             <div className="space-y-6">
               <div className="card">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">Total Expense</h3>
@@ -272,7 +279,9 @@ export default function ReportsPage() {
               ))}
             </select>
           </div>
-          {accountLoading ? <LoadingSpinner /> : accountStatement && (
+          {accountLoading ? <LoadingSpinner /> : accountError ? (
+            <QueryError title="Failed to load account statement" onRetry={() => refetchAccount()} />
+          ) : accountStatement && (
             <div className="card p-0">
               <div className="p-4 border-b border-gray-200">
                 <p className="text-sm text-gray-600">Opening Balance: <span className="font-medium">{formatCurrency(accountStatement.openingBalance)}</span></p>
@@ -320,7 +329,9 @@ export default function ReportsPage() {
               ))}
             </select>
           </div>
-          {personLoading ? <LoadingSpinner /> : personStatement && (
+          {personLoading ? <LoadingSpinner /> : personError ? (
+            <QueryError title="Failed to load person statement" onRetry={() => refetchPerson()} />
+          ) : personStatement && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="card text-center">
@@ -373,7 +384,9 @@ export default function ReportsPage() {
       {/* Loan Report */}
       {activeTab === 'loan' && (
         <div>
-          {loanLoading ? <LoadingSpinner /> : loanReport && (
+          {loanLoading ? <LoadingSpinner /> : loanError ? (
+            <QueryError title="Failed to load loan report" onRetry={() => refetchLoan()} />
+          ) : loanReport && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="card text-center">

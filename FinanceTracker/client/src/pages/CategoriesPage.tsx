@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { categoriesApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import { Plus, Tag, Edit, Trash2 } from 'lucide-react';
@@ -15,7 +16,7 @@ export default function CategoriesPage() {
   const [formName, setFormName] = useState('');
   const [formType, setFormType] = useState<'INCOME' | 'EXPENSE'>('INCOME');
 
-  const { data: categories, isLoading } = useQuery({
+  const { data: categories, isLoading, isError, refetch } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoriesApi.list().then((r) => r.data.data),
   });
@@ -64,6 +65,7 @@ export default function CategoriesPage() {
   };
 
   if (isLoading) return <LoadingSpinner />;
+  if (isError) return <QueryError onRetry={() => refetch()} />;
 
   const incomeCategories = categories?.filter((c: Category) => c.type === 'INCOME') || [];
   const expenseCategories = categories?.filter((c: Category) => c.type === 'EXPENSE') || [];

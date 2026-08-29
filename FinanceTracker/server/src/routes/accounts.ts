@@ -18,7 +18,7 @@ router.get('/', async (req: Request, res: Response) => {
     const result = await db.query(
       `SELECT * FROM ${SCHEMA}.v_account_balances
        WHERE user_id = $1
-       ORDER BY account_type, name`,
+       ORDER BY account_type, account_name`,
       [userId]
     );
     res.json({ success: true, data: result.rows });

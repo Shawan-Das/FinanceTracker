@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { accountsApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import { Plus, Wallet, Edit, Trash2, Building, Banknote, Smartphone } from 'lucide-react';
@@ -29,7 +30,7 @@ export default function AccountsPage() {
   const [formBalanceDate, setFormBalanceDate] = useState(new Date().toISOString().split('T')[0]);
   const [formNotes, setFormNotes] = useState('');
 
-  const { data: accounts, isLoading } = useQuery({
+  const { data: accounts, isLoading, isError, refetch } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountsApi.list().then((r) => r.data.data),
   });
@@ -98,6 +99,7 @@ export default function AccountsPage() {
   };
 
   if (isLoading) return <LoadingSpinner />;
+  if (isError) return <QueryError onRetry={() => refetch()} />;
 
   return (
     <div className="space-y-6">

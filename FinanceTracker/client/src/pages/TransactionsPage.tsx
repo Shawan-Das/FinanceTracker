@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { transactionsApi, accountsApi, peopleApi, categoriesApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import QueryError from '../components/QueryError';
 import Pagination from '../components/Pagination';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
@@ -51,7 +52,7 @@ export default function TransactionsPage() {
     if (!queryParams[key]) delete queryParams[key];
   });
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError: txError, refetch: refetchTx } = useQuery({
     queryKey: ['transactions', queryParams],
     queryFn: () => transactionsApi.list(queryParams).then((r) => ({ data: r.data.data, pagination: r.data.pagination })),
   });
@@ -266,6 +267,8 @@ export default function TransactionsPage() {
       <div className="card p-0">
         {isLoading ? (
           <LoadingSpinner />
+        ) : txError ? (
+          <QueryError title="Failed to load transactions" onRetry={() => refetchTx()} />
         ) : data?.data && data.data.length > 0 ? (
           <>
             <div className="overflow-x-auto">
