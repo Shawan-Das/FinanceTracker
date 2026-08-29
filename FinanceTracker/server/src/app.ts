@@ -128,9 +128,11 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 // =============================================================================
 // Start server
 // =============================================================================
-app.listen(PORT, () => {
-  console.log(`🚀 Finance Tracker API running on http://localhost:${PORT}`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Finance Tracker API running on http://localhost:${PORT}`);
+    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
 
 export default app;

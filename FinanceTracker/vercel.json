@@ -1,12 +1,15 @@
 {
-  "framework": "vite",
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": "client/dist",
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/((?!api/|assets/|.*\\..*).*)",
-      "destination": "/index.html"
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.js"
     }
   ]
 }
