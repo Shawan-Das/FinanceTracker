@@ -37,7 +37,7 @@ export default function PeoplePage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: any }) => peopleApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => peopleApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['people'] });
       toast.success('Person updated!');
@@ -46,7 +46,7 @@ export default function PeoplePage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => peopleApi.delete(id),
+    mutationFn: (id: string) => peopleApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['people'] });
       toast.success('Person removed');
@@ -119,13 +119,13 @@ export default function PeoplePage() {
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => openEdit(p)} className="p-1 hover:bg-gray-100 rounded text-gray-400">
-                    <Edit size={14} />
+                  <button onClick={() => openEdit(p)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
+                    <Edit size={16} />
                   </button>
                   <button onClick={() => {
                     if (confirm('Remove this person?')) deleteMutation.mutate(p.id);
-                  }} className="p-1 hover:bg-red-50 rounded text-red-400">
-                    <Trash2 size={14} />
+                  }} className="p-2 hover:bg-red-50 rounded-lg text-red-400">
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>

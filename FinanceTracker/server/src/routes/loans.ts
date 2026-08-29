@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
+import { generateId } from '../shared/id';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -23,9 +24,10 @@ router.get('/', async (req: Request, res: Response) => {
        FROM ${SCHEMA}.loans l
        LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
        LEFT JOIN (
-         SELECT loan_id, SUM(amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments
-         GROUP BY loan_id
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr2
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1
        ORDER BY l.status = 'ACTIVE' DESC, l.start_date DESC`,
@@ -47,7 +49,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const loanId = parseInt(req.params.id);
+    const loanId = req.params.id;
 
     const result = await db.query(
       `SELECT l.*,
@@ -57,9 +59,10 @@ router.get('/:id', async (req: Request, res: Response) => {
        FROM ${SCHEMA}.loans l
        LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
        LEFT JOIN (
-         SELECT loan_id, SUM(amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments
-         GROUP BY loan_id
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr2
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.id = $1 AND l.user_id = $2`,
       [loanId, userId]
@@ -73,11 +76,10 @@ router.get('/:id', async (req: Request, res: Response) => {
       return;
     }
 
-    // Fetch repayment history
     const repayments = await db.query(
       `SELECT lr.*, t.transaction_date, t.account_id, a.name as account_name
        FROM ${SCHEMA}.loan_repayments lr
-       LEFT JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id
+       INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
        LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
        WHERE lr.loan_id = $1
        ORDER BY lr.repayment_date DESC`,
@@ -104,7 +106,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 // POST /api/loans — Create a new loan
 // =============================================================================
 const createLoanSchema = z.object({
-  person_id: z.coerce.number().int().optional(),
+  person_id: z.string().optional(),
   direction: z.enum(['BORROWED', 'LENT']),
   principal_amount: z.coerce.number().positive('Principal must be greater than zero'),
   interest_amount: z.coerce.number().min(0).default(0),
@@ -117,12 +119,13 @@ router.post('/', validateBody(createLoanSchema), async (req: Request, res: Respo
   try {
     const userId = getUserId(req);
     const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description } = req.body;
+    const id = generateId('loans');
 
     const result = await db.query(
-      `INSERT INTO ${SCHEMA}.loans (user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO ${SCHEMA}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [userId, person_id || null, direction, principal_amount, interest_amount, start_date, due_date || null, description || null]
+      [id, userId, person_id || null, direction, principal_amount, interest_amount, start_date, due_date || null, description || null]
     );
 
     res.status(201).json({
@@ -150,7 +153,7 @@ const updateLoanSchema = z.object({
 router.patch('/:id', validateBody(updateLoanSchema), async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const loanId = parseInt(req.params.id);
+    const loanId = req.params.id;
     const updates = req.body;
 
     const fields: string[] = [];
@@ -206,9 +209,8 @@ router.patch('/:id', validateBody(updateLoanSchema), async (req: Request, res: R
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const loanId = parseInt(req.params.id);
+    const loanId = req.params.id;
 
-    // Check for repayments
     const repayResult = await db.query(
       `SELECT COUNT(*) as count FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`,
       [loanId]
@@ -254,7 +256,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 const createRepaymentSchema = z.object({
   amount: z.coerce.number().positive('Amount must be greater than zero'),
   repayment_date: z.string().min(1),
-  account_id: z.coerce.number().int(),
+  account_id: z.string(),
   notes: z.string().optional(),
 });
 
@@ -262,10 +264,9 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
   const client = await db.getClient();
   try {
     const userId = getUserId(req);
-    const loanId = parseInt(req.params.id);
+    const loanId = req.params.id;
     const { amount, repayment_date, account_id, notes } = req.body;
 
-    // Verify loan exists and belongs to user
     const loanResult = await client.query(
       `SELECT * FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`,
       [loanId, userId]
@@ -281,9 +282,11 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
 
     const loan = loanResult.rows[0];
 
-    // Check if repayment exceeds remaining amount
     const repaidResult = await client.query(
-      `SELECT COALESCE(SUM(amount), 0) as total_repaid FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`,
+      `SELECT COALESCE(SUM(lr.amount), 0) as total_repaid
+       FROM ${SCHEMA}.loan_repayments lr
+       INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+       WHERE lr.loan_id = $1`,
       [loanId]
     );
     const totalRepaid = parseFloat(repaidResult.rows[0].total_repaid);
@@ -294,7 +297,7 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
         success: false,
         error: {
           code: 'AMOUNT_EXCEEDS',
-          message: `Repayment amount (৳${amount}) exceeds remaining balance (৳${remaining})`,
+          message: `Repayment amount ($${amount}) exceeds remaining balance ($${remaining})`,
         },
       });
       return;
@@ -302,27 +305,25 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
 
     await client.query('BEGIN');
 
-    // Determine transaction type based on loan direction
     const txType = loan.direction === 'LENT' ? 'LEND_REPAYMENT' : 'BORROW_REPAYMENT';
+    const txId = generateId('transactions');
 
-    // Create the financial transaction
     const txResult = await client.query(
       `INSERT INTO ${SCHEMA}.transactions
-       (user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
-      [userId, txType, repayment_date, amount, account_id, loan.person_id, loanId, notes || null]
+      [txId, userId, txType, repayment_date, amount, account_id, loan.person_id, loanId, notes || null]
     );
     const tx = txResult.rows[0];
 
-    // Create repayment record linked to the transaction
+    const lreId = generateId('loan_repayments');
     await client.query(
-      `INSERT INTO ${SCHEMA}.loan_repayments (loan_id, transaction_id, amount, repayment_date, notes)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [loanId, tx.id, amount, repayment_date, notes || null]
+      `INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [lreId, loanId, tx.id, amount, repayment_date, notes || null]
     );
 
-    // Update loan status if fully repaid
     const newTotalRepaid = totalRepaid + amount;
     const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
     if (newTotalRepaid >= totalDue) {
@@ -353,9 +354,8 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
 router.get('/:id/repayments', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const loanId = parseInt(req.params.id);
+    const loanId = req.params.id;
 
-    // Verify loan ownership
     const loanCheck = await db.query(
       `SELECT id FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`,
       [loanId, userId]
@@ -371,7 +371,7 @@ router.get('/:id/repayments', async (req: Request, res: Response) => {
     const result = await db.query(
       `SELECT lr.*, t.account_id, a.name as account_name
        FROM ${SCHEMA}.loan_repayments lr
-       LEFT JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id
+       INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
        LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
        WHERE lr.loan_id = $1
        ORDER BY lr.repayment_date DESC`,

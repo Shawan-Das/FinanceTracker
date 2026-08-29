@@ -31,7 +31,7 @@ export default function CategoriesPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: any }) => categoriesApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => categoriesApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast.success('Category updated!');
@@ -40,7 +40,7 @@ export default function CategoriesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => categoriesApi.delete(id),
+    mutationFn: (id: string) => categoriesApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast.success('Category deactivated');
@@ -103,13 +103,13 @@ export default function CategoriesPage() {
                       setFormName(cat.name);
                       setFormType(cat.type);
                       setShowForm(true);
-                    }} className="p-1 hover:bg-gray-100 rounded text-gray-400">
-                      <Edit size={14} />
+                    }} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
+                      <Edit size={16} />
                     </button>
                     <button onClick={() => {
                       if (confirm('Deactivate this category?')) deleteMutation.mutate(cat.id);
-                    }} className="p-1 hover:bg-red-50 rounded text-red-400">
-                      <Trash2 size={14} />
+                    }} className="p-2 hover:bg-red-50 rounded-lg text-red-400">
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
@@ -140,13 +140,13 @@ export default function CategoriesPage() {
                       setFormName(cat.name);
                       setFormType(cat.type);
                       setShowForm(true);
-                    }} className="p-1 hover:bg-gray-100 rounded text-gray-400">
-                      <Edit size={14} />
+                    }} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
+                      <Edit size={16} />
                     </button>
                     <button onClick={() => {
                       if (confirm('Deactivate this category?')) deleteMutation.mutate(cat.id);
-                    }} className="p-1 hover:bg-red-50 rounded text-red-400">
-                      <Trash2 size={14} />
+                    }} className="p-2 hover:bg-red-50 rounded-lg text-red-400">
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
@@ -167,10 +167,14 @@ export default function CategoriesPage() {
           </div>
           <div>
             <label className="label">Type</label>
-            <select className="input" value={formType} onChange={(e) => setFormType(e.target.value as any)}>
-              <option value="INCOME">Income</option>
-              <option value="EXPENSE">Expense</option>
-            </select>
+            {editingCategory ? (
+              <input type="text" className="input bg-gray-50" value={formType === 'INCOME' ? 'Income' : 'Expense'} disabled />
+            ) : (
+              <select className="input" value={formType} onChange={(e) => setFormType(e.target.value as any)}>
+                <option value="INCOME">Income</option>
+                <option value="EXPENSE">Expense</option>
+              </select>
+            )}
           </div>
           <div className="flex gap-2 pt-2">
             <button type="submit" className="btn-primary flex-1">

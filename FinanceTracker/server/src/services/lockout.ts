@@ -1,4 +1,5 @@
 import { db } from '../database/connection';
+import { generateId } from '../shared/id';
 
 const SCHEMA = 'finance_tracker';
 
@@ -53,10 +54,11 @@ export async function recordFailedLogin(
   ipAddress?: string,
 ): Promise<{ locked: boolean; attemptsRemaining: number; lockDurationMinutes?: number }> {
   // Record the attempt
+  const id = generateId('login_attempts');
   await db.query(
-    `INSERT INTO ${SCHEMA}.login_attempts (email, ip_address, success)
-     VALUES ($1, $2, FALSE)`,
-    [email, ipAddress || null]
+    `INSERT INTO ${SCHEMA}.login_attempts (id, email, ip_address, success)
+     VALUES ($1, $2, $3, FALSE)`,
+    [id, email, ipAddress || null]
   );
 
   // Increment failed attempts on the user
@@ -108,9 +110,10 @@ export async function resetFailedLogins(email: string): Promise<void> {
   );
 
   // Record successful attempt
+  const id = generateId('login_attempts');
   await db.query(
-    `INSERT INTO ${SCHEMA}.login_attempts (email, success)
-     VALUES ($1, TRUE)`,
-    [email]
+    `INSERT INTO ${SCHEMA}.login_attempts (id, email, success)
+     VALUES ($1, $2, TRUE)`,
+    [id, email]
   );
 }

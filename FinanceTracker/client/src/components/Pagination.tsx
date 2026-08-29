@@ -27,7 +27,7 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
   };
 
   return (
-    <div className="flex items-center justify-between px-1 py-3">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1 py-3">
       <p className="text-sm text-gray-500">
         Showing {((page - 1) * pagination.limit) + 1} to {Math.min(page * pagination.limit, total)} of {total}
       </p>

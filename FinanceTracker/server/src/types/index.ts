@@ -140,6 +140,6 @@ export interface ApiResponse<T = any> {
 // Extend Express Session
 declare module 'express-session' {
   interface SessionData {
-    userId: number;
+    userId: string;
   }
 }

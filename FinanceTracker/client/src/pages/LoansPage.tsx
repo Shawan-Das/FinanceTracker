@@ -9,6 +9,8 @@ import toast from 'react-hot-toast';
 import { Plus, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
 import type { Loan, Person, Account } from '../types';
 
+const toNum = (v: any): number => typeof v === 'number' ? v : parseFloat(v) || 0;
+
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
@@ -60,7 +62,7 @@ export default function LoansPage() {
   });
 
   const repayMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: any }) => loansApi.createRepayment(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => loansApi.createRepayment(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
@@ -92,7 +94,7 @@ export default function LoansPage() {
     e.preventDefault();
     createMutation.mutate({
       direction,
-      person_id: personId ? parseInt(personId) : undefined,
+      person_id: personId || undefined,
       principal_amount: parseFloat(principal),
       interest_amount: parseFloat(interest) || 0,
       start_date: startDate,
@@ -109,7 +111,7 @@ export default function LoansPage() {
       data: {
         amount: parseFloat(repayAmount),
         repayment_date: repayDate,
-        account_id: parseInt(repayAccountId),
+        account_id: repayAccountId,
         notes: repayNotes || undefined,
       },
     });
@@ -117,7 +119,7 @@ export default function LoansPage() {
 
   const openRepay = (loan: Loan) => {
     setSelectedLoan(loan);
-    setRepayAmount(String(loan.remaining_amount));
+    setRepayAmount(String(toNum(loan.remaining_amount)));
     setRepayDate(new Date().toISOString().split('T')[0]);
     setRepayAccountId('');
     setRepayNotes('');
@@ -150,9 +152,12 @@ export default function LoansPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeLoans.map((loan: Loan) => {
-              const progress = loan.principal_amount + loan.interest_amount > 0
-                ? ((loan.total_repaid / (loan.principal_amount + loan.interest_amount)) * 100)
-                : 0;
+              const principal = toNum(loan.principal_amount);
+              const interest = toNum(loan.interest_amount);
+              const repaid = toNum(loan.total_repaid);
+              const remaining = toNum(loan.remaining_amount);
+              const totalDue = principal + interest;
+              const progress = totalDue > 0 ? ((repaid / totalDue) * 100) : 0;
               return (
                 <div key={loan.id} className="card hover:shadow-md transition-shadow">
                   <div className="flex items-center gap-3 mb-4">
@@ -174,15 +179,15 @@ export default function LoansPage() {
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Total</span>
-                      <span className="font-medium">{formatCurrency(loan.principal_amount + loan.interest_amount)}</span>
+                      <span className="font-medium">{formatCurrency(totalDue)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Repaid</span>
-                      <span className="font-medium text-green-600">{formatCurrency(loan.total_repaid)}</span>
+                      <span className="font-medium text-green-600">{formatCurrency(repaid)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">Remaining</span>
-                      <span className="font-semibold text-orange-600">{formatCurrency(loan.remaining_amount)}</span>
+                      <span className="font-semibold text-orange-600">{formatCurrency(remaining)}</span>
                     </div>
                   </div>
 
@@ -212,6 +217,7 @@ export default function LoansPage() {
             <CheckCircle size={18} className="text-green-500" /> Completed / Cancelled
           </h2>
           <div className="card p-0">
+            <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
@@ -226,7 +232,7 @@ export default function LoansPage() {
                   <tr key={loan.id} className="border-b border-gray-50">
                     <td className="p-4 text-sm">{loan.person_name || 'Unknown'}</td>
                     <td className="p-4 text-sm">{loan.direction}</td>
-                    <td className="p-4 text-sm">{formatCurrency(loan.principal_amount)}</td>
+                    <td className="p-4 text-sm">{formatCurrency(toNum(loan.principal_amount))}</td>
                     <td className="p-4">
                       <span className={`text-xs font-medium px-2 py-1 rounded-full
                         ${loan.status === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
@@ -237,6 +243,7 @@ export default function LoansPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       )}

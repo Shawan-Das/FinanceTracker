@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (fullName: string, email: string, password: string, confirmPassword: string) => Promise<void>;
   logout: () => Promise<void>;
+  checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,13 +31,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const register = useCallback(async (fullName: string, email: string, password: string, confirmPassword: string) => {
-    const res = await authApi.register({
+    await authApi.register({
       full_name: fullName,
       email,
       password,
       confirm_password: confirmPassword,
     });
-    setUser(res.data.data);
+    // Don't set user here — they need to verify email first.
+    // After verification, verify-email sets the session server-side,
+    // and we fetch the real user via checkAuth().
   }, []);
 
   const logout = useCallback(async () => {
@@ -44,8 +47,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }, []);
 
+  const checkAuth = useCallback(async () => {
+    try {
+      const res = await authApi.me();
+      setUser(res.data.data);
+    } catch {
+      setUser(null);
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth }}>
       {children}
     </AuthContext.Provider>
   );

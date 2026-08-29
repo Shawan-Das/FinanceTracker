@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
+import { generateId } from '../shared/id';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -45,12 +46,13 @@ router.post('/', validateBody(createCategorySchema), async (req: Request, res: R
   try {
     const userId = getUserId(req);
     const { name, type, icon, color } = req.body;
+    const id = generateId('categories');
 
     const result = await db.query(
-      `INSERT INTO ${SCHEMA}.categories (user_id, name, type, icon, color)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO ${SCHEMA}.categories (id, user_id, name, type, icon, color)
+       VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING *`,
-      [userId, name, type, icon || null, color || null]
+      [id, userId, name, type, icon || null, color || null]
     );
 
     res.status(201).json({ success: true, data: result.rows[0] });
@@ -83,7 +85,7 @@ const updateCategorySchema = z.object({
 router.patch('/:id', validateBody(updateCategorySchema), async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const categoryId = parseInt(req.params.id);
+    const categoryId = req.params.id;
     const updates = req.body;
 
     const fields: string[] = [];
@@ -139,9 +141,8 @@ router.patch('/:id', validateBody(updateCategorySchema), async (req: Request, re
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const categoryId = parseInt(req.params.id);
+    const categoryId = req.params.id;
 
-    // Soft-delete: mark inactive
     const result = await db.query(
       `UPDATE ${SCHEMA}.categories SET is_active = FALSE, updated_at = NOW()
        WHERE user_id = $1 AND id = $2

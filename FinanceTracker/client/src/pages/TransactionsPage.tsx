@@ -13,6 +13,13 @@ import type { Transaction, TransactionType, Account, Person, Category, Paginatio
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
+function toDateStr(d: any): string {
+  if (!d) return new Date().toISOString().split('T')[0];
+  if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const date = new Date(d);
+  return isNaN(date.getTime()) ? new Date().toISOString().split('T')[0] : date.toISOString().split('T')[0];
+}
+
 const TRANSACTION_TYPES: TransactionType[] = [
   'INCOME', 'EXPENSE', 'TRANSFER',
   'LEND', 'LEND_REPAYMENT', 'BORROW', 'BORROW_REPAYMENT',
@@ -85,8 +92,24 @@ export default function TransactionsPage() {
     },
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => transactionsApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['people'] });
+      toast.success('Transaction updated');
+      resetForm();
+      setShowForm(false);
+    },
+    onError: () => {
+      toast.error('Failed to update transaction');
+    },
+  });
+
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => transactionsApi.delete(id),
+    mutationFn: (id: string) => transactionsApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
@@ -112,7 +135,7 @@ export default function TransactionsPage() {
   const openEdit = (tx: Transaction) => {
     setEditingTx(tx);
     setFormType(tx.transaction_type);
-    setFormDate(tx.transaction_date);
+    setFormDate(toDateStr(tx.transaction_date));
     setFormAmount(String(tx.amount));
     setFormAccountId(tx.account_id ? String(tx.account_id) : '');
     setFormPersonId(tx.person_id ? String(tx.person_id) : '');
@@ -131,25 +154,24 @@ export default function TransactionsPage() {
       description: formDescription || undefined,
       reference: formReference || undefined,
     };
-    if (formAccountId) payload.account_id = parseInt(formAccountId);
-    if (formToAccountId && formType === 'TRANSFER') payload.to_account_id = parseInt(formToAccountId);
-    if (formPersonId) payload.person_id = parseInt(formPersonId);
-    if (formCategoryId) payload.category_id = parseInt(formCategoryId);
+    if (formAccountId) payload.account_id = formAccountId;
+    if (formToAccountId && formType === 'TRANSFER') payload.to_account_id = formToAccountId;
+    if (formPersonId) payload.person_id = formPersonId;
+    if (formCategoryId) payload.category_id = formCategoryId;
 
     if (editingTx) {
-      // For now, we don't support editing transaction type changes
-      transactionsApi.update(editingTx.id, {
-        transaction_date: payload.transaction_date,
-        amount: payload.amount,
-        description: payload.description,
-        reference: payload.reference,
-      }).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        toast.success('Transaction updated');
-        resetForm();
-        setShowForm(false);
-      }).catch(() => toast.error('Failed to update'));
+      updateMutation.mutate({
+        id: editingTx.id,
+        data: {
+          transaction_date: payload.transaction_date,
+          amount: payload.amount,
+          account_id: payload.account_id || null,
+          person_id: payload.person_id || null,
+          category_id: payload.category_id || null,
+          description: payload.description,
+          reference: payload.reference,
+        },
+      });
     } else {
       createMutation.mutate(payload);
     }
@@ -196,7 +218,7 @@ export default function TransactionsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
           <p className="text-gray-500">Your complete financial ledger</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => setShowFilters(!showFilters)} className="btn-secondary">
             <Filter size={16} className="mr-1" /> Filters
           </button>
@@ -306,13 +328,13 @@ export default function TransactionsPage() {
                         {getEffect(tx)}{formatCurrency(tx.amount)}
                       </td>
                       <td className="p-4 text-right">
-                        <button onClick={() => openEdit(tx)} className="p-1 hover:bg-gray-100 rounded text-gray-500 mr-1">
-                          <Edit size={14} />
+                        <button onClick={() => openEdit(tx)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 mr-1">
+                          <Edit size={16} />
                         </button>
                         <button onClick={() => {
                           if (confirm('Delete this transaction?')) deleteMutation.mutate(tx.id);
-                        }} className="p-1 hover:bg-red-50 rounded text-red-500">
-                          <Trash2 size={14} />
+                        }} className="p-2 hover:bg-red-50 rounded-lg text-red-500">
+                          <Trash2 size={16} />
                         </button>
                       </td>
                     </tr>
@@ -439,7 +461,7 @@ export default function TransactionsPage() {
           </div>
 
           <div className="flex gap-2 pt-2">
-            <button type="submit" className="btn-primary flex-1" disabled={createMutation.isPending}>
+            <button type="submit" className="btn-primary flex-1" disabled={createMutation.isPending || updateMutation.isPending}>
               {editingTx ? 'Update' : 'Save'} Transaction
             </button>
             <button type="button" className="btn-secondary"

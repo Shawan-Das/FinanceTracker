@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody, validateQuery } from '../middleware/validation';
+import { generateId } from '../shared/id';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -17,10 +18,10 @@ const listTransactionsQuery = z.object({
   limit: z.coerce.number().int().min(1).max(100).default(30),
   from: z.string().optional(),
   to: z.string().optional(),
-  account_id: z.coerce.number().int().optional(),
-  person_id: z.coerce.number().int().optional(),
+  account_id: z.string().optional(),
+  person_id: z.string().optional(),
   type: z.string().optional(),
-  category_id: z.coerce.number().int().optional(),
+  category_id: z.string().optional(),
   search: z.string().optional(),
   sort: z.enum(['date_asc', 'date_desc']).default('date_desc'),
 });
@@ -31,7 +32,6 @@ router.get('/', validateQuery(listTransactionsQuery), async (req: Request, res: 
     const { page, limit, from, to, account_id, person_id, type, category_id, search, sort } = req.query as any;
     const offset = (page - 1) * limit;
 
-    // Build dynamic WHERE clause
     const conditions: string[] = ['t.user_id = $1', 't.deleted_at IS NULL'];
     const values: any[] = [userId];
     let paramIndex = 2;
@@ -77,7 +77,6 @@ router.get('/', validateQuery(listTransactionsQuery), async (req: Request, res: 
       ? 't.transaction_date ASC, t.id ASC'
       : 't.transaction_date DESC, t.id DESC';
 
-    // Count total
     const countResult = await db.query(
       `SELECT COUNT(*) as total
        FROM ${SCHEMA}.transactions t
@@ -85,7 +84,6 @@ router.get('/', validateQuery(listTransactionsQuery), async (req: Request, res: 
       values
     );
 
-    // Fetch data
     const dataValues = [...values, limit, offset];
     const result = await db.query(
       `SELECT t.*,
@@ -124,7 +122,7 @@ router.get('/', validateQuery(listTransactionsQuery), async (req: Request, res: 
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const txId = parseInt(req.params.id);
+    const txId = req.params.id;
 
     const result = await db.query(
       `SELECT t.*,
@@ -147,7 +145,6 @@ router.get('/:id', async (req: Request, res: Response) => {
       return;
     }
 
-    // If it's a transfer, also fetch transfer details
     let transfer = null;
     if (result.rows[0].transaction_type === 'TRANSFER') {
       const transferResult = await db.query(
@@ -187,14 +184,13 @@ const createTransactionSchema = z.object({
   ]),
   transaction_date: z.string().min(1, 'Date is required'),
   amount: z.coerce.number().positive('Amount must be greater than zero'),
-  account_id: z.coerce.number().int().optional(),
-  person_id: z.coerce.number().int().optional(),
-  category_id: z.coerce.number().int().optional(),
-  loan_id: z.coerce.number().int().optional(),
+  account_id: z.string().optional(),
+  person_id: z.string().optional(),
+  category_id: z.string().optional(),
+  loan_id: z.string().optional(),
   description: z.string().optional(),
   reference: z.string().optional(),
-  // Transfer-specific fields
-  to_account_id: z.coerce.number().int().optional(),
+  to_account_id: z.string().optional(),
 });
 
 router.post('/', validateBody(createTransactionSchema), async (req: Request, res: Response) => {
@@ -214,7 +210,6 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
       to_account_id,
     } = req.body;
 
-    // Validate required fields based on transaction type
     const validationErrors: string[] = [];
 
     if (transaction_type !== 'ADJUSTMENT' && !account_id) {
@@ -238,7 +233,6 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
       return;
     }
 
-    // Verify ownership of referenced entities
     if (account_id) {
       const acc = await client.query(
         `SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`,
@@ -279,35 +273,34 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
       }
     }
 
-    // Start transaction
     await client.query('BEGIN');
 
-    // Create main transaction record
+    const txId = generateId('transactions');
     const txResult = await client.query(
       `INSERT INTO ${SCHEMA}.transactions
-       (user_id, transaction_type, transaction_date, amount, account_id, person_id, category_id, loan_id, description, reference)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, category_id, loan_id, description, reference)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
-      [userId, transaction_type, transaction_date, amount, account_id || null, person_id || null, category_id || null, loan_id || null, description || null, reference || null]
+      [txId, userId, transaction_type, transaction_date, amount, account_id || null, person_id || null, category_id || null, loan_id || null, description || null, reference || null]
     );
     const tx = txResult.rows[0];
 
-    // Handle TRANSFER: create transfer record and update both accounts
     if (transaction_type === 'TRANSFER' && account_id && to_account_id) {
+      const tfrId = generateId('transaction_transfers');
       await client.query(
-        `INSERT INTO ${SCHEMA}.transaction_transfers (transaction_id, from_account_id, to_account_id, amount)
-         VALUES ($1, $2, $3, $4)`,
-        [tx.id, account_id, to_account_id, amount]
+        `INSERT INTO ${SCHEMA}.transaction_transfers (id, transaction_id, from_account_id, to_account_id, amount)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [tfrId, tx.id, account_id, to_account_id, amount]
       );
     }
 
-    // Handle LOAN_REPAYMENT: record repayment against the loan
     if (transaction_type === 'LEND_REPAYMENT' || transaction_type === 'BORROW_REPAYMENT') {
       if (loan_id) {
+        const lreId = generateId('loan_repayments');
         await client.query(
-          `INSERT INTO ${SCHEMA}.loan_repayments (loan_id, transaction_id, amount, repayment_date, notes)
-           VALUES ($1, $2, $3, $4, $5)`,
-          [loan_id, tx.id, amount, transaction_date, description || null]
+          `INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [lreId, loan_id, tx.id, amount, transaction_date, description || null]
         );
       }
     }
@@ -333,9 +326,9 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
 const updateTransactionSchema = z.object({
   transaction_date: z.string().optional(),
   amount: z.coerce.number().positive().optional(),
-  account_id: z.coerce.number().int().optional().nullable(),
-  person_id: z.coerce.number().int().optional().nullable(),
-  category_id: z.coerce.number().int().optional().nullable(),
+  account_id: z.string().optional().nullable(),
+  person_id: z.string().optional().nullable(),
+  category_id: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   reference: z.string().optional().nullable(),
 });
@@ -344,9 +337,8 @@ router.patch('/:id', validateBody(updateTransactionSchema), async (req: Request,
   const client = await db.getClient();
   try {
     const userId = getUserId(req);
-    const txId = parseInt(req.params.id);
+    const txId = req.params.id;
 
-    // Fetch existing transaction
     const existing = await client.query(
       `SELECT * FROM ${SCHEMA}.transactions
        WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
@@ -391,6 +383,53 @@ router.patch('/:id', validateBody(updateTransactionSchema), async (req: Request,
       values
     );
 
+    // If this is a loan repayment and amount was changed, sync loan_repayments
+    const tx = existing.rows[0];
+    if ((tx.transaction_type === 'LEND_REPAYMENT' || tx.transaction_type === 'BORROW_REPAYMENT') && req.body.amount !== undefined) {
+      const newAmount = parseFloat(req.body.amount);
+      const oldAmount = parseFloat(tx.amount);
+
+      if (newAmount !== oldAmount) {
+        await client.query(
+          `UPDATE ${SCHEMA}.loan_repayments SET amount = $1 WHERE transaction_id = $2`,
+          [newAmount, txId]
+        );
+
+        if (tx.loan_id) {
+          const loanResult = await client.query(
+            `SELECT l.*,
+                    COALESCE(lr.total_repaid, 0) AS total_repaid
+             FROM ${SCHEMA}.loans l
+             LEFT JOIN (
+               SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+               FROM ${SCHEMA}.loan_repayments lr2
+               INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+               GROUP BY lr2.loan_id
+             ) lr ON lr.loan_id = l.id
+             WHERE l.id = $1`,
+            [tx.loan_id]
+          );
+          if (loanResult.rows.length > 0) {
+            const loan = loanResult.rows[0];
+            const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+            const totalRepaid = parseFloat(loan.total_repaid || '0');
+            if (loan.status === 'PAID' && totalRepaid < totalDue) {
+              await client.query(
+                `UPDATE ${SCHEMA}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`,
+                [tx.loan_id]
+              );
+            }
+            if (loan.status === 'ACTIVE' && totalRepaid >= totalDue) {
+              await client.query(
+                `UPDATE ${SCHEMA}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
+                [tx.loan_id]
+              );
+            }
+          }
+        }
+      }
+    }
+
     await client.query('COMMIT');
 
     res.json({ success: true, data: result.rows[0] });
@@ -413,9 +452,8 @@ router.delete('/:id', async (req: Request, res: Response) => {
   const client = await db.getClient();
   try {
     const userId = getUserId(req);
-    const txId = parseInt(req.params.id);
+    const txId = req.params.id;
 
-    // Verify the transaction exists and belongs to user
     const existing = await client.query(
       `SELECT * FROM ${SCHEMA}.transactions
        WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
@@ -432,21 +470,46 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     await client.query('BEGIN');
 
-    // Soft-delete the transaction
     await client.query(
       `UPDATE ${SCHEMA}.transactions SET deleted_at = NOW(), updated_at = NOW()
        WHERE id = $1`,
       [txId]
     );
 
-    // If it was a loan repayment, also clean up the repayment record
     const tx = existing.rows[0];
     if (tx.transaction_type === 'LEND_REPAYMENT' || tx.transaction_type === 'BORROW_REPAYMENT') {
       await client.query(
-        `UPDATE ${SCHEMA}.loan_repayments SET transaction_id = NULL
-         WHERE transaction_id = $1`,
+        `DELETE FROM ${SCHEMA}.loan_repayments WHERE transaction_id = $1`,
         [txId]
       );
+
+      if (tx.loan_id) {
+        const loanResult = await client.query(
+          `SELECT l.*,
+                  COALESCE(lr.total_repaid, 0) AS total_repaid
+           FROM ${SCHEMA}.loans l
+           LEFT JOIN (
+             SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+             FROM ${SCHEMA}.loan_repayments lr2
+             INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+             WHERE lr2.loan_id = $1
+             GROUP BY lr2.loan_id
+           ) lr ON lr.loan_id = l.id
+           WHERE l.id = $1`,
+          [tx.loan_id]
+        );
+        if (loanResult.rows.length > 0) {
+          const loan = loanResult.rows[0];
+          const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+          const totalRepaid = parseFloat(loan.total_repaid || '0');
+          if (loan.status === 'PAID' && totalRepaid < totalDue) {
+            await client.query(
+              `UPDATE ${SCHEMA}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`,
+              [tx.loan_id]
+            );
+          }
+        }
+      }
     }
 
     await client.query('COMMIT');

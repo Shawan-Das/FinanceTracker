@@ -22,7 +22,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
  * Helper to get the authenticated user's ID from the session.
  * Throws if called without checking auth first.
  */
-export function getUserId(req: Request): number {
+export function getUserId(req: Request): string {
   if (!req.session.userId) {
     throw new Error('Not authenticated');
   }

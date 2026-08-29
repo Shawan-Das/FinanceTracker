@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string;
   full_name: string;
   email: string;
   default_currency: string;
@@ -7,8 +7,8 @@ export interface User {
 }
 
 export interface Account {
-  account_id: number;
-  user_id: number;
+  account_id: string;
+  user_id: string;
   name: string;
   account_name: string;
   account_type: 'BANK' | 'CASH' | 'MOBILE_WALLET' | 'OTHER';
@@ -23,8 +23,8 @@ export interface Account {
 }
 
 export interface Person {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   name: string;
   phone: string | null;
   email: string | null;
@@ -41,8 +41,8 @@ export interface Person {
 }
 
 export interface Category {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   name: string;
   type: 'INCOME' | 'EXPENSE';
   icon: string | null;
@@ -51,18 +51,18 @@ export interface Category {
 }
 
 export interface Transaction {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   transaction_type: TransactionType;
   transaction_date: string;
   amount: number;
-  account_id: number | null;
+  account_id: string | null;
   account_name?: string;
-  person_id: number | null;
+  person_id: string | null;
   person_name?: string;
-  category_id: number | null;
+  category_id: string | null;
   category_name?: string;
-  loan_id: number | null;
+  loan_id: string | null;
   description: string | null;
   reference: string | null;
   created_at: string;
@@ -81,17 +81,17 @@ export type TransactionType =
   | 'ADJUSTMENT';
 
 export interface TransferDetail {
-  from_account_id: number;
-  to_account_id: number;
+  from_account_id: string;
+  to_account_id: string;
   from_account_name: string;
   to_account_name: string;
   amount: number;
 }
 
 export interface Loan {
-  id: number;
-  user_id: number;
-  person_id: number | null;
+  id: string;
+  user_id: string;
+  person_id: string | null;
   person_name?: string;
   direction: 'BORROWED' | 'LENT';
   principal_amount: number;
@@ -106,9 +106,9 @@ export interface Loan {
 }
 
 export interface LoanRepayment {
-  id: number;
-  loan_id: number;
-  transaction_id: number | null;
+  id: string;
+  loan_id: string;
+  transaction_id: string | null;
   amount: number;
   repayment_date: string;
   account_name?: string;

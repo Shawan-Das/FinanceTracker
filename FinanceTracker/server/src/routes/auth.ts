@@ -8,6 +8,7 @@ import { validateBody } from '../middleware/validation';
 import { authLimiter, sensitiveLimiter } from '../middleware/rateLimit';
 import { isAccountLocked, recordFailedLogin, resetFailedLogins } from '../services/lockout';
 import { sendVerificationCode, generateVerificationCode } from '../services/email';
+import { generateId } from '../shared/id';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -18,7 +19,7 @@ const CODE_EXPIRY_MINUTES = parseInt(process.env.VERIFICATION_CODE_EXPIRY_MINUTE
 // Helper: Generate and store verification code
 // =============================================================================
 async function createVerificationCode(
-  userId: number,
+  userId: string,
   purpose: 'registration' | 'password_reset',
 ): Promise<string> {
   // Invalidate any existing codes for this purpose
@@ -30,13 +31,12 @@ async function createVerificationCode(
   );
 
   const code = generateVerificationCode();
-  const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1000);
-
-  await db.query(
-    `INSERT INTO ${SCHEMA}.email_verifications (user_id, code, purpose, expires_at)
-     VALUES ($1, $2, $3, $4)`,
-    [userId, code, purpose, expiresAt]
-  );
+  const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1000);    const id = generateId('email_verifications');
+    await db.query(
+      `INSERT INTO ${SCHEMA}.email_verifications (id, user_id, code, purpose, expires_at)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [id, userId, code, purpose, expiresAt]
+    );
 
   return code;
 }
@@ -95,11 +95,12 @@ router.post('/register', authLimiter, validateBody(registerSchema), async (req: 
     const passwordHash = await bcrypt.hash(password, 12);
 
     // Insert user (unverified)
+    const userId = generateId('users');
     const result = await db.query(
-      `INSERT INTO ${SCHEMA}.users (full_name, email, password_hash, is_verified)
-       VALUES ($1, $2, $3, FALSE)
+      `INSERT INTO ${SCHEMA}.users (id, full_name, email, password_hash, is_verified)
+       VALUES ($1, $2, $3, $4, FALSE)
        RETURNING id, full_name, email`,
-      [full_name, email, passwordHash]
+      [userId, full_name, email, passwordHash]
     );
 
     const user = result.rows[0];

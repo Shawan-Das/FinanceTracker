@@ -1,4 +1,5 @@
 import { db } from './connection';
+import { generateId } from '../shared/id';
 
 const SCHEMA = 'finance_tracker';
 
@@ -31,26 +32,28 @@ const DEFAULT_EXPENSE_CATEGORIES = [
  * Seed default categories for a newly registered user.
  * Uses INSERT ... ON CONFLICT DO NOTHING to be idempotent.
  */
-export async function seedDefaultCategories(userId: number): Promise<void> {
+export async function seedDefaultCategories(userId: string): Promise<void> {
   const client = await db.getClient();
   try {
     await client.query('BEGIN');
 
     for (const name of DEFAULT_INCOME_CATEGORIES) {
+      const id = generateId('categories');
       await client.query(
-        `INSERT INTO ${SCHEMA}.categories (user_id, name, type)
-         VALUES ($1, $2, 'INCOME')
+        `INSERT INTO ${SCHEMA}.categories (id, user_id, name, type)
+         VALUES ($1, $2, $3, 'INCOME')
          ON CONFLICT (user_id, name, type) DO NOTHING`,
-        [userId, name]
+        [id, userId, name]
       );
     }
 
     for (const name of DEFAULT_EXPENSE_CATEGORIES) {
+      const id = generateId('categories');
       await client.query(
-        `INSERT INTO ${SCHEMA}.categories (user_id, name, type)
-         VALUES ($1, $2, 'EXPENSE')
+        `INSERT INTO ${SCHEMA}.categories (id, user_id, name, type)
+         VALUES ($1, $2, $3, 'EXPENSE')
          ON CONFLICT (user_id, name, type) DO NOTHING`,
-        [userId, name]
+        [id, userId, name]
       );
     }
 

@@ -8,6 +8,8 @@ import {
 } from 'recharts';
 import type { Account, Person } from '../types';
 
+const toNum = (v: any): number => typeof v === 'number' ? v : parseFloat(v) || 0;
+
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
@@ -112,7 +114,7 @@ export default function ReportsPage() {
 
       {/* Date filters (for income/expense) */}
       {['income', 'expense'].includes(activeTab) && (
-        <div className="flex gap-4 items-end">
+        <div className="flex flex-wrap gap-4 items-end">
           <div>
             <label className="label">From</label>
             <input type="date" className="input" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
@@ -287,6 +289,7 @@ export default function ReportsPage() {
                 <p className="text-sm text-gray-600">Opening Balance: <span className="font-medium">{formatCurrency(accountStatement.openingBalance)}</span></p>
                 <p className="text-sm text-gray-600">Closing Balance: <span className="font-semibold">{formatCurrency(accountStatement.closingBalance)}</span></p>
               </div>
+              <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
@@ -311,6 +314,7 @@ export default function ReportsPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>
@@ -334,22 +338,83 @@ export default function ReportsPage() {
           ) : personStatement && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="card text-center">
-                  <p className="text-sm text-gray-500">They owe you</p>
-                  <p className="text-xl font-bold text-green-600">{formatCurrency(personStatement.balance.amount_they_owe_you)}</p>
-                </div>
-                <div className="card text-center">
-                  <p className="text-sm text-gray-500">You owe them</p>
-                  <p className="text-xl font-bold text-red-600">{formatCurrency(personStatement.balance.amount_you_owe_them)}</p>
-                </div>
-                <div className="card text-center">
-                  <p className="text-sm text-gray-500">Net</p>
-                  <p className={`text-xl font-bold ${personStatement.balance.amount_they_owe_you - personStatement.balance.amount_you_owe_them >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatCurrency(personStatement.balance.amount_they_owe_you - personStatement.balance.amount_you_owe_them)}
-                  </p>
-                </div>
+                {(() => {
+                  const oweYou = toNum(personStatement.balance.amount_they_owe_you);
+                  const youOwe = toNum(personStatement.balance.amount_you_owe_them);
+                  const net = oweYou - youOwe;
+                  return (<>
+                    <div className="card text-center">
+                      <p className="text-sm text-gray-500">They owe you</p>
+                      <p className="text-xl font-bold text-green-600">{formatCurrency(oweYou)}</p>
+                    </div>
+                    <div className="card text-center">
+                      <p className="text-sm text-gray-500">You owe them</p>
+                      <p className="text-xl font-bold text-red-600">{formatCurrency(youOwe)}</p>
+                    </div>
+                    <div className="card text-center">
+                      <p className="text-sm text-gray-500">Net</p>
+                      <p className={`text-xl font-bold ${net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {formatCurrency(net)}
+                      </p>
+                    </div>
+                  </>);
+                })()}
               </div>
+              {/* Loans */}
+              {personStatement.loans && personStatement.loans.length > 0 && (
+                <div className="card p-0">
+                  <div className="p-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Loans</h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
+                        <th className="p-3">Direction</th>
+                        <th className="p-3">Principal</th>
+                        <th className="p-3">Interest</th>
+                        <th className="p-3">Repaid</th>
+                        <th className="p-3">Remaining</th>
+                        <th className="p-3">Start Date</th>
+                        <th className="p-3">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {personStatement.loans.map((loan: any) => (
+                        <tr key={loan.id} className="border-b border-gray-50">
+                          <td className="p-3 text-sm font-medium">
+                            <span className={loan.direction === 'LENT' ? 'text-blue-600' : 'text-orange-600'}>
+                              {loan.direction === 'LENT' ? 'You lent' : 'You borrowed'}
+                            </span>
+                          </td>
+                          <td className="p-3 text-sm">{formatCurrency(toNum(loan.principal_amount))}</td>
+                          <td className="p-3 text-sm">{formatCurrency(toNum(loan.interest_amount))}</td>
+                          <td className="p-3 text-sm text-green-600">{formatCurrency(toNum(loan.total_repaid))}</td>
+                          <td className="p-3 text-sm text-orange-600 font-medium">{formatCurrency(toNum(loan.remaining_amount))}</td>
+                          <td className="p-3 text-sm">{new Date(loan.start_date).toLocaleDateString()}</td>
+                          <td className="p-3">
+                            <span className={`text-xs font-medium px-2 py-1 rounded-full
+                              ${loan.status === 'ACTIVE' ? 'bg-orange-100 text-orange-700' :
+                                loan.status === 'PAID' ? 'bg-green-100 text-green-700' :
+                                loan.status === 'OVERDUE' ? 'bg-red-100 text-red-700' :
+                                'bg-gray-100 text-gray-700'}`}>
+                              {loan.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Transactions */}
               <div className="card p-0">
+                <div className="p-4 border-b border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900">Transactions</h3>
+                </div>
+                <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
@@ -375,6 +440,7 @@ export default function ReportsPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             </div>
           )}
@@ -408,6 +474,7 @@ export default function ReportsPage() {
               </div>
 
               <div className="card p-0">
+                <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
@@ -424,9 +491,9 @@ export default function ReportsPage() {
                       <tr key={loan.id} className="border-b border-gray-50">
                         <td className="p-3 text-sm font-medium">{loan.person_name || 'Unknown'}</td>
                         <td className="p-3 text-sm">{loan.direction}</td>
-                        <td className="p-3 text-sm">{formatCurrency(loan.principal_amount)}</td>
-                        <td className="p-3 text-sm text-green-600">{formatCurrency(loan.total_repaid)}</td>
-                        <td className="p-3 text-sm text-orange-600 font-medium">{formatCurrency(loan.remaining_amount)}</td>
+                        <td className="p-3 text-sm">{formatCurrency(toNum(loan.principal_amount))}</td>
+                        <td className="p-3 text-sm text-green-600">{formatCurrency(toNum(loan.total_repaid))}</td>
+                        <td className="p-3 text-sm text-orange-600 font-medium">{formatCurrency(toNum(loan.remaining_amount))}</td>
                         <td className="p-3">
                           <span className={`text-xs font-medium px-2 py-1 rounded-full
                             ${loan.status === 'ACTIVE' ? 'bg-orange-100 text-orange-700' :
@@ -440,6 +507,7 @@ export default function ReportsPage() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
             </div>
           )}

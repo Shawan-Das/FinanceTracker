@@ -163,9 +163,10 @@ router.get('/loan-summary', async (req: Request, res: Response) => {
        FROM ${SCHEMA}.loans l
        LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
        LEFT JOIN (
-         SELECT loan_id, SUM(amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments
-         GROUP BY loan_id
+         SELECT lr.loan_id, SUM(lr.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1 AND l.status = 'ACTIVE'
        ORDER BY l.due_date ASC NULLS LAST, l.start_date DESC`,

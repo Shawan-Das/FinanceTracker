@@ -60,11 +60,11 @@ export const authApi = {
 // =============================================================================
 export const accountsApi = {
   list: () => api.get('/accounts'),
-  get: (id: number) => api.get(`/accounts/${id}`),
+  get: (id: string) => api.get(`/accounts/${id}`),
   create: (data: any) => api.post('/accounts', data),
-  update: (id: number, data: any) => api.patch(`/accounts/${id}`, data),
-  delete: (id: number) => api.delete(`/accounts/${id}`),
-  transactions: (id: number, params?: any) => api.get(`/accounts/${id}/transactions`, { params }),
+  update: (id: string, data: any) => api.patch(`/accounts/${id}`, data),
+  delete: (id: string) => api.delete(`/accounts/${id}`),
+  transactions: (id: string, params?: any) => api.get(`/accounts/${id}/transactions`, { params }),
 };
 
 // =============================================================================
@@ -72,11 +72,11 @@ export const accountsApi = {
 // =============================================================================
 export const peopleApi = {
   list: () => api.get('/people'),
-  get: (id: number) => api.get(`/people/${id}`),
+  get: (id: string) => api.get(`/people/${id}`),
   create: (data: any) => api.post('/people', data),
-  update: (id: number, data: any) => api.patch(`/people/${id}`, data),
-  delete: (id: number) => api.delete(`/people/${id}`),
-  transactions: (id: number, params?: any) => api.get(`/people/${id}/transactions`, { params }),
+  update: (id: string, data: any) => api.patch(`/people/${id}`, data),
+  delete: (id: string) => api.delete(`/people/${id}`),
+  transactions: (id: string, params?: any) => api.get(`/people/${id}/transactions`, { params }),
 };
 
 // =============================================================================
@@ -85,8 +85,8 @@ export const peopleApi = {
 export const categoriesApi = {
   list: () => api.get('/categories'),
   create: (data: any) => api.post('/categories', data),
-  update: (id: number, data: any) => api.patch(`/categories/${id}`, data),
-  delete: (id: number) => api.delete(`/categories/${id}`),
+  update: (id: string, data: any) => api.patch(`/categories/${id}`, data),
+  delete: (id: string) => api.delete(`/categories/${id}`),
 };
 
 // =============================================================================
@@ -94,10 +94,10 @@ export const categoriesApi = {
 // =============================================================================
 export const transactionsApi = {
   list: (params?: any) => api.get('/transactions', { params }),
-  get: (id: number) => api.get(`/transactions/${id}`),
+  get: (id: string) => api.get(`/transactions/${id}`),
   create: (data: any) => api.post('/transactions', data),
-  update: (id: number, data: any) => api.patch(`/transactions/${id}`, data),
-  delete: (id: number) => api.delete(`/transactions/${id}`),
+  update: (id: string, data: any) => api.patch(`/transactions/${id}`, data),
+  delete: (id: string) => api.delete(`/transactions/${id}`),
 };
 
 // =============================================================================
@@ -105,12 +105,12 @@ export const transactionsApi = {
 // =============================================================================
 export const loansApi = {
   list: () => api.get('/loans'),
-  get: (id: number) => api.get(`/loans/${id}`),
+  get: (id: string) => api.get(`/loans/${id}`),
   create: (data: any) => api.post('/loans', data),
-  update: (id: number, data: any) => api.patch(`/loans/${id}`, data),
-  delete: (id: number) => api.delete(`/loans/${id}`),
-  repayments: (id: number) => api.get(`/loans/${id}/repayments`),
-  createRepayment: (id: number, data: any) => api.post(`/loans/${id}/repayments`, data),
+  update: (id: string, data: any) => api.patch(`/loans/${id}`, data),
+  delete: (id: string) => api.delete(`/loans/${id}`),
+  repayments: (id: string) => api.get(`/loans/${id}/repayments`),
+  createRepayment: (id: string, data: any) => api.post(`/loans/${id}/repayments`, data),
 };
 
 // =============================================================================

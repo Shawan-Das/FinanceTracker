@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
+import { generateId } from '../shared/id';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -41,7 +42,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const personId = parseInt(req.params.id);
+    const personId = req.params.id;
 
     const result = await db.query(
       `SELECT p.*,
@@ -89,12 +90,13 @@ router.post('/', validateBody(createPersonSchema), async (req: Request, res: Res
   try {
     const userId = getUserId(req);
     const { name, phone, email, notes } = req.body;
+    const id = generateId('people');
 
     const result = await db.query(
-      `INSERT INTO ${SCHEMA}.people (user_id, name, phone, email, notes)
-       VALUES ($1, $2, $3, NULLIF($4, ''), $5)
+      `INSERT INTO ${SCHEMA}.people (id, user_id, name, phone, email, notes)
+       VALUES ($1, $2, $3, NULLIF($4, ''), $5, $6)
        RETURNING *`,
-      [userId, name, phone || null, email || null, notes || null]
+      [id, userId, name, phone || null, email || null, notes || null]
     );
 
     res.status(201).json({
@@ -124,7 +126,7 @@ const updatePersonSchema = z.object({
 router.patch('/:id', validateBody(updatePersonSchema), async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const personId = parseInt(req.params.id);
+    const personId = req.params.id;
     const updates = req.body;
 
     const fields: string[] = [];
@@ -180,9 +182,8 @@ router.patch('/:id', validateBody(updatePersonSchema), async (req: Request, res:
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const personId = parseInt(req.params.id);
+    const personId = req.params.id;
 
-    // Check for outstanding balance
     const balanceResult = await db.query(
       `SELECT * FROM ${SCHEMA}.v_person_balances
        WHERE user_id = $1 AND person_id = $2`,
@@ -234,7 +235,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 router.get('/:id/transactions', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const personId = parseInt(req.params.id);
+    const personId = req.params.id;
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 30;
     const offset = (page - 1) * limit;

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
+import { generateId } from '../shared/id';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -37,7 +38,7 @@ router.get('/', async (req: Request, res: Response) => {
 router.get('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const accountId = parseInt(req.params.id);
+    const accountId = req.params.id;
 
     const result = await db.query(
       `SELECT * FROM ${SCHEMA}.v_account_balances
@@ -79,12 +80,13 @@ router.post('/', validateBody(createAccountSchema), async (req: Request, res: Re
   try {
     const userId = getUserId(req);
     const { name, account_type, currency, opening_balance, opening_balance_date, notes } = req.body;
+    const id = generateId('accounts');
 
     const result = await db.query(
-      `INSERT INTO ${SCHEMA}.accounts (user_id, name, account_type, currency, opening_balance, opening_balance_date, notes)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO ${SCHEMA}.accounts (id, user_id, name, account_type, currency, opening_balance, opening_balance_date, notes)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [userId, name, account_type, currency, opening_balance, opening_balance_date || new Date().toISOString().split('T')[0], notes]
+      [id, userId, name, account_type, currency, opening_balance, opening_balance_date || new Date().toISOString().split('T')[0], notes]
     );
 
     res.status(201).json({ success: true, data: result.rows[0] });
@@ -119,10 +121,9 @@ const updateAccountSchema = z.object({
 router.patch('/:id', validateBody(updateAccountSchema), async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const accountId = parseInt(req.params.id);
+    const accountId = req.params.id;
     const updates = req.body;
 
-    // Build dynamic SET clause
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
@@ -171,14 +172,13 @@ router.patch('/:id', validateBody(updateAccountSchema), async (req: Request, res
 });
 
 // =============================================================================
-// DELETE /api/accounts/:id — Soft delete an account
+// DELETE /api/accounts/:id — Delete an account
 // =============================================================================
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const accountId = parseInt(req.params.id);
+    const accountId = req.params.id;
 
-    // Check if account has transactions
     const txResult = await db.query(
       `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
        WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`,
@@ -227,7 +227,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 router.get('/:id/transactions', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const accountId = parseInt(req.params.id);
+    const accountId = req.params.id;
 
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 30;

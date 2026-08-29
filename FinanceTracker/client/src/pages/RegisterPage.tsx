@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authApi } from '../api/client';
@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 type Step = 'register' | 'verify';
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { register, checkAuth } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('register');
   const [email, setEmail] = useState('');
@@ -17,14 +17,30 @@ export default function RegisterPage() {
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearInterval(cooldownTimerRef.current);
+      }
+    };
+  }, []);
 
   // Start cooldown timer
   const startCooldown = () => {
+    if (cooldownTimerRef.current) {
+      clearInterval(cooldownTimerRef.current);
+    }
     setResendCooldown(60);
-    const timer = setInterval(() => {
+    cooldownTimerRef.current = setInterval(() => {
       setResendCooldown((prev) => {
         if (prev <= 1) {
-          clearInterval(timer);
+          if (cooldownTimerRef.current) {
+            clearInterval(cooldownTimerRef.current);
+            cooldownTimerRef.current = null;
+          }
           return 0;
         }
         return prev - 1;
@@ -69,6 +85,8 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await authApi.verifyEmail({ email, code: verificationCode });
+      // Fetch the real user data now that the session is set server-side
+      await checkAuth();
       toast.success('Email verified! Welcome to Finance Tracker.');
       navigate('/');
     } catch (error: any) {

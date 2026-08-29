@@ -98,7 +98,7 @@ export default function Layout() {
         {/* Top bar (mobile) */}
         <header className="sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3 lg:hidden">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebarOpen(true)} className="p-1">
+            <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 rounded-lg hover:bg-gray-100">
               <Menu size={24} />
             </button>
             <h1 className="text-lg font-bold text-primary-700">💰 Finance Tracker</h1>

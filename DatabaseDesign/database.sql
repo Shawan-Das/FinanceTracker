@@ -1,6 +1,10 @@
 -- =============================================================================
 -- Personal Finance Tracker — PostgreSQL Schema
 -- Schema: finance_tracker
+--
+-- SECURITY: All primary keys use prefixed random IDs (e.g. usr_, txn_, acc_)
+-- instead of sequential integers to prevent ID guessing/enumeration attacks.
+-- Format: {prefix}_{12-char base62 random string}
 -- =============================================================================
 
 -- Create schema
@@ -10,7 +14,7 @@ CREATE SCHEMA IF NOT EXISTS finance_tracker;
 -- USERS
 -- =============================================================================
 CREATE TABLE finance_tracker.users (
-    id              SERIAL PRIMARY KEY,
+    id              VARCHAR(16) PRIMARY KEY,
     full_name       VARCHAR(255) NOT NULL,
     email           VARCHAR(255) NOT NULL UNIQUE,
     password_hash   VARCHAR(255) NOT NULL,
@@ -30,8 +34,8 @@ CREATE INDEX idx_users_email ON finance_tracker.users (email);
 -- EMAIL VERIFICATION CODES
 -- =============================================================================
 CREATE TABLE finance_tracker.email_verifications (
-    id              SERIAL PRIMARY KEY,
-    user_id         INTEGER NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
+    id              VARCHAR(16) PRIMARY KEY,
+    user_id         VARCHAR(16) NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
     code            VARCHAR(10) NOT NULL,
     purpose         VARCHAR(20) NOT NULL CHECK (purpose IN ('registration', 'password_reset')),
     expires_at      TIMESTAMPTZ NOT NULL,
@@ -46,7 +50,7 @@ CREATE INDEX idx_email_verifications_code ON finance_tracker.email_verifications
 -- LOGIN ATTEMPTS (for brute-force protection)
 -- =============================================================================
 CREATE TABLE finance_tracker.login_attempts (
-    id          SERIAL PRIMARY KEY,
+    id          VARCHAR(16) PRIMARY KEY,
     email       VARCHAR(255) NOT NULL,
     ip_address  INET,
     success     BOOLEAN NOT NULL DEFAULT FALSE,
@@ -59,8 +63,8 @@ CREATE INDEX idx_login_attempts_email_time ON finance_tracker.login_attempts (em
 -- ACCOUNTS
 -- =============================================================================
 CREATE TABLE finance_tracker.accounts (
-    id                  SERIAL PRIMARY KEY,
-    user_id             INTEGER NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
+    id                  VARCHAR(16) PRIMARY KEY,
+    user_id             VARCHAR(16) NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
     name                VARCHAR(255) NOT NULL,
     account_type        VARCHAR(20) NOT NULL CHECK (account_type IN ('BANK', 'CASH', 'MOBILE_WALLET', 'OTHER')),
     currency            VARCHAR(3) NOT NULL DEFAULT 'BDT',
@@ -79,8 +83,8 @@ CREATE UNIQUE INDEX idx_accounts_user_name ON finance_tracker.accounts (user_id,
 -- PEOPLE
 -- =============================================================================
 CREATE TABLE finance_tracker.people (
-    id          SERIAL PRIMARY KEY,
-    user_id     INTEGER NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
+    id          VARCHAR(16) PRIMARY KEY,
+    user_id     VARCHAR(16) NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
     name        VARCHAR(255) NOT NULL,
     phone       VARCHAR(50),
     email       VARCHAR(255),
@@ -96,8 +100,8 @@ CREATE INDEX idx_people_user_id ON finance_tracker.people (user_id);
 -- CATEGORIES
 -- =============================================================================
 CREATE TABLE finance_tracker.categories (
-    id          SERIAL PRIMARY KEY,
-    user_id     INTEGER NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
+    id          VARCHAR(16) PRIMARY KEY,
+    user_id     VARCHAR(16) NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
     name        VARCHAR(255) NOT NULL,
     type        VARCHAR(10) NOT NULL CHECK (type IN ('INCOME', 'EXPENSE')),
     icon        VARCHAR(50),
@@ -114,9 +118,9 @@ CREATE UNIQUE INDEX idx_categories_user_name_type ON finance_tracker.categories 
 -- LOANS
 -- =============================================================================
 CREATE TABLE finance_tracker.loans (
-    id              SERIAL PRIMARY KEY,
-    user_id         INTEGER NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
-    person_id       INTEGER REFERENCES finance_tracker.people(id) ON DELETE SET NULL,
+    id              VARCHAR(16) PRIMARY KEY,
+    user_id         VARCHAR(16) NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
+    person_id       VARCHAR(16) REFERENCES finance_tracker.people(id) ON DELETE SET NULL,
     direction       VARCHAR(10) NOT NULL CHECK (direction IN ('BORROWED', 'LENT')),
     principal_amount NUMERIC(15,2) NOT NULL CHECK (principal_amount > 0),
     interest_amount NUMERIC(15,2) NOT NULL DEFAULT 0,
@@ -136,8 +140,8 @@ CREATE INDEX idx_loans_user_status ON finance_tracker.loans (user_id, status);
 -- TRANSACTIONS
 -- =============================================================================
 CREATE TABLE finance_tracker.transactions (
-    id              SERIAL PRIMARY KEY,
-    user_id         INTEGER NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
+    id              VARCHAR(16) PRIMARY KEY,
+    user_id         VARCHAR(16) NOT NULL REFERENCES finance_tracker.users(id) ON DELETE CASCADE,
     transaction_type VARCHAR(20) NOT NULL CHECK (transaction_type IN (
         'INCOME', 'EXPENSE', 'TRANSFER',
         'LEND', 'LEND_REPAYMENT', 'BORROW', 'BORROW_REPAYMENT',
@@ -145,10 +149,10 @@ CREATE TABLE finance_tracker.transactions (
     )),
     transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,
     amount          NUMERIC(15,2) NOT NULL CHECK (amount > 0),
-    account_id      INTEGER REFERENCES finance_tracker.accounts(id) ON DELETE SET NULL,
-    person_id       INTEGER REFERENCES finance_tracker.people(id) ON DELETE SET NULL,
-    category_id     INTEGER REFERENCES finance_tracker.categories(id) ON DELETE SET NULL,
-    loan_id         INTEGER REFERENCES finance_tracker.loans(id) ON DELETE SET NULL,
+    account_id      VARCHAR(16) REFERENCES finance_tracker.accounts(id) ON DELETE SET NULL,
+    person_id       VARCHAR(16) REFERENCES finance_tracker.people(id) ON DELETE SET NULL,
+    category_id     VARCHAR(16) REFERENCES finance_tracker.categories(id) ON DELETE SET NULL,
+    loan_id         VARCHAR(16) REFERENCES finance_tracker.loans(id) ON DELETE SET NULL,
     description     TEXT,
     reference       TEXT,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -167,10 +171,10 @@ CREATE INDEX idx_transactions_not_deleted ON finance_tracker.transactions (user_
 -- TRANSACTION TRANSFERS (links the two sides of a transfer)
 -- =============================================================================
 CREATE TABLE finance_tracker.transaction_transfers (
-    id              SERIAL PRIMARY KEY,
-    transaction_id  INTEGER NOT NULL REFERENCES finance_tracker.transactions(id) ON DELETE CASCADE,
-    from_account_id INTEGER NOT NULL REFERENCES finance_tracker.accounts(id) ON DELETE CASCADE,
-    to_account_id   INTEGER NOT NULL REFERENCES finance_tracker.accounts(id) ON DELETE CASCADE,
+    id              VARCHAR(16) PRIMARY KEY,
+    transaction_id  VARCHAR(16) NOT NULL REFERENCES finance_tracker.transactions(id) ON DELETE CASCADE,
+    from_account_id VARCHAR(16) NOT NULL REFERENCES finance_tracker.accounts(id) ON DELETE CASCADE,
+    to_account_id   VARCHAR(16) NOT NULL REFERENCES finance_tracker.accounts(id) ON DELETE CASCADE,
     amount          NUMERIC(15,2) NOT NULL CHECK (amount > 0),
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -183,9 +187,9 @@ CREATE INDEX idx_transaction_transfers_transaction_id ON finance_tracker.transac
 -- LOAN REPAYMENTS
 -- =============================================================================
 CREATE TABLE finance_tracker.loan_repayments (
-    id              SERIAL PRIMARY KEY,
-    loan_id         INTEGER NOT NULL REFERENCES finance_tracker.loans(id) ON DELETE CASCADE,
-    transaction_id  INTEGER REFERENCES finance_tracker.transactions(id) ON DELETE SET NULL,
+    id              VARCHAR(16) PRIMARY KEY,
+    loan_id         VARCHAR(16) NOT NULL REFERENCES finance_tracker.loans(id) ON DELETE CASCADE,
+    transaction_id  VARCHAR(16) REFERENCES finance_tracker.transactions(id) ON DELETE SET NULL,
     amount          NUMERIC(15,2) NOT NULL CHECK (amount > 0),
     repayment_date  DATE NOT NULL DEFAULT CURRENT_DATE,
     notes           TEXT,
@@ -306,8 +310,8 @@ DROP VIEW IF EXISTS finance_tracker.v_person_balances;
 CREATE VIEW finance_tracker.v_person_balances AS
 SELECT
     p.id,
-    t.user_id,
-    t.person_id,
+    p.user_id,
+    p.id AS person_id,
     p.name,
     p.name AS person_name,
     p.phone,
@@ -328,12 +332,13 @@ SELECT
         COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0)
         - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0)
     ) AS amount_you_owe_them
-FROM finance_tracker.transactions t
-JOIN finance_tracker.people p ON p.id = t.person_id
-WHERE t.person_id IS NOT NULL
-  AND t.deleted_at IS NULL
-  AND t.transaction_type IN ('LEND', 'LEND_REPAYMENT', 'BORROW', 'BORROW_REPAYMENT')
-GROUP BY t.user_id, t.person_id, p.id, p.name, p.phone, p.email, p.notes, p.is_active, p.created_at, p.updated_at;
+FROM finance_tracker.people p
+LEFT JOIN finance_tracker.transactions t
+    ON t.person_id = p.id
+    AND t.deleted_at IS NULL
+    AND t.transaction_type IN ('LEND', 'LEND_REPAYMENT', 'BORROW', 'BORROW_REPAYMENT')
+WHERE p.is_active = TRUE
+GROUP BY p.id, p.user_id, p.name, p.phone, p.email, p.notes, p.is_active, p.created_at, p.updated_at;
 
 -- View: Dashboard summary
 CREATE OR REPLACE VIEW finance_tracker.v_dashboard_summary AS

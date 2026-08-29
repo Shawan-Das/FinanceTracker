@@ -160,7 +160,7 @@ router.get('/expense', async (req: Request, res: Response) => {
 router.get('/account-statement', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const accountId = parseInt(req.query.account_id as string);
+    const accountId = req.query.account_id as string;
 
     if (!accountId) {
       res.status(400).json({
@@ -197,8 +197,8 @@ router.get('/account-statement', async (req: Request, res: Response) => {
                 WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN -t.amount
                 WHEN t.transaction_type = 'TRANSFER' THEN
                   CASE
-                    WHEN tt.from_account_id = $3 THEN -t.amount
-                    WHEN tt.to_account_id = $3 THEN t.amount
+                    WHEN tt.from_account_id = $2 THEN -t.amount
+                    WHEN tt.to_account_id = $2 THEN t.amount
                     ELSE 0
                   END
                 ELSE 0
@@ -208,12 +208,12 @@ router.get('/account-statement', async (req: Request, res: Response) => {
        LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
        LEFT JOIN ${SCHEMA}.transaction_transfers tt ON tt.transaction_id = t.id
        WHERE t.user_id = $1
-         AND (t.account_id = $3
-              OR tt.from_account_id = $3
-              OR tt.to_account_id = $3)
+         AND (t.account_id = $2
+              OR tt.from_account_id = $2
+              OR tt.to_account_id = $2)
          AND t.deleted_at IS NULL
        ORDER BY t.transaction_date ASC, t.id ASC`,
-      [userId, accountId, accountId]
+      [userId, accountId]
     );
 
     // Calculate running balance
@@ -247,7 +247,7 @@ router.get('/account-statement', async (req: Request, res: Response) => {
 router.get('/person-statement', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    const personId = parseInt(req.query.person_id as string);
+    const personId = req.query.person_id as string;
 
     if (!personId) {
       res.status(400).json({
@@ -296,12 +296,30 @@ router.get('/person-statement', async (req: Request, res: Response) => {
       total_borrow_repaid: 0,
     };
 
+    // Fetch loans associated with this person
+    const loansResult = await db.query(
+      `SELECT l.*,
+              COALESCE(lr.total_repaid, 0) AS total_repaid,
+              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
+       FROM ${SCHEMA}.loans l
+       LEFT JOIN (
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr2
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
+       ) lr ON lr.loan_id = l.id
+       WHERE l.user_id = $1 AND l.person_id = $2
+       ORDER BY l.start_date DESC`,
+      [userId, personId]
+    );
+
     res.json({
       success: true,
       data: {
         person,
         balance,
         transactions: txResult.rows,
+        loans: loansResult.rows,
       },
     });
   } catch (error) {
@@ -328,9 +346,10 @@ router.get('/loan', async (req: Request, res: Response) => {
        FROM ${SCHEMA}.loans l
        LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
        LEFT JOIN (
-         SELECT loan_id, SUM(amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments
-         GROUP BY loan_id
+         SELECT lr.loan_id, SUM(lr.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1
        ORDER BY l.start_date DESC`,
@@ -345,9 +364,10 @@ router.get('/loan', async (req: Request, res: Response) => {
          COUNT(*) FILTER (WHERE status = 'OVERDUE') AS overdue_count
        FROM ${SCHEMA}.loans l
        LEFT JOIN (
-         SELECT loan_id, SUM(amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments
-         GROUP BY loan_id
+         SELECT lr.loan_id, SUM(lr.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1`,
       [userId]

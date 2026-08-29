@@ -27,6 +27,8 @@ import type { Transaction, DashboardSummary, MonthlyChartData } from '../types';
 
 const COLORS = ['#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4'];
 
+const toNum = (v: any): number => typeof v === 'number' ? v : parseFloat(v) || 0;
+
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
@@ -51,27 +53,27 @@ export default function DashboardPage() {
     queryFn: () => dashboardApi.summary().then((r) => r.data.data),
   });
 
-  const { data: recentTx, isLoading: recentLoading } = useQuery({
+  const { data: recentTx, isLoading: recentLoading, isError: recentError } = useQuery({
     queryKey: ['dashboard', 'recent'],
     queryFn: () => dashboardApi.recentTransactions().then((r) => r.data.data),
   });
 
-  const { data: monthlyData } = useQuery({
+  const { data: monthlyData, isError: monthlyError } = useQuery({
     queryKey: ['dashboard', 'monthly'],
     queryFn: () => dashboardApi.monthlyChart().then((r) => r.data.data),
   });
 
-  const { data: categoryData } = useQuery({
+  const { data: categoryData, isError: categoryError } = useQuery({
     queryKey: ['dashboard', 'categories'],
     queryFn: () => dashboardApi.expenseByCategory().then((r) => r.data.data),
   });
 
-  const { data: loanSummary } = useQuery({
+  const { data: loanSummary, isError: loanError } = useQuery({
     queryKey: ['dashboard', 'loans'],
     queryFn: () => dashboardApi.loanSummary().then((r) => r.data.data),
   });
 
-  const { data: peopleSummary } = useQuery({
+  const { data: peopleSummary, isError: peopleError } = useQuery({
     queryKey: ['dashboard', 'people'],
     queryFn: () => dashboardApi.peopleSummary().then((r) => r.data.data),
   });
@@ -145,7 +147,9 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 card">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Income vs Expense (12 months)</h3>
-          {monthlyData && monthlyData.length > 0 ? (
+          {monthlyError ? (
+            <p className="text-sm text-red-500 py-8 text-center">Failed to load chart data</p>
+          ) : monthlyData && monthlyData.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={monthlyData}>
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
@@ -163,7 +167,9 @@ export default function DashboardPage() {
 
         <div className="card">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Expense by Category</h3>
-          {categoryData && categoryData.length > 0 ? (
+          {categoryError ? (
+            <p className="text-sm text-red-500 py-8 text-center">Failed to load category data</p>
+          ) : categoryData && categoryData.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
                 <Pie
@@ -218,7 +224,9 @@ export default function DashboardPage() {
             <Users size={18} /> People
           </h3>
           <div className="space-y-3">
-            {peopleSummary?.map((p: any) => (
+            {peopleError ? (
+              <p className="text-sm text-red-500 text-center py-4">Failed to load people</p>
+            ) : peopleSummary?.map((p: any) => (
               <div key={p.person_id} className="py-2 border-b border-gray-100 last:border-0">
                 <p className="text-sm font-medium text-gray-900">{p.person_name}</p>
                 <div className="flex gap-4 text-xs mt-1">
@@ -231,7 +239,7 @@ export default function DashboardPage() {
                 </div>
               </div>
             ))}
-            {(!peopleSummary || peopleSummary.length === 0) && (
+            {!peopleError && (!peopleSummary || peopleSummary.length === 0) && (
               <p className="text-sm text-gray-500 text-center py-4">No people added yet</p>
             )}
           </div>
@@ -243,7 +251,9 @@ export default function DashboardPage() {
             <CreditCard size={18} /> Active Loans
           </h3>
           <div className="space-y-3">
-            {loanSummary?.map((loan: any) => (
+            {loanError ? (
+              <p className="text-sm text-red-500 text-center py-4">Failed to load loans</p>
+            ) : loanSummary?.map((loan: any) => (
               <div key={loan.id} className="py-2 border-b border-gray-100 last:border-0">
                 <div className="flex justify-between items-center">
                   <div>
@@ -255,13 +265,13 @@ export default function DashboardPage() {
                     )}
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-orange-600">{formatCurrency(loan.remaining_amount)}</p>
+                    <p className="text-sm font-semibold text-orange-600">{formatCurrency(toNum(loan.remaining_amount))}</p>
                     <p className="text-xs text-gray-500">remaining</p>
                   </div>
                 </div>
               </div>
             ))}
-            {(!loanSummary || loanSummary.length === 0) && (
+            {!loanError && (!loanSummary || loanSummary.length === 0) && (
               <p className="text-sm text-gray-500 text-center py-4">No active loans</p>
             )}
           </div>

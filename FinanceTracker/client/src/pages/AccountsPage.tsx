@@ -45,7 +45,7 @@ export default function AccountsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: any }) => accountsApi.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: any }) => accountsApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       toast.success('Account updated!');
@@ -54,7 +54,7 @@ export default function AccountsPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => accountsApi.delete(id),
+    mutationFn: (id: string) => accountsApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       toast.success('Account deleted');
@@ -128,13 +128,13 @@ export default function AccountsPage() {
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <button onClick={() => openEdit(acc)} className="p-1 hover:bg-gray-100 rounded text-gray-400">
-                    <Edit size={14} />
+                  <button onClick={() => openEdit(acc)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
+                    <Edit size={16} />
                   </button>
                   <button onClick={() => {
                     if (confirm('Delete this account?')) deleteMutation.mutate(acc.account_id);
-                  }} className="p-1 hover:bg-red-50 rounded text-red-400">
-                    <Trash2 size={14} />
+                  }} className="p-2 hover:bg-red-50 rounded-lg text-red-400">
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>
