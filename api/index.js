@@ -1,9 +1,9 @@
 /**
  * Vercel Serverless Entry Point
  *
- * Loads the bundled Express app. The vercel-build script uses esbuild
- * to bundle the entire server into api/server.js (a single file with
- * all dependencies resolved), so no path issues at runtime.
+ * Loads the bundled Express app from _server.js (same directory).
+ * The vercel-build script uses esbuild to bundle the entire server
+ * into this single file so no cross-directory path resolution issues.
  */
 let app;
 
