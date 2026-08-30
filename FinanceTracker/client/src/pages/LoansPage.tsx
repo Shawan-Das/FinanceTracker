@@ -23,6 +23,7 @@ export default function LoansPage() {
   // Create loan form
   const [direction, setDirection] = useState<'BORROWED' | 'LENT'>('LENT');
   const [personId, setPersonId] = useState('');
+  const [accountId, setAccountId] = useState('');
   const [principal, setPrincipal] = useState('');
   const [interest, setInterest] = useState('0');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
@@ -75,6 +76,7 @@ export default function LoansPage() {
   const resetCreateForm = () => {
     setDirection('LENT');
     setPersonId('');
+    setAccountId('');
     setPrincipal('');
     setInterest('0');
     setStartDate(new Date().toISOString().split('T')[0]);
@@ -95,6 +97,7 @@ export default function LoansPage() {
     createMutation.mutate({
       direction,
       person_id: personId || undefined,
+      account_id: accountId || undefined,
       principal_amount: parseFloat(principal),
       interest_amount: parseFloat(interest) || 0,
       start_date: startDate,
@@ -276,6 +279,15 @@ export default function LoansPage() {
               <option value="">Select person</option>
               {people?.map((p: Person) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label">From Account</label>
+            <select className="input" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
+              <option value="">Select account</option>
+              {accounts?.map((a: Account) => (
+                <option key={a.account_id} value={a.account_id}>{a.account_name} ({formatCurrency(a.current_balance)})</option>
               ))}
             </select>
           </div>

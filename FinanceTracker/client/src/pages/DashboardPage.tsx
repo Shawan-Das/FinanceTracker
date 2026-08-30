@@ -111,7 +111,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500">Receivable</p>
-              <p className="text-xl font-bold text-green-600">{formatCurrency(s.totalReceivable)}</p>
+              <p className="text-xl font-bold text-green-600">{formatCurrency(Math.max(0, toNum(s.totalReceivable)))}</p>
             </div>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-sm text-gray-500">Payable</p>
-              <p className="text-xl font-bold text-red-600">{formatCurrency(s.totalPayable)}</p>
+              <p className="text-xl font-bold text-red-600">{formatCurrency(Math.max(0, toNum(s.totalPayable)))}</p>
             </div>
           </div>
         </div>

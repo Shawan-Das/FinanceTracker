@@ -339,8 +339,8 @@ export default function ReportsPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {(() => {
-                  const oweYou = toNum(personStatement.balance.amount_they_owe_you);
-                  const youOwe = toNum(personStatement.balance.amount_you_owe_them);
+                  const oweYou = Math.max(0, toNum(personStatement.balance.amount_they_owe_you));
+                  const youOwe = Math.max(0, toNum(personStatement.balance.amount_you_owe_them));
                   const net = oweYou - youOwe;
                   return (<>
                     <div className="card text-center">

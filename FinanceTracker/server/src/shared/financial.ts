@@ -161,15 +161,17 @@ export function calculatePersonBalance(
   borrowed: number,
   borrowedRepaid: number,
 ): PersonBalance {
+  const theyOweYou = Math.max(0, lent - lentRepaid);
+  const youOweThem = Math.max(0, borrowed - borrowedRepaid);
   return {
     personId: 0,
     totalLent: lent,
     totalLentRepaid: lentRepaid,
     totalBorrowed: borrowed,
     totalBorrowRepaid: borrowedRepaid,
-    theyOweYou: lent - lentRepaid,
-    youOweThem: borrowed - borrowedRepaid,
-    netBalance: (lent - lentRepaid) - (borrowed - borrowedRepaid),
+    theyOweYou,
+    youOweThem,
+    netBalance: theyOweYou - youOweThem,
   };
 }
 
@@ -177,14 +179,14 @@ export function calculatePersonBalance(
  * Calculate outstanding receivable (what a person owes the user).
  */
 export function calculateReceivable(totalLent: number, totalLentRepaid: number): number {
-  return totalLent - totalLentRepaid;
+  return Math.max(0, totalLent - totalLentRepaid);
 }
 
 /**
  * Calculate outstanding payable (what the user owes a person).
  */
 export function calculatePayable(totalBorrowed: number, totalBorrowRepaid: number): number {
-  return totalBorrowed - totalBorrowRepaid;
+  return Math.max(0, totalBorrowed - totalBorrowRepaid);
 }
 
 // =============================================================================

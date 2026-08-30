@@ -324,13 +324,15 @@ SELECT
     COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0) AS total_lent_repaid,
     COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0) AS total_borrowed,
     COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0) AS total_borrow_repaid,
-    (
+    GREATEST(
         COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0)
-        - COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0)
+        - COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0),
+        0
     ) AS amount_they_owe_you,
-    (
+    GREATEST(
         COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0)
-        - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0)
+        - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0),
+        0
     ) AS amount_you_owe_them
 FROM finance_tracker.people p
 LEFT JOIN finance_tracker.transactions t
@@ -349,11 +351,11 @@ SELECT
         AS net_cash_flow,
     SUM(CASE WHEN transaction_type = 'INCOME' THEN amount ELSE 0 END) AS total_income,
     SUM(CASE WHEN transaction_type = 'EXPENSE' THEN amount ELSE 0 END) AS total_expense,
-    SUM(CASE WHEN transaction_type IN ('LEND') THEN amount ELSE 0 END)
-        - SUM(CASE WHEN transaction_type IN ('LEND_REPAYMENT') THEN amount ELSE 0 END)
+    GREATEST(SUM(CASE WHEN transaction_type IN ('LEND') THEN amount ELSE 0 END)
+        - SUM(CASE WHEN transaction_type IN ('LEND_REPAYMENT') THEN amount ELSE 0 END), 0)
         AS total_receivable,
-    SUM(CASE WHEN transaction_type IN ('BORROW') THEN amount ELSE 0 END)
-        - SUM(CASE WHEN transaction_type IN ('BORROW_REPAYMENT') THEN amount ELSE 0 END)
+    GREATEST(SUM(CASE WHEN transaction_type IN ('BORROW') THEN amount ELSE 0 END)
+        - SUM(CASE WHEN transaction_type IN ('BORROW_REPAYMENT') THEN amount ELSE 0 END), 0)
         AS total_payable
 FROM finance_tracker.transactions
 WHERE deleted_at IS NULL

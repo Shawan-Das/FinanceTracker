@@ -113,31 +113,53 @@ const createLoanSchema = z.object({
   start_date: z.string().min(1),
   due_date: z.string().optional().nullable(),
   description: z.string().optional(),
+  account_id: z.string().optional(),
 });
 
 router.post('/', validateBody(createLoanSchema), async (req: Request, res: Response) => {
+  const client = await db.getClient();
   try {
     const userId = getUserId(req);
-    const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description } = req.body;
+    const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description, account_id } = req.body;
     const id = generateId('loans');
 
-    const result = await db.query(
+    await client.query('BEGIN');
+
+    const result = await client.query(
       `INSERT INTO ${SCHEMA}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
       [id, userId, person_id || null, direction, principal_amount, interest_amount, start_date, due_date || null, description || null]
     );
 
+    // Also create the corresponding transaction so v_person_balances stays accurate
+    let txId: string | null = null;
+    if (account_id) {
+      const txType = direction === 'LENT' ? 'LEND' : 'BORROW';
+      txId = generateId('transactions');
+      await client.query(
+        `INSERT INTO ${SCHEMA}.transactions
+         (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [txId, userId, txType, start_date, principal_amount, account_id, person_id || null, id, description || null]
+      );
+    }
+
+    await client.query('COMMIT');
+
     res.status(201).json({
       success: true,
-      data: { ...result.rows[0], total_repaid: 0, remaining_amount: principal_amount + interest_amount },
+      data: { ...result.rows[0], total_repaid: 0, remaining_amount: principal_amount + interest_amount, transaction_id: txId },
     });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Create loan error:', error);
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to create loan' },
     });
+  } finally {
+    client.release();
   }
 });
 

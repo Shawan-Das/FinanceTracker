@@ -57997,26 +57997,41 @@ var require_loans = __commonJS({
       interest_amount: zod_1.z.coerce.number().min(0).default(0),
       start_date: zod_1.z.string().min(1),
       due_date: zod_1.z.string().optional().nullable(),
-      description: zod_1.z.string().optional()
+      description: zod_1.z.string().optional(),
+      account_id: zod_1.z.string().optional()
     });
     router.post("/", (0, validation_1.validateBody)(createLoanSchema), async (req, res) => {
+      const client = await connection_1.db.getClient();
       try {
         const userId = (0, auth_12.getUserId)(req);
-        const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description } = req.body;
+        const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description, account_id } = req.body;
         const id = (0, id_1.generateId)("loans");
-        const result = await connection_1.db.query(`INSERT INTO ${SCHEMA}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description)
+        await client.query("BEGIN");
+        const result = await client.query(`INSERT INTO ${SCHEMA}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`, [id, userId, person_id || null, direction, principal_amount, interest_amount, start_date, due_date || null, description || null]);
+        let txId = null;
+        if (account_id) {
+          const txType = direction === "LENT" ? "LEND" : "BORROW";
+          txId = (0, id_1.generateId)("transactions");
+          await client.query(`INSERT INTO ${SCHEMA}.transactions
+         (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [txId, userId, txType, start_date, principal_amount, account_id, person_id || null, id, description || null]);
+        }
+        await client.query("COMMIT");
         res.status(201).json({
           success: true,
-          data: { ...result.rows[0], total_repaid: 0, remaining_amount: principal_amount + interest_amount }
+          data: { ...result.rows[0], total_repaid: 0, remaining_amount: principal_amount + interest_amount, transaction_id: txId }
         });
       } catch (error) {
+        await client.query("ROLLBACK");
         console.error("Create loan error:", error);
         res.status(500).json({
           success: false,
           error: { code: "SERVER_ERROR", message: "Failed to create loan" }
         });
+      } finally {
+        client.release();
       }
     });
     var updateLoanSchema = zod_1.z.object({
