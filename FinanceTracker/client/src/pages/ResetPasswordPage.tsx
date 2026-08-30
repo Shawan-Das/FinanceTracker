@@ -76,8 +76,9 @@ export default function ResetPasswordPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label">Email</label>
-              <input type="email" className="input" placeholder="you@example.com"
-                value={email} onChange={(e) => setEmail(e.target.value)} required autoFocus />
+              <input type="email" className="input bg-gray-50"
+                value={email} readOnly required autoFocus />
+              <p className="text-xs text-gray-500 mt-1">Code was sent to this email</p>
             </div>
             <div>
               <label className="label">Reset Code</label>
