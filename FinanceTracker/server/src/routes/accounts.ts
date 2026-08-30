@@ -179,18 +179,27 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const userId = getUserId(req);
     const accountId = req.params.id;
 
+    // Check for transactions referencing this account (directly or via transfers)
     const txResult = await db.query(
       `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
        WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`,
       [userId, accountId]
     );
 
-    if (parseInt(txResult.rows[0].count) > 0) {
+    const transferResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA}.transaction_transfers tt
+       JOIN ${SCHEMA}.transactions t ON t.id = tt.transaction_id AND t.deleted_at IS NULL
+       WHERE t.user_id = $1 AND (tt.from_account_id = $2 OR tt.to_account_id = $2)`,
+      [userId, accountId]
+    );
+
+    const totalRefs = parseInt(txResult.rows[0].count) + parseInt(transferResult.rows[0].count);
+    if (totalRefs > 0) {
       res.status(409).json({
         success: false,
         error: {
           code: 'ACCOUNT_HAS_TRANSACTIONS',
-          message: 'Cannot delete an account with existing transactions. Deactivate it instead.',
+          message: 'Cannot delete an account with existing transactions or transfers. Deactivate it instead.',
         },
       });
       return;

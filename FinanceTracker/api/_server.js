@@ -57094,12 +57094,16 @@ var require_accounts = __commonJS({
         const accountId = req.params.id;
         const txResult = await connection_1.db.query(`SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
        WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`, [userId, accountId]);
-        if (parseInt(txResult.rows[0].count) > 0) {
+        const transferResult = await connection_1.db.query(`SELECT COUNT(*) as count FROM ${SCHEMA}.transaction_transfers tt
+       JOIN ${SCHEMA}.transactions t ON t.id = tt.transaction_id AND t.deleted_at IS NULL
+       WHERE t.user_id = $1 AND (tt.from_account_id = $2 OR tt.to_account_id = $2)`, [userId, accountId]);
+        const totalRefs = parseInt(txResult.rows[0].count) + parseInt(transferResult.rows[0].count);
+        if (totalRefs > 0) {
           res.status(409).json({
             success: false,
             error: {
               code: "ACCOUNT_HAS_TRANSACTIONS",
-              message: "Cannot delete an account with existing transactions. Deactivate it instead."
+              message: "Cannot delete an account with existing transactions or transfers. Deactivate it instead."
             }
           });
           return;
@@ -57725,6 +57729,24 @@ var require_transactions = __commonJS({
             return;
           }
         }
+        if (category_id) {
+          const expectedType = transaction_type === "INCOME" ? "INCOME" : "EXPENSE";
+          const c = await client.query(`SELECT id, type FROM ${SCHEMA}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`, [category_id, userId]);
+          if (c.rows.length === 0) {
+            res.status(400).json({
+              success: false,
+              error: { code: "INVALID_CATEGORY", message: "Category not found" }
+            });
+            return;
+          }
+          if (["INCOME", "EXPENSE"].includes(transaction_type) && c.rows[0].type !== expectedType) {
+            res.status(400).json({
+              success: false,
+              error: { code: "INVALID_CATEGORY", message: `Category type '${c.rows[0].type}' does not match transaction type '${transaction_type}'` }
+            });
+            return;
+          }
+        }
         await client.query("BEGIN");
         const txId = (0, id_1.generateId)("transactions");
         const txResult = await client.query(`INSERT INTO ${SCHEMA}.transactions
@@ -57781,6 +57803,36 @@ var require_transactions = __commonJS({
           return;
         }
         const updates = req.body;
+        if (updates.account_id) {
+          const acc = await client.query(`SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [updates.account_id, userId]);
+          if (acc.rows.length === 0) {
+            res.status(400).json({
+              success: false,
+              error: { code: "INVALID_ACCOUNT", message: "Account not found" }
+            });
+            return;
+          }
+        }
+        if (updates.person_id) {
+          const p = await client.query(`SELECT id FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2 AND is_active = TRUE`, [updates.person_id, userId]);
+          if (p.rows.length === 0) {
+            res.status(400).json({
+              success: false,
+              error: { code: "INVALID_PERSON", message: "Person not found" }
+            });
+            return;
+          }
+        }
+        if (updates.category_id) {
+          const c = await client.query(`SELECT id FROM ${SCHEMA}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`, [updates.category_id, userId]);
+          if (c.rows.length === 0) {
+            res.status(400).json({
+              success: false,
+              error: { code: "INVALID_CATEGORY", message: "Category not found" }
+            });
+            return;
+          }
+        }
         const fields = [];
         const values = [];
         let paramIndex = 1;
@@ -58134,6 +58186,13 @@ var require_loans = __commonJS({
           return;
         }
         const loan = loanResult.rows[0];
+        if (loan.status !== "ACTIVE") {
+          res.status(400).json({
+            success: false,
+            error: { code: "LOAN_NOT_ACTIVE", message: `Cannot record repayment for a loan with status '${loan.status}'` }
+          });
+          return;
+        }
         const repaidResult = await client.query(`SELECT COALESCE(SUM(lr.amount), 0) as total_repaid
        FROM ${SCHEMA}.loan_repayments lr
        INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
@@ -58145,7 +58204,7 @@ var require_loans = __commonJS({
             success: false,
             error: {
               code: "AMOUNT_EXCEEDS",
-              message: `Repayment amount ($${amount}) exceeds remaining balance ($${remaining})`
+              message: `Repayment amount (\u09F3${amount}) exceeds remaining balance (\u09F3${remaining})`
             }
           });
           return;

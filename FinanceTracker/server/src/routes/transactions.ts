@@ -272,6 +272,27 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
         return;
       }
     }
+    if (category_id) {
+      const expectedType = transaction_type === 'INCOME' ? 'INCOME' : 'EXPENSE';
+      const c = await client.query(
+        `SELECT id, type FROM ${SCHEMA}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`,
+        [category_id, userId]
+      );
+      if (c.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_CATEGORY', message: 'Category not found' },
+        });
+        return;
+      }
+      if (['INCOME', 'EXPENSE'].includes(transaction_type) && c.rows[0].type !== expectedType) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_CATEGORY', message: `Category type '${c.rows[0].type}' does not match transaction type '${transaction_type}'` },
+        });
+        return;
+      }
+    }
 
     await client.query('BEGIN');
 
@@ -354,6 +375,48 @@ router.patch('/:id', validateBody(updateTransactionSchema), async (req: Request,
     }
 
     const updates = req.body;
+
+    // Validate that referenced entities belong to the user
+    if (updates.account_id) {
+      const acc = await client.query(
+        `SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`,
+        [updates.account_id, userId]
+      );
+      if (acc.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_ACCOUNT', message: 'Account not found' },
+        });
+        return;
+      }
+    }
+    if (updates.person_id) {
+      const p = await client.query(
+        `SELECT id FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2 AND is_active = TRUE`,
+        [updates.person_id, userId]
+      );
+      if (p.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_PERSON', message: 'Person not found' },
+        });
+        return;
+      }
+    }
+    if (updates.category_id) {
+      const c = await client.query(
+        `SELECT id FROM ${SCHEMA}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`,
+        [updates.category_id, userId]
+      );
+      if (c.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: 'INVALID_CATEGORY', message: 'Category not found' },
+        });
+        return;
+      }
+    }
+
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;

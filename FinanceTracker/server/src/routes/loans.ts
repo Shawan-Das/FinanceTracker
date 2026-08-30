@@ -304,6 +304,14 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
 
     const loan = loanResult.rows[0];
 
+    if (loan.status !== 'ACTIVE') {
+      res.status(400).json({
+        success: false,
+        error: { code: 'LOAN_NOT_ACTIVE', message: `Cannot record repayment for a loan with status '${loan.status}'` },
+      });
+      return;
+    }
+
     const repaidResult = await client.query(
       `SELECT COALESCE(SUM(lr.amount), 0) as total_repaid
        FROM ${SCHEMA}.loan_repayments lr
@@ -319,7 +327,7 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
         success: false,
         error: {
           code: 'AMOUNT_EXCEEDS',
-          message: `Repayment amount ($${amount}) exceeds remaining balance ($${remaining})`,
+          message: `Repayment amount (৳${amount}) exceeds remaining balance (৳${remaining})`,
         },
       });
       return;
