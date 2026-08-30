@@ -12,7 +12,7 @@
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
     "build": "cd client && npm run build && cd ../server && npm run build",
-    "vercel-build": "cd server && npm run build && cd ../client && npm run build && cd .. && rm -rf public && mkdir -p public && cp -r client/dist/* public/",
+    "vercel-build": "cd server && npm run build && cd ../client && npm run build && cd .. && node vercel-build.js",
     "start": "cd server && npm start",
     "test": "cd server && npm test",
     "db:create": "cd server && npm run db:create",

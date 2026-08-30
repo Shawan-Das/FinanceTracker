@@ -1,14 +1,14 @@
 /**
  * Vercel Serverless Entry Point
  *
- * This wraps the Express app so it can run as a Vercel serverless function.
- * All /api/* requests are routed here by vercel.json.
+ * The vercel-build script copies server/dist/* into api/dist/ so that
+ * all required files are colocated. Vercel's nft bundler can then trace
+ * and include everything the function needs.
  */
 let app;
 
 try {
-  // The server is pre-built to server/dist/app.js
-  const appModule = require('../FinanceTracker/server/dist/app.js');
+  const appModule = require('./dist/app.js');
   app = appModule.default || appModule;
 } catch (error) {
   console.error('Failed to load the Express app:', error);
