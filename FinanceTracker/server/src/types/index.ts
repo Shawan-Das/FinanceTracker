@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string;
   full_name: string;
   email: string;
   password_hash: string;
@@ -9,8 +9,8 @@ export interface User {
 }
 
 export interface Account {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   name: string;
   account_type: 'BANK' | 'CASH' | 'MOBILE_WALLET' | 'OTHER';
   currency: string;
@@ -23,8 +23,8 @@ export interface Account {
 }
 
 export interface Person {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   name: string;
   phone: string | null;
   email: string | null;
@@ -35,8 +35,8 @@ export interface Person {
 }
 
 export interface Category {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   name: string;
   type: 'INCOME' | 'EXPENSE';
   icon: string | null;
@@ -47,15 +47,15 @@ export interface Category {
 }
 
 export interface Transaction {
-  id: number;
-  user_id: number;
+  id: string;
+  user_id: string;
   transaction_type: TransactionType;
   transaction_date: string;
   amount: number;
-  account_id: number | null;
-  person_id: number | null;
-  category_id: number | null;
-  loan_id: number | null;
+  account_id: string | null;
+  person_id: string | null;
+  category_id: string | null;
+  loan_id: string | null;
   description: string | null;
   reference: string | null;
   created_at: Date;
@@ -74,18 +74,18 @@ export type TransactionType =
   | 'ADJUSTMENT';
 
 export interface TransactionTransfer {
-  id: number;
-  transaction_id: number;
-  from_account_id: number;
-  to_account_id: number;
+  id: string;
+  transaction_id: string;
+  from_account_id: string;
+  to_account_id: string;
   amount: number;
   created_at: Date;
 }
 
 export interface Loan {
-  id: number;
-  user_id: number;
-  person_id: number | null;
+  id: string;
+  user_id: string;
+  person_id: string | null;
   direction: 'BORROWED' | 'LENT';
   principal_amount: number;
   interest_amount: number;
@@ -98,9 +98,9 @@ export interface Loan {
 }
 
 export interface LoanRepayment {
-  id: number;
-  loan_id: number;
-  transaction_id: number | null;
+  id: string;
+  loan_id: string;
+  transaction_id: string | null;
   amount: number;
   repayment_date: string;
   notes: string | null;
@@ -135,11 +135,4 @@ export interface ApiResponse<T = any> {
     total: number;
     totalPages: number;
   };
-}
-
-// Extend Express Session
-declare module 'express-session' {
-  interface SessionData {
-    userId: string;
-  }
 }
