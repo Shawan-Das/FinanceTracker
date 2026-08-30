@@ -1,10 +1,4 @@
 {
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    }
-  ],
   "outputDirectory": "public",
   "routes": [
     {
@@ -16,7 +10,6 @@
       "dest": "/assets/$1"
     },
     {
-      "src": "/(.*)",
       "handle": "filesystem"
     },
     {
