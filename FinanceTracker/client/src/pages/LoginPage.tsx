@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { authApi } from '../api/client';
 import toast from 'react-hot-toast';
+import { Mail } from 'lucide-react';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -11,6 +13,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
   const [lockoutTimer, setLockoutTimer] = useState(0);
+  const [emailNotVerified, setEmailNotVerified] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   // Lockout countdown timer
   useEffect(() => {
@@ -40,6 +45,7 @@ export default function LoginPage() {
       toast.error('Please fill in all fields');
       return;
     }
+    setEmailNotVerified(false);
     setLoading(true);
     try {
       await login(email, password);
@@ -62,6 +68,7 @@ export default function LoginPage() {
         }
         toast.error(errMsg);
       } else if (errCode === 'EMAIL_NOT_VERIFIED') {
+        setEmailNotVerified(true);
         toast.error(errMsg + ' Check your inbox or resend the code.');
       } else {
         toast.error(errMsg);
@@ -70,6 +77,29 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  const handleResendVerification = async () => {
+    if (resendCooldown > 0 || !email) return;
+    setResendLoading(true);
+    try {
+      await authApi.resendVerification({ email });
+      toast.success('Verification code sent! Check your inbox.');
+      setResendCooldown(60);
+    } catch {
+      toast.error('Failed to resend verification code');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => (prev <= 1 ? 0 : prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown > 0]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -104,6 +134,39 @@ export default function LoginPage() {
               <p className="text-sm text-yellow-800">
                 ⚠️ <strong>{attemptsRemaining}</strong> attempt{attemptsRemaining !== 1 ? 's' : ''} remaining before account lockout.
               </p>
+            </div>
+          )}
+
+          {/* Email Not Verified Banner */}
+          {emailNotVerified && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <Mail size={20} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-amber-800">Email not verified</p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Please verify your email before logging in. Check your inbox for the verification code.
+                  </p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <button
+                      onClick={handleResendVerification}
+                      disabled={resendCooldown > 0 || resendLoading}
+                      className="text-sm font-medium text-amber-800 hover:text-amber-900 underline disabled:no-underline disabled:text-amber-500 disabled:cursor-not-allowed"
+                    >
+                      {resendCooldown > 0
+                        ? `Resend in ${resendCooldown}s`
+                        : resendLoading
+                          ? 'Sending...'
+                          : 'Resend verification code'
+                      }
+                    </button>
+                    <span className="text-amber-500">·</span>
+                    <Link to="/register" className="text-sm font-medium text-amber-800 hover:text-amber-900 underline">
+                      Register again
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

@@ -79,6 +79,13 @@ router.post('/register', authLimiter, validateBody(registerSchema), async (req: 
         return;
       }
       // Unverified account exists — resend verification code
+      // Also update password in case user chose a different one on retry
+      const passwordHash = await bcrypt.hash(password, 12);
+      await db.query(
+        `UPDATE ${SCHEMA}.users SET password_hash = $1, updated_at = NOW() WHERE id = $2`,
+        [passwordHash, user.id]
+      );
+
       const code = await createVerificationCode(user.id, 'registration');
       await sendVerificationCode(email, code, 'registration');
 
