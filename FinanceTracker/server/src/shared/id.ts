@@ -8,7 +8,7 @@
  * 62^12 ≈ 3.2 × 10^21 possible values per table — collision-resistant.
  */
 
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ-0123456789=';
 
 function randomString(length: number): string {
   let result = '';
