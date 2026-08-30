@@ -1,12 +1,14 @@
 /**
  * Vercel Build Script (cross-platform)
  *
- * Copies the client build output to ../public/ for Vercel's static file serving.
- * The server dist stays in FinanceTracker/server/dist/ and is bundled into the
- * serverless function via the includeFiles config in vercel.json.
+ * 1. Builds the TypeScript server
+ * 2. Bundles the server into a single file using esbuild (so no path issues)
+ * 3. Builds the React client
+ * 4. Copies client build to ../public/
  */
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 
@@ -36,13 +38,31 @@ function copyDir(src, dest) {
   }
 }
 
-// Clean and recreate public/
+// 1. Build TypeScript server
+console.log('🔨 Building server...');
+execSync('cd server && npx tsc', { stdio: 'inherit' });
+
+// 2. Bundle server into single file for Vercel
+console.log('📦 Bundling server for Vercel...');
+const esbuildPath = path.join(__dirname, 'node_modules', '.bin', 'esbuild');
+const esbuildExists = fs.existsSync(esbuildPath) || fs.existsSync(esbuildPath + '.cmd');
+if (esbuildExists) {
+  execSync(`${esbuildPath} server/dist/app.js --bundle --platform=node --outfile=../api/server.js --external:pg --external:pg-native --external:bcrypt --packages=external`, { stdio: 'inherit' });
+} else {
+  // Fallback: use npx
+  execSync(`npx esbuild server/dist/app.js --bundle --platform=node --outfile=../api/server.js --external:pg --external:pg-native --external:bcrypt --packages=external`, { stdio: 'inherit' });
+}
+console.log('✓ Bundled server → api/server.js');
+
+// 3. Build React client
+console.log('🔨 Building client...');
+execSync('cd client && npm run build', { stdio: 'inherit' });
+
+// 4. Copy client build to public/
 const publicDir = path.join(ROOT, 'public');
 rmrf(publicDir);
-
-// Copy client build to public/
 const clientDist = path.join(__dirname, 'client', 'dist');
 copyDir(clientDist, publicDir);
 console.log('✓ Copied client/dist/ → public/');
 
-console.log('\nBuild output ready for Vercel.');
+console.log('\n✅ Vercel build complete!');

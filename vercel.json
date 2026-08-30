@@ -3,10 +3,7 @@
   "builds": [
     {
       "src": "api/index.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["FinanceTracker/server/dist/**"]
-      }
+      "use": "@vercel/node"
     }
   ],
   "outputDirectory": "public",
