@@ -6,10 +6,21 @@
     }
   ],
   "outputDirectory": "public",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/((?!api/|assets/).*)",
-      "destination": "/index.html"
+      "src": "/api/(.*)",
+      "dest": "/api"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
