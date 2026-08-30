@@ -1,12 +1,10 @@
 /**
- * Vercel Build Script (cross-platform)
+ * Vercel Build Script
  *
- * 1. Builds the TypeScript server
- * 2. Bundles the server into a single file using esbuild
- * 3. Builds the React client
+ * 1. Builds TypeScript server
+ * 2. Bundles server with external packages (resolved from node_modules at runtime)
+ * 3. Builds React client
  * 4. Copies client build to public/
- *
- * All outputs are inside FinanceTracker/ (the Vercel Root Directory).
  */
 const fs = require('fs');
 const path = require('path');
@@ -16,11 +14,8 @@ function rmrf(dir) {
   if (!fs.existsSync(dir)) return;
   for (const f of fs.readdirSync(dir)) {
     const fp = path.join(dir, f);
-    if (fs.lstatSync(fp).isDirectory()) {
-      rmrf(fp);
-    } else {
-      fs.unlinkSync(fp);
-    }
+    if (fs.lstatSync(fp).isDirectory()) rmrf(fp);
+    else fs.unlinkSync(fp);
   }
   fs.rmdirSync(dir);
 }
@@ -28,13 +23,9 @@ function rmrf(dir) {
 function copyDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   for (const f of fs.readdirSync(src)) {
-    const srcPath = path.join(src, f);
-    const destPath = path.join(dest, f);
-    if (fs.lstatSync(srcPath).isDirectory()) {
-      copyDir(srcPath, destPath);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
-    }
+    const s = path.join(src, f), d = path.join(dest, f);
+    if (fs.lstatSync(s).isDirectory()) copyDir(s, d);
+    else fs.copyFileSync(s, d);
   }
 }
 
@@ -42,13 +33,16 @@ function copyDir(src, dest) {
 console.log('Building server...');
 execSync('cd server && npx tsc', { stdio: 'inherit' });
 
-// 2. Bundle server into single file for Vercel
-console.log('Bundling server for Vercel...');
+// 2. Bundle server — external packages resolve from node_modules at runtime
+console.log('Bundling server...');
 const esbuildPath = path.join(__dirname, 'node_modules', '.bin', 'esbuild');
-const esbuildExists = fs.existsSync(esbuildPath) || fs.existsSync(esbuildPath + '.cmd');
-const esbuildBin = esbuildExists ? esbuildPath : 'npx esbuild';
-execSync(`${esbuildBin} server/dist/app.js --bundle --platform=node --outfile=api/_server.js --packages=external`, { stdio: 'inherit' });
-console.log('Bundled server to api/_server.js');
+const esbuildBin = fs.existsSync(esbuildPath) ? esbuildPath : 'npx esbuild';
+execSync(
+  `${esbuildBin} server/dist/app.js --bundle --platform=node --outfile=api/_server.js --packages=external`,
+  { stdio: 'inherit' }
+);
+const size = fs.statSync(path.join(__dirname, 'api', '_server.js')).size;
+console.log(`Bundled server to api/_server.js (${Math.round(size/1024)}KB)`);
 
 // 3. Build React client
 console.log('Building client...');
@@ -57,8 +51,7 @@ execSync('cd client && npm run build', { stdio: 'inherit' });
 // 4. Copy client build to public/
 const publicDir = path.join(__dirname, 'public');
 rmrf(publicDir);
-const clientDist = path.join(__dirname, 'client', 'dist');
-copyDir(clientDist, publicDir);
+copyDir(path.join(__dirname, 'client', 'dist'), publicDir);
 console.log('Copied client/dist/ to public/');
 
 console.log('\nVercel build complete!');
