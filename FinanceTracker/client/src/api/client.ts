@@ -111,6 +111,8 @@ export const loansApi = {
   delete: (id: string) => api.delete(`/loans/${id}`),
   repayments: (id: string) => api.get(`/loans/${id}/repayments`),
   createRepayment: (id: string, data: any) => api.post(`/loans/${id}/repayments`, data),
+  orphaned: () => api.get('/loans/orphaned'),
+  fixOrphaned: (data: { account_id: string }) => api.post('/loans/fix-orphaned', data),
 };
 
 // =============================================================================

@@ -6,7 +6,7 @@ import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
-import { Plus, CreditCard, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Plus, CreditCard, AlertTriangle, CheckCircle, Wrench } from 'lucide-react';
 import type { Loan, Person, Account } from '../types';
 
 const toNum = (v: any): number => typeof v === 'number' ? v : parseFloat(v) || 0;
@@ -30,6 +30,10 @@ export default function LoansPage() {
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
 
+  // Fix orphaned loans
+  const [showFixForm, setShowFixForm] = useState(false);
+  const [fixAccountId, setFixAccountId] = useState('');
+
   // Repay form
   const [repayAmount, setRepayAmount] = useState('');
   const [repayDate, setRepayDate] = useState(new Date().toISOString().split('T')[0]);
@@ -49,6 +53,24 @@ export default function LoansPage() {
   const { data: accounts } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountsApi.list().then((r) => r.data.data),
+  });
+
+  const { data: orphanedData, refetch: refetchOrphaned } = useQuery({
+    queryKey: ['loans', 'orphaned'],
+    queryFn: () => loansApi.orphaned().then((r) => r.data.data),
+  });
+
+  const fixOrphanedMutation = useMutation({
+    mutationFn: (data: { account_id: string }) => loansApi.fixOrphaned(data),
+    onSuccess: (response) => {
+      const fixedCount = response.data.data.fixed_count;
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      refetchOrphaned();
+      toast.success(`Fixed ${fixedCount} loan(s) — missing transactions created!`);
+      setShowFixForm(false);
+      setFixAccountId('');
+    },
   });
 
   const createMutation = useMutation({
@@ -146,6 +168,30 @@ export default function LoansPage() {
           <Plus size={16} className="mr-1" /> New Loan
         </button>
       </div>
+
+      {/* Orphaned Loans Warning */}
+      {orphanedData && orphanedData.count > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <Wrench size={20} className="text-amber-600 mt-0.5" />
+            <div className="flex-1">
+              <h3 className="text-sm font-semibold text-amber-800">
+                {orphanedData.count} loan(s) missing transaction records
+              </h3>
+              <p className="text-sm text-amber-700 mt-1">
+                These loans were created before the system started tracking transactions automatically.
+                Their balances may be inaccurate until fixed.
+              </p>
+              <button
+                onClick={() => { setFixAccountId(''); setShowFixForm(true); }}
+                className="mt-3 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors"
+              >
+                <Wrench size={14} className="inline mr-1" /> Fix {orphanedData.count} Loan(s)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Active Loans */}
       {activeLoans.length > 0 && (
@@ -375,6 +421,61 @@ export default function LoansPage() {
             </div>
           </form>
         )}
+      </Modal>
+
+      {/* Fix Orphaned Loans Modal */}
+      <Modal isOpen={showFixForm} onClose={() => { setShowFixForm(false); setFixAccountId(''); }} title="Fix Missing Transactions">
+        <div className="space-y-4">
+          <div className="bg-amber-50 rounded-lg p-4">
+            <p className="text-sm text-amber-800">
+              This will create the missing LEND/BORROW transactions for {orphanedData?.count || 0} loan(s)
+              that were created before automatic transaction tracking was added.
+            </p>
+            <p className="text-sm text-amber-700 mt-2">
+              Select the account the money was originally sent from. This ensures your account balances are accurate.
+            </p>
+          </div>
+          {orphanedData && orphanedData.loans.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-gray-500 uppercase">Loans to fix:</p>
+              {orphanedData.loans.map((loan: any) => (
+                <div key={loan.id} className="flex justify-between text-sm py-1">
+                  <span className="text-gray-700">
+                    {loan.direction === 'LENT' ? 'Lent to' : 'Borrowed from'} {loan.person_name || 'Unknown'}
+                  </span>
+                  <span className="font-medium">{formatCurrency(toNum(loan.principal_amount))}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div>
+            <label className="label">Select Account</label>
+            <select className="input" value={fixAccountId} onChange={(e) => setFixAccountId(e.target.value)}>
+              <option value="">Choose account...</option>
+              {accounts?.map((a: Account) => (
+                <option key={a.account_id} value={a.account_id}>{a.account_name} ({formatCurrency(a.current_balance)})</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-2 pt-2">
+            <button
+              onClick={() => {
+                if (!fixAccountId) {
+                  toast.error('Please select an account');
+                  return;
+                }
+                fixOrphanedMutation.mutate({ account_id: fixAccountId });
+              }}
+              className="btn-primary flex-1"
+              disabled={fixOrphanedMutation.isPending}
+            >
+              {fixOrphanedMutation.isPending ? 'Fixing...' : `Fix ${orphanedData?.count || 0} Loan(s)`}
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => { setShowFixForm(false); setFixAccountId(''); }}>
+              Cancel
+            </button>
+          </div>
+        </div>
       </Modal>
     </div>
   );

@@ -58206,6 +58206,96 @@ var require_loans = __commonJS({
         });
       }
     });
+    router.get("/orphaned", async (req, res) => {
+      try {
+        const userId = (0, auth_12.getUserId)(req);
+        const result = await connection_1.db.query(`SELECT l.id, l.direction, l.principal_amount, l.interest_amount,
+              l.start_date, l.status, l.description,
+              p.name AS person_name
+       FROM ${SCHEMA}.loans l
+       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
+       WHERE l.user_id = $1
+         AND NOT EXISTS (
+           SELECT 1 FROM ${SCHEMA}.transactions t
+           WHERE t.loan_id = l.id
+             AND t.transaction_type IN ('LEND', 'BORROW')
+             AND t.deleted_at IS NULL
+         )
+       ORDER BY l.start_date ASC`, [userId]);
+        res.json({
+          success: true,
+          data: {
+            count: result.rows.length,
+            loans: result.rows
+          }
+        });
+      } catch (error) {
+        console.error("Find orphaned loans error:", error);
+        res.status(500).json({
+          success: false,
+          error: { code: "SERVER_ERROR", message: "Failed to find orphaned loans" }
+        });
+      }
+    });
+    router.post("/fix-orphaned", async (req, res) => {
+      const client = await connection_1.db.getClient();
+      try {
+        const userId = (0, auth_12.getUserId)(req);
+        const { account_id } = req.body;
+        if (!account_id) {
+          res.status(400).json({
+            success: false,
+            error: { code: "VALIDATION_ERROR", message: "account_id is required to create missing transactions" }
+          });
+          return;
+        }
+        const accCheck = await client.query(`SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [account_id, userId]);
+        if (accCheck.rows.length === 0) {
+          res.status(400).json({
+            success: false,
+            error: { code: "INVALID_ACCOUNT", message: "Account not found" }
+          });
+          return;
+        }
+        await client.query("BEGIN");
+        const orphans = await client.query(`SELECT l.id, l.direction, l.principal_amount, l.start_date, l.description, l.person_id
+       FROM ${SCHEMA}.loans l
+       WHERE l.user_id = $1
+         AND NOT EXISTS (
+           SELECT 1 FROM ${SCHEMA}.transactions t
+           WHERE t.loan_id = l.id
+             AND t.transaction_type IN ('LEND', 'BORROW')
+             AND t.deleted_at IS NULL
+         )
+       ORDER BY l.start_date ASC`, [userId]);
+        const fixed = [];
+        for (const loan of orphans.rows) {
+          const txType = loan.direction === "LENT" ? "LEND" : "BORROW";
+          const txId = (0, id_1.generateId)("transactions");
+          await client.query(`INSERT INTO ${SCHEMA}.transactions
+         (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [txId, userId, txType, loan.start_date, loan.principal_amount, account_id, loan.person_id, loan.id, loan.description || "Backfilled from loan"]);
+          fixed.push(loan.id);
+        }
+        await client.query("COMMIT");
+        res.json({
+          success: true,
+          data: {
+            fixed_count: fixed.length,
+            fixed_loan_ids: fixed
+          }
+        });
+      } catch (error) {
+        await client.query("ROLLBACK");
+        console.error("Fix orphaned loans error:", error);
+        res.status(500).json({
+          success: false,
+          error: { code: "SERVER_ERROR", message: "Failed to fix orphaned loans" }
+        });
+      } finally {
+        client.release();
+      }
+    });
     exports2.default = router;
   }
 });
