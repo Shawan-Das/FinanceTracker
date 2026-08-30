@@ -16,6 +16,7 @@
       "dest": "/assets/$1"
     },
     {
+      "src": "/(.*)",
       "handle": "filesystem"
     },
     {
