@@ -88,11 +88,13 @@ router.patch('/:id', validateBody(updateCategorySchema), async (req: Request, re
     const categoryId = req.params.id;
     const updates = req.body;
 
+    const ALLOWED_FIELDS = ['name', 'icon', 'color', 'is_active'];
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
 
     for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
       fields.push(`${key} = $${paramIndex}`);
       values.push(value);
       paramIndex++;

@@ -6,7 +6,7 @@ import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
-import { Plus, CreditCard, AlertTriangle, CheckCircle, Wrench } from 'lucide-react';
+import { Plus, CreditCard, AlertTriangle, CheckCircle, Wrench, FileText } from 'lucide-react';
 import type { Loan, Person, Account } from '../types';
 
 const toNum = (v: any): number => typeof v === 'number' ? v : parseFloat(v) || 0;
@@ -112,6 +112,23 @@ export default function LoansPage() {
     setRepayAccountId('');
     setRepayNotes('');
     setSelectedLoan(null);
+  };
+
+  const handleDownloadVoucher = async (loan: Loan) => {
+    try {
+      const response = await loansApi.voucher(loan.id, 'voucher');
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `loan-${loan.id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch {
+      toast.error('Failed to generate voucher');
+    }
   };
 
   const handleCreate = (e: React.FormEvent) => {
@@ -249,9 +266,14 @@ export default function LoansPage() {
                     <p className="text-xs text-gray-500 mb-3">Due: {new Date(loan.due_date).toLocaleDateString()}</p>
                   )}
 
-                  <button onClick={() => openRepay(loan)} className="btn-primary w-full text-sm">
-                    Record Repayment
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => openRepay(loan)} className="btn-primary flex-1 text-sm">
+                      Record Repayment
+                    </button>
+                    <button onClick={() => handleDownloadVoucher(loan)} className="btn-secondary text-sm px-3" title="Download Voucher">
+                      <FileText size={16} />
+                    </button>
+                  </div>
                 </div>
               );
             })}

@@ -93,21 +93,21 @@ describe('Transfers preserve total wealth', () => {
   });
 
   it('transfer amount cannot equal zero or be negative', () => {
-    const result1 = validateTransfer(1, 2, 0);
+    const result1 = validateTransfer('acc_abc123def456', 'acc_xyz789ghi012', 0);
     expect(result1.valid).toBe(false);
 
-    const result2 = validateTransfer(1, 2, -100);
+    const result2 = validateTransfer('acc_abc123def456', 'acc_xyz789ghi012', -100);
     expect(result2.valid).toBe(false);
   });
 
   it('source and destination accounts cannot be the same', () => {
-    const result = validateTransfer(1, 1, 5000);
+    const result = validateTransfer('acc_abc123def456', 'acc_abc123def456', 5000);
     expect(result.valid).toBe(false);
     expect(result.error).toContain('cannot be the same');
   });
 
   it('valid transfer passes validation', () => {
-    const result = validateTransfer(1, 2, 5000);
+    const result = validateTransfer('acc_abc123def456', 'acc_xyz789ghi012', 5000);
     expect(result.valid).toBe(true);
   });
 });

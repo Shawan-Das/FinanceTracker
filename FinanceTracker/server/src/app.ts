@@ -99,8 +99,15 @@ if (isProduction) {
   }));
 
   // SPA fallback — serve index.html for all non-API routes
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
+  // Catch-all: API routes that weren't matched above get a 404;
+  // everything else serves the SPA index.html.
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Route ${req.method} ${req.path} not found` },
+      });
+    } else {
       res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
         if (err) {
           console.error('Failed to serve index.html:', err);

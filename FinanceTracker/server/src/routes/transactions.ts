@@ -5,6 +5,8 @@ import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody, validateQuery } from '../middleware/validation';
 import { generateId } from '../shared/id';
 
+import { generateVoucherPDF, VoucherType } from '../services/voucher';
+
 const router = Router();
 const SCHEMA = 'finance_tracker';
 
@@ -112,6 +114,178 @@ router.get('/', validateQuery(listTransactionsQuery), async (req: Request, res: 
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to load transactions' },
+    });
+  }
+});
+
+// =============================================================================
+// GET /api/transactions/export — Export transactions as CSV or JSON
+// (Must be defined BEFORE /:id so Express doesn't treat 'export' as an ID)
+// =============================================================================
+router.get('/export', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const format = (req.query.format as string) || 'json';
+    const from = req.query.from as string | undefined;
+    const to = req.query.to as string | undefined;
+    const type = req.query.type as string | undefined;
+
+    const conditions: string[] = ['t.user_id = $1', 't.deleted_at IS NULL'];
+    const values: any[] = [userId];
+    let paramIndex = 2;
+
+    if (from) {
+      conditions.push(`t.transaction_date >= $${paramIndex}`);
+      values.push(from);
+      paramIndex++;
+    }
+    if (to) {
+      conditions.push(`t.transaction_date <= $${paramIndex}`);
+      values.push(to);
+      paramIndex++;
+    }
+    if (type) {
+      conditions.push(`t.transaction_type = $${paramIndex}`);
+      values.push(type);
+      paramIndex++;
+    }
+
+    const result = await db.query(
+      `SELECT t.transaction_date, t.transaction_type, t.amount,
+              a.name AS account_name, p.name AS person_name,
+              c.name AS category_name, t.description, t.reference,
+              t.created_at
+       FROM ${SCHEMA}.transactions t
+       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+       WHERE ${conditions.join(' AND ')}
+       ORDER BY t.transaction_date ASC, t.id ASC`,
+      values
+    );
+
+    if (format === 'csv') {
+      const headers = ['Date', 'Type', 'Amount', 'Account', 'Person', 'Category', 'Description', 'Reference'];
+      const rows = result.rows.map((r: any) => [
+        r.transaction_date,
+        r.transaction_type,
+        r.amount,
+        r.account_name || '',
+        r.person_name || '',
+        r.category_name || '',
+        r.description || '',
+        r.reference || '',
+      ]);
+
+      const csv = [headers.join(','), ...rows.map((row: any[]) =>
+        row.map((cell: any) => `"${String(cell).replace(/"/g, '""')}"`).join(',')
+      )].join('\n');
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="transactions.csv"');
+      res.send(csv);
+    } else {
+      res.json({ success: true, data: result.rows });
+    }
+  } catch (error) {
+    console.error('Export transactions error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to export transactions' },
+    });
+  }
+});
+
+// =============================================================================
+// GET /api/transactions/:id/voucher — Generate PDF voucher for a transaction
+// (Must be defined BEFORE /:id so Express doesn't treat 'voucher' as an ID)
+// =============================================================================
+router.get('/:id/voucher', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const txId = req.params.id;
+    const voucherType: VoucherType = (req.query.type as VoucherType) || 'voucher';
+
+    // Fetch transaction with all related data
+    const txResult = await db.query(
+      `SELECT t.*,
+              a.name as account_name,
+              p.name as person_name,
+              c.name as category_name
+       FROM ${SCHEMA}.transactions t
+       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+       WHERE t.id = $1 AND t.user_id = $2 AND t.deleted_at IS NULL`,
+      [txId, userId]
+    );
+
+    if (txResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Transaction not found' },
+      });
+      return;
+    }
+
+    const tx = txResult.rows[0];
+
+    // Fetch user info
+    const userResult = await db.query(
+      `SELECT full_name, email FROM ${SCHEMA}.users WHERE id = $1`,
+      [userId]
+    );
+    const user = userResult.rows[0] || { full_name: 'User', email: '' };
+
+    // Fetch transfer details if applicable
+    let fromAccountName: string | null = null;
+    let toAccountName: string | null = null;
+    if (tx.transaction_type === 'TRANSFER') {
+      const ttResult = await db.query(
+        `SELECT fa.name as from_name, ta.name as to_name
+         FROM ${SCHEMA}.transaction_transfers tt
+         JOIN ${SCHEMA}.accounts fa ON fa.id = tt.from_account_id
+         JOIN ${SCHEMA}.accounts ta ON ta.id = tt.to_account_id
+         WHERE tt.transaction_id = $1`,
+        [txId]
+      );
+      if (ttResult.rows.length > 0) {
+        fromAccountName = ttResult.rows[0].from_name;
+        toAccountName = ttResult.rows[0].to_name;
+      }
+    }
+
+    // Generate PDF
+    const pdfDoc = generateVoucherPDF(
+      {
+        id: tx.id,
+        transaction_type: tx.transaction_type,
+        transaction_date: tx.transaction_date,
+        amount: parseFloat(tx.amount),
+        description: tx.description,
+        reference: tx.reference,
+        account_name: tx.account_name,
+        person_name: tx.person_name,
+        category_name: tx.category_name,
+        user_name: user.full_name,
+        user_email: user.email,
+        from_account_name: fromAccountName,
+        to_account_name: toAccountName,
+      },
+      voucherType,
+    );
+
+    // Set response headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${voucherType}-${tx.id}.pdf"`);
+
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  } catch (error) {
+    console.error('Generate voucher error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to generate voucher' },
     });
   }
 });
@@ -417,11 +591,13 @@ router.patch('/:id', validateBody(updateTransactionSchema), async (req: Request,
       }
     }
 
+    const ALLOWED_FIELDS = ['transaction_date', 'amount', 'account_id', 'person_id', 'category_id', 'description', 'reference'];
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
 
     for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
       fields.push(`${key} = $${paramIndex}`);
       values.push(value);
       paramIndex++;

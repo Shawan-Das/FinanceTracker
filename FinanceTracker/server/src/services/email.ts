@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -158,8 +159,8 @@ export async function sendVerificationCode(
 // =============================================================================
 
 /**
- * Generate a 6-digit numeric verification code.
+ * Generate a 6-digit numeric verification code using a CSPRNG.
  */
 export function generateVerificationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 999999).toString();
 }

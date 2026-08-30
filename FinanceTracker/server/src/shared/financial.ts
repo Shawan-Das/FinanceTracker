@@ -30,13 +30,13 @@ export type TransactionType =
   | 'ADJUSTMENT';
 
 export interface AccountBalance {
-  accountId: number;
+  accountId: string;
   openingBalance: number;
   currentBalance: number;
 }
 
 export interface PersonBalance {
-  personId: number;
+  personId: string;
   totalLent: number;
   totalLentRepaid: number;
   totalBorrowed: number;
@@ -47,7 +47,7 @@ export interface PersonBalance {
 }
 
 export interface LoanBalance {
-  loanId: number;
+  loanId: string;
   principalAmount: number;
   interestAmount: number;
   totalRepaid: number;
@@ -164,7 +164,7 @@ export function calculatePersonBalance(
   const theyOweYou = Math.max(0, lent - lentRepaid);
   const youOweThem = Math.max(0, borrowed - borrowedRepaid);
   return {
-    personId: 0,
+    personId: '',
     totalLent: lent,
     totalLentRepaid: lentRepaid,
     totalBorrowed: borrowed,
@@ -205,7 +205,7 @@ export function calculateLoanBalance(
   const remaining = totalDue - totalRepaid;
 
   return {
-    loanId: 0,
+    loanId: '',
     principalAmount,
     interestAmount,
     totalRepaid,
@@ -268,8 +268,8 @@ export function calculateNetPosition(
  * Validate a transfer between two accounts.
  */
 export function validateTransfer(
-  fromAccountId: number,
-  toAccountId: number,
+  fromAccountId: string,
+  toAccountId: string,
   amount: number,
 ): { valid: boolean; error?: string } {
   if (fromAccountId === toAccountId) {

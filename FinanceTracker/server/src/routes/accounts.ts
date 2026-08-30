@@ -124,11 +124,13 @@ router.patch('/:id', validateBody(updateAccountSchema), async (req: Request, res
     const accountId = req.params.id;
     const updates = req.body;
 
+    const ALLOWED_FIELDS = ['name', 'account_type', 'opening_balance', 'opening_balance_date', 'is_active', 'notes'];
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
 
     for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
       fields.push(`${key} = $${paramIndex}`);
       values.push(value);
       paramIndex++;

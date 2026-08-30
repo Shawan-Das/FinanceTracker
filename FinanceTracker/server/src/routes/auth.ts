@@ -544,4 +544,69 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
   }
 });
 
+// =============================================================================
+// POST /api/auth/change-password — Change password while logged in
+// =============================================================================
+const changePasswordSchema = z.object({
+  current_password: z.string().min(1, 'Current password is required'),
+  new_password: z.string().min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+  confirm_password: z.string(),
+}).refine((data) => data.new_password === data.confirm_password, {
+  message: 'Passwords do not match',
+  path: ['confirm_password'],
+});
+
+router.post('/change-password', requireAuth, sensitiveLimiter, validateBody(changePasswordSchema), async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const { current_password, new_password } = req.body;
+
+    const result = await db.query(
+      `SELECT id, password_hash FROM ${SCHEMA}.users WHERE id = $1`,
+      [userId]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'USER_NOT_FOUND', message: 'User not found' },
+      });
+      return;
+    }
+
+    const user = result.rows[0];
+
+    // Verify current password
+    const validPassword = await bcrypt.compare(current_password, user.password_hash);
+    if (!validPassword) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_PASSWORD', message: 'Current password is incorrect' },
+      });
+      return;
+    }
+
+    // Hash and update new password
+    const passwordHash = await bcrypt.hash(new_password, 12);
+    await db.query(
+      `UPDATE ${SCHEMA}.users SET password_hash = $1, updated_at = NOW() WHERE id = $2`,
+      [passwordHash, userId]
+    );
+
+    res.json({
+      success: true,
+      data: { message: 'Password changed successfully' },
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'An unexpected error occurred' },
+    });
+  }
+});
+
 export default router;

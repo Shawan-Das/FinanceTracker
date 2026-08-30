@@ -8,6 +8,7 @@ import {
   CreditCard,
   Tag,
   BarChart3,
+  Settings,
   LogOut,
   Menu,
   X,
@@ -22,6 +23,7 @@ const navItems = [
   { to: '/loans', icon: CreditCard, label: 'Loans' },
   { to: '/categories', icon: Tag, label: 'Categories' },
   { to: '/reports', icon: BarChart3, label: 'Reports' },
+  { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function Layout() {

@@ -53,6 +53,8 @@ export const authApi = {
     api.post('/auth/forgot-password', data),
   resetPassword: (data: { email: string; code: string; password: string; confirm_password: string }) =>
     api.post('/auth/reset-password', data),
+  changePassword: (data: { current_password: string; new_password: string; confirm_password: string }) =>
+    api.post('/auth/change-password', data),
 };
 
 // =============================================================================
@@ -76,6 +78,7 @@ export const peopleApi = {
   create: (data: any) => api.post('/people', data),
   update: (id: string, data: any) => api.patch(`/people/${id}`, data),
   delete: (id: string) => api.delete(`/people/${id}`),
+  summary: (id: string) => api.get(`/people/${id}/summary`),
   transactions: (id: string, params?: any) => api.get(`/people/${id}/transactions`, { params }),
 };
 
@@ -98,6 +101,11 @@ export const transactionsApi = {
   create: (data: any) => api.post('/transactions', data),
   update: (id: string, data: any) => api.patch(`/transactions/${id}`, data),
   delete: (id: string) => api.delete(`/transactions/${id}`),
+  export: (params?: any) => api.get('/transactions/export', { params, responseType: 'blob' }),
+  voucher: (id: string, type?: string) => api.get(`/transactions/${id}/voucher`, {
+    params: { type: type || 'voucher' },
+    responseType: 'blob',
+  }),
 };
 
 // =============================================================================
@@ -113,6 +121,10 @@ export const loansApi = {
   createRepayment: (id: string, data: any) => api.post(`/loans/${id}/repayments`, data),
   orphaned: () => api.get('/loans/orphaned'),
   fixOrphaned: (data: { account_id: string }) => api.post('/loans/fix-orphaned', data),
+  voucher: (id: string, type?: string) => api.get(`/loans/${id}/voucher`, {
+    params: { type: type || 'voucher' },
+    responseType: 'blob',
+  }),
 };
 
 // =============================================================================

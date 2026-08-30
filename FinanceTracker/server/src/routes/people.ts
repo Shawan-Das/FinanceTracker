@@ -37,6 +37,66 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // =============================================================================
+// GET /api/people/:id/summary — Person summary with balance and transaction counts
+// (Must be defined BEFORE /:id so Express doesn't treat 'summary' as an ID)
+// =============================================================================
+router.get('/:id/summary', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.params.id;
+
+    const personResult = await db.query(
+      `SELECT p.*,
+              COALESCE(pb.amount_they_owe_you, 0) AS amount_they_owe_you,
+              COALESCE(pb.amount_you_owe_them, 0) AS amount_you_owe_them,
+              COALESCE(pb.total_lent, 0) AS total_lent,
+              COALESCE(pb.total_lent_repaid, 0) AS total_lent_repaid,
+              COALESCE(pb.total_borrowed, 0) AS total_borrowed,
+              COALESCE(pb.total_borrow_repaid, 0) AS total_borrow_repaid
+       FROM ${SCHEMA}.people p
+       LEFT JOIN ${SCHEMA}.v_person_balances pb ON pb.user_id = p.user_id AND pb.person_id = p.id
+       WHERE p.user_id = $1 AND p.id = $2`,
+      [userId, personId]
+    );
+
+    if (personResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Person not found' },
+      });
+      return;
+    }
+
+    const txCount = await db.query(
+      `SELECT COUNT(*) as total FROM ${SCHEMA}.transactions
+       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`,
+      [userId, personId]
+    );
+
+    const loanCount = await db.query(
+      `SELECT COUNT(*) as total FROM ${SCHEMA}.loans
+       WHERE user_id = $1 AND person_id = $2`,
+      [userId, personId]
+    );
+
+    res.json({
+      success: true,
+      data: {
+        ...personResult.rows[0],
+        transaction_count: parseInt(txCount.rows[0].total),
+        loan_count: parseInt(loanCount.rows[0].total),
+      },
+    });
+  } catch (error) {
+    console.error('Person summary error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to load person summary' },
+    });
+  }
+});
+
+// =============================================================================
 // GET /api/people/:id — Get a single person
 // =============================================================================
 router.get('/:id', async (req: Request, res: Response) => {
@@ -129,11 +189,13 @@ router.patch('/:id', validateBody(updatePersonSchema), async (req: Request, res:
     const personId = req.params.id;
     const updates = req.body;
 
+    const ALLOWED_FIELDS = ['name', 'phone', 'email', 'notes', 'is_active'];
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
 
     for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
       fields.push(`${key} = $${paramIndex}`);
       values.push(value);
       paramIndex++;

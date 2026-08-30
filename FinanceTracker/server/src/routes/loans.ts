@@ -4,6 +4,7 @@ import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
 import { generateId } from '../shared/id';
+import { generateVoucherPDF, VoucherData, VoucherType } from '../services/voucher';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -11,11 +12,26 @@ const SCHEMA = 'finance_tracker';
 router.use(requireAuth);
 
 // =============================================================================
+// Auto-detect overdue loans: mark ACTIVE loans past due_date as OVERDUE
+// =============================================================================
+async function markOverdueLoans(userId: string): Promise<void> {
+  await db.query(
+    `UPDATE ${SCHEMA}.loans
+     SET status = 'OVERDUE', updated_at = NOW()
+     WHERE user_id = $1 AND status = 'ACTIVE'
+       AND due_date IS NOT NULL AND due_date < CURRENT_DATE`,
+    [userId]
+  );
+}
+
+// =============================================================================
 // GET /api/loans — List all loans with repayment summary
 // =============================================================================
 router.get('/', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
+    // Auto-detect overdue loans before listing
+    await markOverdueLoans(userId);
     const result = await db.query(
       `SELECT l.*,
               p.name as person_name,
@@ -170,6 +186,86 @@ router.post('/fix-orphaned', async (req: Request, res: Response) => {
 });
 
 // =============================================================================
+// GET /api/loans/:id/voucher — Generate PDF voucher for a loan
+// (Must be defined BEFORE /:id so Express doesn't treat 'voucher' as an ID)
+// =============================================================================
+router.get('/:id/voucher', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const voucherType: VoucherType = (req.query.type as VoucherType) || 'voucher';
+
+    const loanResult = await db.query(
+      `SELECT l.*,
+              p.name as person_name,
+              COALESCE(lr.total_repaid, 0) AS total_repaid,
+              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
+       FROM ${SCHEMA}.loans l
+       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
+       LEFT JOIN (
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr2
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
+       ) lr ON lr.loan_id = l.id
+       WHERE l.id = $1 AND l.user_id = $2`,
+      [loanId, userId]
+    );
+
+    if (loanResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Loan not found' },
+      });
+      return;
+    }
+
+    const loan = loanResult.rows[0];
+
+    // Fetch user info
+    const userResult = await db.query(
+      `SELECT full_name, email FROM ${SCHEMA}.users WHERE id = $1`,
+      [userId]
+    );
+    const user = userResult.rows[0] || { full_name: 'User', email: '' };
+
+    // Build a synthetic VoucherData from loan data
+    const direction = loan.direction === 'LENT' ? 'Lend' : 'Borrow';
+    const label = loan.direction === 'LENT'
+      ? `Loan ${direction} to ${loan.person_name || 'Unknown'}`
+      : `Loan ${direction} from ${loan.person_name || 'Unknown'}`;
+
+    const voucherData: VoucherData = {
+      id: loan.id,
+      transaction_type: loan.direction === 'LENT' ? 'LEND' : 'BORROW',
+      transaction_date: loan.start_date,
+      amount: parseFloat(loan.principal_amount),
+      description: loan.description || label,
+      reference: `Interest: ৳${parseFloat(loan.interest_amount).toLocaleString()} | Repaid: ৳${parseFloat(loan.total_repaid).toLocaleString()} | Remaining: ৳${parseFloat(loan.remaining_amount).toLocaleString()}`,
+      account_name: null,
+      person_name: loan.person_name,
+      category_name: `Loan (${loan.status})`,
+      user_name: user.full_name,
+      user_email: user.email,
+    };
+
+    const pdfDoc = generateVoucherPDF(voucherData, voucherType);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="loan-${loan.id}.pdf"`);
+
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  } catch (error) {
+    console.error('Generate loan voucher error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to generate loan voucher' },
+    });
+  }
+});
+
+// =============================================================================
 // GET /api/loans/:id — Get a single loan with repayments
 // =============================================================================
 router.get('/:id', async (req: Request, res: Response) => {
@@ -304,11 +400,13 @@ router.patch('/:id', validateBody(updateLoanSchema), async (req: Request, res: R
     const loanId = req.params.id;
     const updates = req.body;
 
+    const ALLOWED_FIELDS = ['due_date', 'status', 'description'];
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
 
     for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
       fields.push(`${key} = $${paramIndex}`);
       values.push(value);
       paramIndex++;
@@ -434,6 +532,19 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
       res.status(400).json({
         success: false,
         error: { code: 'LOAN_NOT_ACTIVE', message: `Cannot record repayment for a loan with status '${loan.status}'` },
+      });
+      return;
+    }
+
+    // Verify account belongs to user
+    const accCheck = await client.query(
+      `SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`,
+      [account_id, userId]
+    );
+    if (accCheck.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_ACCOUNT', message: 'Account not found' },
       });
       return;
     }
