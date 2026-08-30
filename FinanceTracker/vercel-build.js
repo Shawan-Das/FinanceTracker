@@ -1,11 +1,9 @@
 /**
  * Vercel Build Script (cross-platform)
  *
- * Copies the server build output to ../api/dist/ and the client build output
- * to ../public/ so Vercel can deploy them correctly.
- *
- * This script runs from FinanceTracker/ directory (where package.json is).
- * api/ and public/ are at the project root (one level up).
+ * Copies the client build output to ../public/ for Vercel's static file serving.
+ * The server dist stays in FinanceTracker/server/dist/ and is bundled into the
+ * serverless function via the includeFiles config in vercel.json.
  */
 const fs = require('fs');
 const path = require('path');
@@ -38,21 +36,13 @@ function copyDir(src, dest) {
   }
 }
 
-// Clean and recreate output directories
+// Clean and recreate public/
 const publicDir = path.join(ROOT, 'public');
-const apiDistDir = path.join(ROOT, 'api', 'dist');
-
 rmrf(publicDir);
-rmrf(apiDistDir);
 
 // Copy client build to public/
 const clientDist = path.join(__dirname, 'client', 'dist');
 copyDir(clientDist, publicDir);
 console.log('✓ Copied client/dist/ → public/');
-
-// Copy server build to api/dist/
-const serverDist = path.join(__dirname, 'server', 'dist');
-copyDir(serverDist, apiDistDir);
-console.log('✓ Copied server/dist/ → api/dist/');
 
 console.log('\nBuild output ready for Vercel.');
