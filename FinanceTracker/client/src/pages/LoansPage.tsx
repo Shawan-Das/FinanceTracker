@@ -29,6 +29,7 @@ export default function LoansPage() {
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
+  const [loanSendReceipt, setLoanSendReceipt] = useState(false);
 
   // Fix orphaned loans
   const [showFixForm, setShowFixForm] = useState(false);
@@ -39,6 +40,7 @@ export default function LoansPage() {
   const [repayDate, setRepayDate] = useState(new Date().toISOString().split('T')[0]);
   const [repayAccountId, setRepayAccountId] = useState('');
   const [repayNotes, setRepayNotes] = useState('');
+  const [repaySendReceipt, setRepaySendReceipt] = useState(false);
 
   const { data: loans, isLoading, isError: loansError, refetch: refetchLoans } = useQuery({
     queryKey: ['loans'],
@@ -104,6 +106,7 @@ export default function LoansPage() {
     setStartDate(new Date().toISOString().split('T')[0]);
     setDueDate('');
     setDescription('');
+    setLoanSendReceipt(false);
   };
 
   const resetRepayForm = () => {
@@ -111,6 +114,7 @@ export default function LoansPage() {
     setRepayDate(new Date().toISOString().split('T')[0]);
     setRepayAccountId('');
     setRepayNotes('');
+    setRepaySendReceipt(false);
     setSelectedLoan(null);
   };
 
@@ -142,6 +146,7 @@ export default function LoansPage() {
       start_date: startDate,
       due_date: dueDate || undefined,
       description: description || undefined,
+      send_receipt: loanSendReceipt,
     });
   };
 
@@ -155,6 +160,7 @@ export default function LoansPage() {
         repayment_date: repayDate,
         account_id: repayAccountId,
         notes: repayNotes || undefined,
+        send_receipt: repaySendReceipt,
       },
     });
   };
@@ -382,6 +388,30 @@ export default function LoansPage() {
             <input type="text" className="input" placeholder="Loan details..."
               value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
+
+          {/* Send Receipt */}
+          {personId && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={loanSendReceipt}
+                  onChange={(e) => setLoanSendReceipt(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">📧 Send receipt to party</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {people?.find((p: Person) => p.id === personId)?.email
+                      ? `Send a PDF receipt to ${people.find((p: Person) => p.id === personId)?.email}`
+                      : 'Add an email to this person to enable sending receipts'
+                    }
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
+
           <div className="flex gap-2 pt-2">
             <button type="submit" className="btn-primary flex-1" disabled={createMutation.isPending}>
               Create Loan
@@ -432,6 +462,28 @@ export default function LoansPage() {
               <input type="text" className="input" placeholder="Payment notes..."
                 value={repayNotes} onChange={(e) => setRepayNotes(e.target.value)} />
             </div>
+
+            {/* Send Receipt */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={repaySendReceipt}
+                  onChange={(e) => setRepaySendReceipt(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">📧 Send repayment receipt to party</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {selectedLoan?.person_name && people?.find((p: Person) => p.id === selectedLoan.person_id)?.email
+                      ? `Send a PDF receipt to ${people.find((p: Person) => p.id === selectedLoan.person_id)?.email}`
+                      : 'Add an email to this person to enable sending receipts'
+                    }
+                  </p>
+                </div>
+              </label>
+            </div>
+
             <div className="flex gap-2 pt-2">
               <button type="submit" className="btn-primary flex-1" disabled={repayMutation.isPending}>
                 Record Repayment

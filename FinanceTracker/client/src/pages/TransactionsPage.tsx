@@ -55,6 +55,7 @@ export default function TransactionsPage() {
   const [formCategoryId, setFormCategoryId] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formReference, setFormReference] = useState('');
+  const [formSendReceipt, setFormSendReceipt] = useState(false);
 
   // Queries
   const queryParams: Record<string, any> = { page, limit: 30, ...filters };
@@ -132,6 +133,7 @@ export default function TransactionsPage() {
     setFormCategoryId('');
     setFormDescription('');
     setFormReference('');
+    setFormSendReceipt(false);
     setEditingTx(null);
   };
 
@@ -162,6 +164,7 @@ export default function TransactionsPage() {
     if (formToAccountId && formType === 'TRANSFER') payload.to_account_id = formToAccountId;
     if (formPersonId) payload.person_id = formPersonId;
     if (formCategoryId) payload.category_id = formCategoryId;
+    if (formSendReceipt && !editingTx) payload.send_receipt = true;
 
     if (editingTx) {
       updateMutation.mutate({
@@ -515,6 +518,29 @@ export default function TransactionsPage() {
             <input type="text" className="input" placeholder="Optional reference"
               value={formReference} onChange={(e) => setFormReference(e.target.value)} />
           </div>
+
+          {/* Send Receipt — only for lending/borrowing, only when creating */}
+          {!editingTx && ['LEND', 'BORROW', 'LEND_REPAYMENT', 'BORROW_REPAYMENT'].includes(formType) && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formSendReceipt}
+                  onChange={(e) => setFormSendReceipt(e.target.checked)}
+                  className="mt-0.5"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">📧 Send receipt to party</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {formPersonId && people?.find((p: Person) => p.id === formPersonId)?.email
+                      ? `Send a PDF receipt to ${people.find((p: Person) => p.id === formPersonId)?.email}`
+                      : 'Add an email to this person to enable sending receipts'
+                    }
+                  </p>
+                </div>
+              </label>
+            </div>
+          )}
 
           <div className="flex gap-2 pt-2">
             <button type="submit" className="btn-primary flex-1" disabled={createMutation.isPending || updateMutation.isPending}>

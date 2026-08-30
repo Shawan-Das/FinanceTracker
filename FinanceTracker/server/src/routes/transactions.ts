@@ -6,6 +6,7 @@ import { validateBody, validateQuery } from '../middleware/validation';
 import { generateId } from '../shared/id';
 
 import { generateVoucherPDF, VoucherType } from '../services/voucher';
+import { sendTransactionReceipt } from '../services/email';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -365,6 +366,7 @@ const createTransactionSchema = z.object({
   description: z.string().optional(),
   reference: z.string().optional(),
   to_account_id: z.string().optional(),
+  send_receipt: z.boolean().optional().default(false),
 });
 
 router.post('/', validateBody(createTransactionSchema), async (req: Request, res: Response) => {
@@ -382,6 +384,7 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
       description,
       reference,
       to_account_id,
+      send_receipt,
     } = req.body;
 
     const validationErrors: string[] = [];
@@ -503,6 +506,38 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
     await client.query('COMMIT');
 
     res.status(201).json({ success: true, data: tx });
+
+    // ── Fire-and-forget: send receipt to the other party ──
+    if (send_receipt && person_id && ['LEND', 'BORROW', 'LEND_REPAYMENT', 'BORROW_REPAYMENT'].includes(transaction_type)) {
+      (async () => {
+        try {
+          const personResult = await db.query(
+            `SELECT name, email FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2`,
+            [person_id, userId]
+          );
+          const person = personResult.rows[0];
+          if (!person || !person.email) return;
+
+          const userResult = await db.query(
+            `SELECT full_name FROM ${SCHEMA}.users WHERE id = $1`,
+            [userId]
+          );
+          const userName = userResult.rows[0]?.full_name || 'User';
+
+          await sendTransactionReceipt({
+            to: person.email,
+            senderName: userName,
+            recipientName: person.name,
+            transactionType: tx.transaction_type,
+            amount: parseFloat(tx.amount),
+            date: tx.transaction_date,
+            description: tx.description,
+          });
+        } catch (err) {
+          console.error('Failed to send transaction receipt:', err);
+        }
+      })();
+    }
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Create transaction error:', error);

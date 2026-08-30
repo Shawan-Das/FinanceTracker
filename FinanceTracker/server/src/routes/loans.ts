@@ -5,6 +5,7 @@ import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
 import { generateId } from '../shared/id';
 import { generateVoucherPDF, VoucherData, VoucherType } from '../services/voucher';
+import { sendTransactionReceipt } from '../services/email';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -336,13 +337,14 @@ const createLoanSchema = z.object({
   due_date: z.string().optional().nullable(),
   description: z.string().optional(),
   account_id: z.string().optional(),
+  send_receipt: z.boolean().optional().default(false),
 });
 
 router.post('/', validateBody(createLoanSchema), async (req: Request, res: Response) => {
   const client = await db.getClient();
   try {
     const userId = getUserId(req);
-    const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description, account_id } = req.body;
+    const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description, account_id, send_receipt } = req.body;
     const id = generateId('loans');
 
     await client.query('BEGIN');
@@ -373,6 +375,39 @@ router.post('/', validateBody(createLoanSchema), async (req: Request, res: Respo
       success: true,
       data: { ...result.rows[0], total_repaid: 0, remaining_amount: principal_amount + interest_amount, transaction_id: txId },
     });
+
+    // ── Fire-and-forget: send receipt to the other party ──
+    if (send_receipt && person_id) {
+      (async () => {
+        try {
+          const personResult = await db.query(
+            `SELECT name, email FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2`,
+            [person_id, userId]
+          );
+          const person = personResult.rows[0];
+          if (!person || !person.email) return;
+
+          const userResult = await db.query(
+            `SELECT full_name FROM ${SCHEMA}.users WHERE id = $1`,
+            [userId]
+          );
+          const userName = userResult.rows[0]?.full_name || 'User';
+
+          const txType = direction === 'LENT' ? 'LEND' : 'BORROW';
+          await sendTransactionReceipt({
+            to: person.email,
+            senderName: userName,
+            recipientName: person.name,
+            transactionType: txType,
+            amount: principal_amount,
+            date: start_date,
+            description: description || null,
+          });
+        } catch (err) {
+          console.error('Failed to send loan receipt:', err);
+        }
+      })();
+    }
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Create loan error:', error);
@@ -504,6 +539,7 @@ const createRepaymentSchema = z.object({
   repayment_date: z.string().min(1),
   account_id: z.string(),
   notes: z.string().optional(),
+  send_receipt: z.boolean().optional().default(false),
 });
 
 router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: Request, res: Response) => {
@@ -511,7 +547,7 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
   try {
     const userId = getUserId(req);
     const loanId = req.params.id;
-    const { amount, repayment_date, account_id, notes } = req.body;
+    const { amount, repayment_date, account_id, notes, send_receipt } = req.body;
 
     const loanResult = await client.query(
       `SELECT * FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`,
@@ -603,6 +639,39 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
     await client.query('COMMIT');
 
     res.status(201).json({ success: true, data: tx });
+
+    // ── Fire-and-forget: send receipt to the other party ──
+    if (send_receipt && loan.person_id) {
+      (async () => {
+        try {
+          const personResult = await db.query(
+            `SELECT name, email FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2`,
+            [loan.person_id, userId]
+          );
+          const person = personResult.rows[0];
+          if (!person || !person.email) return;
+
+          const userResult = await db.query(
+            `SELECT full_name FROM ${SCHEMA}.users WHERE id = $1`,
+            [userId]
+          );
+          const userName = userResult.rows[0]?.full_name || 'User';
+
+          const repayTxType = loan.direction === 'LENT' ? 'LEND_REPAYMENT' : 'BORROW_REPAYMENT';
+          await sendTransactionReceipt({
+            to: person.email,
+            senderName: userName,
+            recipientName: person.name,
+            transactionType: repayTxType,
+            amount: amount,
+            date: repayment_date,
+            description: notes || null,
+          });
+        } catch (err) {
+          console.error('Failed to send repayment receipt:', err);
+        }
+      })();
+    }
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Create repayment error:', error);
