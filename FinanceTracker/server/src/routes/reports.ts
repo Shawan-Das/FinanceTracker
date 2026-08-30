@@ -212,7 +212,7 @@ router.get('/account-statement', async (req: Request, res: Response) => {
               OR tt.from_account_id = $2
               OR tt.to_account_id = $2)
          AND t.deleted_at IS NULL
-       ORDER BY t.transaction_date ASC, t.id ASC`,
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
       [userId, accountId]
     );
 
@@ -277,7 +277,7 @@ router.get('/person-statement', async (req: Request, res: Response) => {
        FROM ${SCHEMA}.transactions t
        LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
        WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
-       ORDER BY t.transaction_date ASC, t.id ASC`,
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
       [userId, personId]
     );
 

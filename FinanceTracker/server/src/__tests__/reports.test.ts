@@ -386,7 +386,7 @@ describe('SQL query parameter correctness', () => {
              OR tt.from_account_id = $2
              OR tt.to_account_id = $2)
         AND t.deleted_at IS NULL
-      ORDER BY t.transaction_date ASC, t.id ASC
+      ORDER BY t.transaction_date ASC, t.created_at ASC
     `;
 
     // Verify $1 is used for user_id
@@ -411,7 +411,7 @@ describe('SQL query parameter correctness', () => {
       FROM finance_tracker.transactions t
       LEFT JOIN finance_tracker.accounts a ON a.id = t.account_id
       WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
-      ORDER BY t.transaction_date ASC, t.id ASC
+      ORDER BY t.transaction_date ASC, t.created_at ASC
     `;
 
     expect(personStatementQuery).toContain('t.user_id = $1');

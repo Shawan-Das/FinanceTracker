@@ -314,7 +314,7 @@ router.get('/:id/transactions', async (req: Request, res: Response) => {
        LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
        LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
-       ORDER BY t.transaction_date DESC, t.id DESC
+       ORDER BY t.transaction_date DESC, t.created_at DESC
        LIMIT $3 OFFSET $4`,
       [userId, personId, limit, offset]
     );
