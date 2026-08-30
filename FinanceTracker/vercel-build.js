@@ -47,12 +47,12 @@ console.log('📦 Bundling server for Vercel...');
 const esbuildPath = path.join(__dirname, 'node_modules', '.bin', 'esbuild');
 const esbuildExists = fs.existsSync(esbuildPath) || fs.existsSync(esbuildPath + '.cmd');
 if (esbuildExists) {
-  execSync(`${esbuildPath} server/dist/app.js --bundle --platform=node --outfile=../api/server.js --external:pg --external:pg-native --external:bcrypt --packages=external`, { stdio: 'inherit' });
+  execSync(`${esbuildPath} server/dist/app.js --bundle --platform=node --outfile=../api/_server.js --packages=external`, { stdio: 'inherit' });
 } else {
   // Fallback: use npx
-  execSync(`npx esbuild server/dist/app.js --bundle --platform=node --outfile=../api/server.js --external:pg --external:pg-native --external:bcrypt --packages=external`, { stdio: 'inherit' });
+  execSync(`npx esbuild server/dist/app.js --bundle --platform=node --outfile=../api/_server.js --packages=external`, { stdio: 'inherit' });
 }
-console.log('✓ Bundled server → api/server.js');
+console.log('✓ Bundled server → api/_server.js');
 
 // 3. Build React client
 console.log('🔨 Building client...');

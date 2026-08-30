@@ -8,7 +8,7 @@
 let app;
 
 try {
-  const appModule = require('./server.js');
+  const appModule = require('./_server.js');
   app = appModule.default || appModule;
 } catch (error) {
   console.error('Failed to load the Express app:', error);
