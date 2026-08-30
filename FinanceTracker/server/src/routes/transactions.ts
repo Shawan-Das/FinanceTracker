@@ -77,8 +77,8 @@ router.get('/', validateQuery(listTransactionsQuery), async (req: Request, res: 
 
     const whereClause = conditions.join(' AND ');
     const orderClause = sort === 'date_asc'
-      ? 't.transaction_date ASC, t.id ASC'
-      : 't.transaction_date DESC, t.id DESC';
+      ? 't.transaction_date ASC, t.created_at ASC'
+      : 't.transaction_date DESC, t.created_at DESC';
 
     const countResult = await db.query(
       `SELECT COUNT(*) as total
@@ -161,7 +161,7 @@ router.get('/export', async (req: Request, res: Response) => {
        LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
        LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
        WHERE ${conditions.join(' AND ')}
-       ORDER BY t.transaction_date ASC, t.id ASC`,
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
       values
     );
 
