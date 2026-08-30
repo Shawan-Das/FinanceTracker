@@ -6,10 +6,10 @@ import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
-import { Plus, CreditCard, AlertTriangle, CheckCircle, Wrench, FileText } from 'lucide-react';
+import { Plus, CreditCard, AlertTriangle, CheckCircle2, Wrench, FileText, Calendar, ArrowUpRight, ArrowDownRight, Mail } from 'lucide-react';
 import type { Loan, Person, Account } from '../types';
 
-const toNum = (v: any): number => typeof v === 'number' ? v : parseFloat(v) || 0;
+const toNum = (v: any): number => (typeof v === 'number' ? v : parseFloat(v) || 0);
 
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -80,7 +80,7 @@ export default function LoansPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      toast.success('Loan created!');
+      toast.success('Loan position recorded!');
       setShowCreateForm(false);
       resetCreateForm();
     },
@@ -91,7 +91,7 @@ export default function LoansPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['loans'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      toast.success('Repayment recorded!');
+      toast.success('Repayment transaction logged!');
       setShowRepayForm(false);
       resetRepayForm();
     },
@@ -131,7 +131,7 @@ export default function LoansPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch {
-      toast.error('Failed to generate voucher');
+      toast.error('Failed to generate loan voucher PDF');
     }
   };
 
@@ -174,7 +174,7 @@ export default function LoansPage() {
     setShowRepayForm(true);
   };
 
-  if (isLoading) return <LoadingSpinner />;
+  if (isLoading) return <LoadingSpinner message="Loading active loan portfolio..." />;
   if (loansError) return <QueryError title="Failed to load loans" onRetry={() => refetchLoans()} />;
 
   const activeLoans = loans?.filter((l: Loan) => l.status === 'ACTIVE') || [];
@@ -182,101 +182,149 @@ export default function LoansPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Loans</h1>
-          <p className="text-gray-500">Track loans you've lent or borrowed</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+            Loan Portfolio & Amortization
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Track money lent out or borrowed, interest terms, and repayment schedules.
+          </p>
         </div>
-        <button onClick={() => { resetCreateForm(); setShowCreateForm(true); }} className="btn-primary">
-          <Plus size={16} className="mr-1" /> New Loan
+
+        <button
+          onClick={() => { resetCreateForm(); setShowCreateForm(true); }}
+          className="btn-primary text-xs font-semibold px-3.5 py-2 shadow-sm shadow-brand-500/20"
+        >
+          <Plus size={15} />
+          <span>New Loan Record</span>
         </button>
       </div>
 
-      {/* Orphaned Loans Warning */}
+      {/* Orphaned Warning */}
       {orphanedData && orphanedData.count > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60">
           <div className="flex items-start gap-3">
-            <Wrench size={20} className="text-amber-600 mt-0.5" />
+            <Wrench size={20} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-amber-800">
-                {orphanedData.count} loan(s) missing transaction records
+              <h3 className="text-xs font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider">
+                {orphanedData.count} Legacy Loan(s) Require Synchronization
               </h3>
-              <p className="text-sm text-amber-700 mt-1">
-                These loans were created before the system started tracking transactions automatically.
-                Their balances may be inaccurate until fixed.
+              <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                These loans were created prior to automated ledger sync. Click below to map them to your funding account.
               </p>
               <button
                 onClick={() => { setFixAccountId(''); setShowFixForm(true); }}
-                className="mt-3 px-4 py-2 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition-colors"
+                className="mt-3 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors flex items-center gap-1.5"
               >
-                <Wrench size={14} className="inline mr-1" /> Fix {orphanedData.count} Loan(s)
+                <Wrench size={14} /> Fix {orphanedData.count} Loan Record(s)
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Active Loans */}
+      {/* Active Loans Section */}
       {activeLoans.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <AlertTriangle size={18} className="text-orange-500" /> Active Loans
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={18} className="text-amber-500" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              Active Loans ({activeLoans.length})
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {activeLoans.map((loan: Loan) => {
               const principal = toNum(loan.principal_amount);
               const interest = toNum(loan.interest_amount);
               const repaid = toNum(loan.total_repaid);
               const remaining = toNum(loan.remaining_amount);
               const totalDue = principal + interest;
-              const progress = totalDue > 0 ? ((repaid / totalDue) * 100) : 0;
+              const progress = totalDue > 0 ? (repaid / totalDue) * 100 : 0;
+              const isLent = loan.direction === 'LENT';
+
               return (
-                <div key={loan.id} className="card hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center
-                      ${loan.direction === 'LENT' ? 'bg-blue-100' : 'bg-orange-100'}`}>
-                      <CreditCard size={20}
-                        className={loan.direction === 'LENT' ? 'text-blue-600' : 'text-orange-600'} />
+                <div
+                  key={loan.id}
+                  className="card p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
+                >
+                  <div>
+                    {/* Direction Badge & Name */}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold shadow-sm ${
+                          isLent
+                            ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400'
+                            : 'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
+                        }`}>
+                          {isLent ? <ArrowUpRight size={20} /> : <ArrowDownRight size={20} />}
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                            {isLent ? 'Lent to' : 'Borrowed from'} {loan.person_name || 'Contact'}
+                          </h3>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                            isLent
+                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                              : 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                          }`}>
+                            {loan.direction}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
-                        {loan.direction === 'LENT' ? 'Lent to' : 'Borrowed from'} {loan.person_name || 'Unknown'}
-                      </h3>
-                      <p className="text-xs text-gray-500">
-                        Started: {new Date(loan.start_date).toLocaleDateString()}
+
+                    {/* Breakdown List */}
+                    <div className="space-y-2 py-3 border-y border-slate-100 dark:border-slate-800/80 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Total Principal + Int.</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100">{formatCurrency(totalDue)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-500 dark:text-slate-400">Repaid Amount</span>
+                        <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(repaid)}</span>
+                      </div>
+                      <div className="flex justify-between pt-1 border-t border-slate-100 dark:border-slate-800/50">
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">Remaining Balance</span>
+                        <span className="font-extrabold text-amber-600 dark:text-amber-400">{formatCurrency(remaining)}</span>
+                      </div>
+                    </div>
+
+                    {/* Repayment Progress Bar */}
+                    <div className="my-3">
+                      <div className="flex justify-between text-[11px] text-slate-400 font-medium mb-1">
+                        <span>Repayment Progress</span>
+                        <span>{progress.toFixed(0)}%</span>
+                      </div>
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                        <div
+                          className="bg-brand-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(progress, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {loan.due_date && (
+                      <p className="text-[11px] text-slate-400 flex items-center gap-1 mb-4">
+                        <Calendar size={13} /> Due Date: {new Date(loan.due_date).toLocaleDateString()}
                       </p>
-                    </div>
+                    )}
                   </div>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Total</span>
-                      <span className="font-medium">{formatCurrency(totalDue)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Repaid</span>
-                      <span className="font-medium text-green-600">{formatCurrency(repaid)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Remaining</span>
-                      <span className="font-semibold text-orange-600">{formatCurrency(remaining)}</span>
-                    </div>
-                  </div>
-
-                  {/* Progress bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                    <div className="bg-primary-600 h-2 rounded-full transition-all" style={{ width: `${Math.min(progress, 100)}%` }} />
-                  </div>
-
-                  {loan.due_date && (
-                    <p className="text-xs text-gray-500 mb-3">Due: {new Date(loan.due_date).toLocaleDateString()}</p>
-                  )}
-
-                  <div className="flex gap-2">
-                    <button onClick={() => openRepay(loan)} className="btn-primary flex-1 text-sm">
-                      Record Repayment
+                  <div className="flex gap-2 pt-2">
+                    <button
+                      onClick={() => openRepay(loan)}
+                      className="btn-primary flex-1 text-xs py-2 font-semibold shadow-sm shadow-brand-500/20"
+                    >
+                      Record Payment
                     </button>
-                    <button onClick={() => handleDownloadVoucher(loan)} className="btn-secondary text-sm px-3" title="Download Voucher">
+                    <button
+                      onClick={() => handleDownloadVoucher(loan)}
+                      className="btn-secondary text-xs p-2"
+                      title="Download Loan Voucher PDF"
+                    >
                       <FileText size={16} />
                     </button>
                   </div>
@@ -287,39 +335,42 @@ export default function LoansPage() {
         </div>
       )}
 
-      {/* Other Loans */}
+      {/* Other Completed Loans Table */}
       {otherLoans.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <CheckCircle size={18} className="text-green-500" /> Completed / Cancelled
-          </h2>
-          <div className="card p-0">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={18} className="text-emerald-500" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              Completed & Settled Loans
+            </h2>
+          </div>
+
+          <div className="card p-0 overflow-hidden">
             <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="text-left text-xs text-gray-500 uppercase border-b border-gray-200">
-                  <th className="p-4">Person</th>
-                  <th className="p-4">Direction</th>
-                  <th className="p-4">Principal</th>
-                  <th className="p-4">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {otherLoans.map((loan: Loan) => (
-                  <tr key={loan.id} className="border-b border-gray-50">
-                    <td className="p-4 text-sm">{loan.person_name || 'Unknown'}</td>
-                    <td className="p-4 text-sm">{loan.direction}</td>
-                    <td className="p-4 text-sm">{formatCurrency(toNum(loan.principal_amount))}</td>
-                    <td className="p-4">
-                      <span className={`text-xs font-medium px-2 py-1 rounded-full
-                        ${loan.status === 'PAID' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                        {loan.status}
-                      </span>
-                    </td>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
+                    <th className="p-4">Contact</th>
+                    <th className="p-4">Direction</th>
+                    <th className="p-4">Principal Amount</th>
+                    <th className="p-4">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                  {otherLoans.map((loan: Loan) => (
+                    <tr key={loan.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40">
+                      <td className="p-4 font-bold text-slate-900 dark:text-slate-100">{loan.person_name || 'Unknown'}</td>
+                      <td className="p-4 text-slate-500 dark:text-slate-400 font-medium">{loan.direction}</td>
+                      <td className="p-4 font-bold text-slate-900 dark:text-slate-100">{formatCurrency(toNum(loan.principal_amount))}</td>
+                      <td className="p-4">
+                        <span className="badge badge-success text-[10px]">
+                          {loan.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -327,71 +378,131 @@ export default function LoansPage() {
 
       {loans && loans.length === 0 && (
         <EmptyState
-          title="No loans yet"
-          description="Record money you've lent or borrowed to keep track of it."
+          title="No active loan agreements"
+          description="Log debt principal amounts and repayment timelines to track personal credit."
           action={
-            <button onClick={() => setShowCreateForm(true)} className="btn-primary">
-              <Plus size={16} className="mr-1" /> Add Loan
+            <button onClick={() => setShowCreateForm(true)} className="btn-primary text-xs font-semibold px-4 py-2">
+              <Plus size={15} /> Add First Loan
             </button>
           }
         />
       )}
 
-      {/* Create Loan Modal */}
-      <Modal isOpen={showCreateForm} onClose={() => { setShowCreateForm(false); resetCreateForm(); }} title="New Loan">
+      {/* Modal: New Loan */}
+      <Modal
+        isOpen={showCreateForm}
+        onClose={() => { setShowCreateForm(false); resetCreateForm(); }}
+        title="Record New Loan Agreement"
+      >
         <form onSubmit={handleCreate} className="space-y-4">
           <div>
-            <label className="label">Loan Direction</label>
-            <select className="input" value={direction} onChange={(e) => setDirection(e.target.value as any)}>
-              <option value="LENT">I lent money to someone</option>
-              <option value="BORROWED">I borrowed money from someone</option>
+            <label className="label">Loan Type / Direction</label>
+            <select
+              className="input text-xs font-semibold"
+              value={direction}
+              onChange={(e) => setDirection(e.target.value as any)}
+            >
+              <option value="LENT">I lent money to someone (Receivable)</option>
+              <option value="BORROWED">I borrowed money from someone (Payable)</option>
             </select>
-          </div>
-          <div>
-            <label className="label">Person</label>
-            <select className="input" value={personId} onChange={(e) => setPersonId(e.target.value)}>
-              <option value="">Select person</option>
-              {people?.map((p: Person) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="label">From Account</label>
-            <select className="input" value={accountId} onChange={(e) => setAccountId(e.target.value)}>
-              <option value="">Select account</option>
-              {accounts?.map((a: Account) => (
-                <option key={a.account_id} value={a.account_id}>{a.account_name} ({formatCurrency(a.current_balance)})</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="label">Principal Amount (৳)</label>
-            <input type="number" className="input" step="0.01" min="0.01" placeholder="0.00"
-              value={principal} onChange={(e) => setPrincipal(e.target.value)} required />
-          </div>
-          <div>
-            <label className="label">Interest Amount (৳)</label>
-            <input type="number" className="input" step="0.01" min="0" placeholder="0"
-              value={interest} onChange={(e) => setInterest(e.target.value)} />
-          </div>
-          <div>
-            <label className="label">Start Date</label>
-            <input type="date" className="input" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
-          </div>
-          <div>
-            <label className="label">Due Date (optional)</label>
-            <input type="date" className="input" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-          </div>
-          <div>
-            <label className="label">Description (optional)</label>
-            <input type="text" className="input" placeholder="Loan details..."
-              value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
 
-          {/* Send Receipt */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Contact / Person</label>
+              <select
+                className="input"
+                value={personId}
+                onChange={(e) => setPersonId(e.target.value)}
+                required
+              >
+                <option value="">Select person</option>
+                {people?.map((p: Person) => (
+                  <option key={p.id} value={p.id}>{p.name}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Source / Settlement Account</label>
+              <select
+                className="input"
+                value={accountId}
+                onChange={(e) => setAccountId(e.target.value)}
+                required
+              >
+                <option value="">Select account</option>
+                {accounts?.map((a: Account) => (
+                  <option key={a.account_id} value={a.account_id}>
+                    {a.account_name} ({formatCurrency(a.current_balance)})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Principal Amount (৳)</label>
+              <input
+                type="number"
+                className="input font-mono font-bold"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                value={principal}
+                onChange={(e) => setPrincipal(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Fixed Interest Fee (৳)</label>
+              <input
+                type="number"
+                className="input font-mono"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                value={interest}
+                onChange={(e) => setInterest(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Start Date</label>
+              <input
+                type="date"
+                className="input"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Due Date (Optional)</label>
+              <input
+                type="date"
+                className="input"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="label">Description / Purpose</label>
+            <input
+              type="text"
+              className="input"
+              placeholder="e.g. Emergency medical assistance loan"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
           {personId && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div className="p-3 rounded-xl bg-brand-50/60 dark:bg-brand-950/40 border border-brand-200/60 dark:border-brand-900/60">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -400,71 +511,108 @@ export default function LoansPage() {
                   className="mt-0.5"
                 />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">📧 Send receipt to party</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {people?.find((p: Person) => p.id === personId)?.email
-                      ? `Send a PDF receipt to ${people.find((p: Person) => p.id === personId)?.email}`
-                      : 'Add an email to this person to enable sending receipts'
-                    }
+                  <p className="text-xs font-bold text-brand-900 dark:text-brand-200 flex items-center gap-1.5">
+                    <Mail size={14} /> Email Loan Agreement Receipt
+                  </p>
+                  <p className="text-[11px] text-brand-700 dark:text-brand-300 mt-0.5">
+                    Dispatch an official PDF summary of terms to contact email.
                   </p>
                 </div>
               </label>
             </div>
           )}
 
-          <div className="flex gap-2 pt-2">
-            <button type="submit" className="btn-primary flex-1" disabled={createMutation.isPending}>
-              Create Loan
-            </button>
-            <button type="button" className="btn-secondary" onClick={() => { setShowCreateForm(false); resetCreateForm(); }}>
+          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            <button
+              type="button"
+              className="btn-secondary flex-1 text-xs"
+              onClick={() => { setShowCreateForm(false); resetCreateForm(); }}
+            >
               Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
+              disabled={createMutation.isPending}
+            >
+              Create Loan Position
             </button>
           </div>
         </form>
       </Modal>
 
-      {/* Repay Modal */}
-      <Modal isOpen={showRepayForm} onClose={() => { setShowRepayForm(false); resetRepayForm(); }} title="Record Repayment">
+      {/* Modal: Record Repayment */}
+      <Modal
+        isOpen={showRepayForm}
+        onClose={() => { setShowRepayForm(false); resetRepayForm(); }}
+        title="Record Loan Repayment"
+      >
         {selectedLoan && (
           <form onSubmit={handleRepay} className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4 text-sm">
-              <p className="text-gray-600">
-                {selectedLoan.direction === 'LENT' ? 'Lent to' : 'Borrowed from'}:{' '}
-                <span className="font-medium text-gray-900">{selectedLoan.person_name}</span>
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 text-xs space-y-1">
+              <p className="font-semibold text-slate-900 dark:text-slate-100">
+                {selectedLoan.direction === 'LENT' ? 'Repayment from' : 'Repayment to'}:{' '}
+                <span className="font-normal">{selectedLoan.person_name || 'Contact'}</span>
               </p>
-              <p className="text-gray-600">
-                Remaining: <span className="font-semibold text-orange-600">{formatCurrency(selectedLoan.remaining_amount)}</span>
+              <p className="text-slate-500 dark:text-slate-400">
+                Current Remaining Balance: <strong className="text-amber-600 dark:text-amber-400">{formatCurrency(selectedLoan.remaining_amount)}</strong>
               </p>
             </div>
+
             <div>
               <label className="label">Repayment Amount (৳)</label>
-              <input type="number" className="input" step="0.01" min="0.01"
-                max={selectedLoan.remaining_amount} placeholder="0.00"
-                value={repayAmount} onChange={(e) => setRepayAmount(e.target.value)} required />
+              <input
+                type="number"
+                className="input font-mono font-bold text-base"
+                step="0.01"
+                min="0.01"
+                max={selectedLoan.remaining_amount}
+                value={repayAmount}
+                onChange={(e) => setRepayAmount(e.target.value)}
+                required
+              />
             </div>
+
             <div>
-              <label className="label">From Account</label>
-              <select className="input" value={repayAccountId}
-                onChange={(e) => setRepayAccountId(e.target.value)} required>
+              <label className="label">Settlement Account</label>
+              <select
+                className="input"
+                value={repayAccountId}
+                onChange={(e) => setRepayAccountId(e.target.value)}
+                required
+              >
                 <option value="">Select account</option>
                 {accounts?.map((a: Account) => (
-                  <option key={a.account_id} value={a.account_id}>{a.account_name} ({formatCurrency(a.current_balance)})</option>
+                  <option key={a.account_id} value={a.account_id}>
+                    {a.account_name} ({formatCurrency(a.current_balance)})
+                  </option>
                 ))}
               </select>
             </div>
+
             <div>
-              <label className="label">Date</label>
-              <input type="date" className="input" value={repayDate}
-                onChange={(e) => setRepayDate(e.target.value)} required />
-            </div>
-            <div>
-              <label className="label">Notes (optional)</label>
-              <input type="text" className="input" placeholder="Payment notes..."
-                value={repayNotes} onChange={(e) => setRepayNotes(e.target.value)} />
+              <label className="label">Payment Date</label>
+              <input
+                type="date"
+                className="input"
+                value={repayDate}
+                onChange={(e) => setRepayDate(e.target.value)}
+                required
+              />
             </div>
 
-            {/* Send Receipt */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div>
+              <label className="label">Notes / Remarks</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="Optional payment reference..."
+                value={repayNotes}
+                onChange={(e) => setRepayNotes(e.target.value)}
+              />
+            </div>
+
+            <div className="p-3 rounded-xl bg-brand-50/60 dark:bg-brand-950/40 border border-brand-200/60 dark:border-brand-900/60">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -473,64 +621,63 @@ export default function LoansPage() {
                   className="mt-0.5"
                 />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">📧 Send repayment receipt to party</p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {selectedLoan?.person_name && people?.find((p: Person) => p.id === selectedLoan.person_id)?.email
-                      ? `Send a PDF receipt to ${people.find((p: Person) => p.id === selectedLoan.person_id)?.email}`
-                      : 'Add an email to this person to enable sending receipts'
-                    }
+                  <p className="text-xs font-bold text-brand-900 dark:text-brand-200 flex items-center gap-1.5">
+                    <Mail size={14} /> Send Email Repayment Voucher
+                  </p>
+                  <p className="text-[11px] text-brand-700 dark:text-brand-300 mt-0.5">
+                    Email an official PDF payment receipt to the contact.
                   </p>
                 </div>
               </label>
             </div>
 
-            <div className="flex gap-2 pt-2">
-              <button type="submit" className="btn-primary flex-1" disabled={repayMutation.isPending}>
-                Record Repayment
-              </button>
-              <button type="button" className="btn-secondary"
-                onClick={() => { setShowRepayForm(false); resetRepayForm(); }}>
+            <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+              <button
+                type="button"
+                className="btn-secondary flex-1 text-xs"
+                onClick={() => { setShowRepayForm(false); resetRepayForm(); }}
+              >
                 Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
+                disabled={repayMutation.isPending}
+              >
+                Log Repayment
               </button>
             </div>
           </form>
         )}
       </Modal>
 
-      {/* Fix Orphaned Loans Modal */}
-      <Modal isOpen={showFixForm} onClose={() => { setShowFixForm(false); setFixAccountId(''); }} title="Fix Missing Transactions">
+      {/* Fix Orphaned Modal */}
+      <Modal
+        isOpen={showFixForm}
+        onClose={() => { setShowFixForm(false); setFixAccountId(''); }}
+        title="Synchronize Legacy Loans"
+      >
         <div className="space-y-4">
-          <div className="bg-amber-50 rounded-lg p-4">
-            <p className="text-sm text-amber-800">
-              This will create the missing LEND/BORROW transactions for {orphanedData?.count || 0} loan(s)
-              that were created before automatic transaction tracking was added.
-            </p>
-            <p className="text-sm text-amber-700 mt-2">
-              Select the account the money was originally sent from. This ensures your account balances are accurate.
-            </p>
+          <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs text-amber-900 dark:text-amber-200">
+            Select the primary account to link for missing ledger transactions.
           </div>
-          {orphanedData && orphanedData.loans.length > 0 && (
-            <div className="space-y-1">
-              <p className="text-xs font-medium text-gray-500 uppercase">Loans to fix:</p>
-              {orphanedData.loans.map((loan: any) => (
-                <div key={loan.id} className="flex justify-between text-sm py-1">
-                  <span className="text-gray-700">
-                    {loan.direction === 'LENT' ? 'Lent to' : 'Borrowed from'} {loan.person_name || 'Unknown'}
-                  </span>
-                  <span className="font-medium">{formatCurrency(toNum(loan.principal_amount))}</span>
-                </div>
-              ))}
-            </div>
-          )}
+
           <div>
-            <label className="label">Select Account</label>
-            <select className="input" value={fixAccountId} onChange={(e) => setFixAccountId(e.target.value)}>
-              <option value="">Choose account...</option>
+            <label className="label">Funding Account</label>
+            <select
+              className="input"
+              value={fixAccountId}
+              onChange={(e) => setFixAccountId(e.target.value)}
+            >
+              <option value="">Select funding account...</option>
               {accounts?.map((a: Account) => (
-                <option key={a.account_id} value={a.account_id}>{a.account_name} ({formatCurrency(a.current_balance)})</option>
+                <option key={a.account_id} value={a.account_id}>
+                  {a.account_name} ({formatCurrency(a.current_balance)})
+                </option>
               ))}
             </select>
           </div>
+
           <div className="flex gap-2 pt-2">
             <button
               onClick={() => {
@@ -540,12 +687,16 @@ export default function LoansPage() {
                 }
                 fixOrphanedMutation.mutate({ account_id: fixAccountId });
               }}
-              className="btn-primary flex-1"
+              className="btn-primary flex-1 text-xs"
               disabled={fixOrphanedMutation.isPending}
             >
-              {fixOrphanedMutation.isPending ? 'Fixing...' : `Fix ${orphanedData?.count || 0} Loan(s)`}
+              {fixOrphanedMutation.isPending ? 'Syncing...' : 'Sync Loans'}
             </button>
-            <button type="button" className="btn-secondary" onClick={() => { setShowFixForm(false); setFixAccountId(''); }}>
+            <button
+              type="button"
+              className="btn-secondary text-xs"
+              onClick={() => { setShowFixForm(false); setFixAccountId(''); }}
+            >
               Cancel
             </button>
           </div>

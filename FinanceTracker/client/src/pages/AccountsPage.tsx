@@ -6,17 +6,33 @@ import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
-import { Plus, Wallet, Edit, Trash2, Building, Banknote, Smartphone } from 'lucide-react';
+import { Plus, Wallet, Edit, Trash2, Building2, Banknote, Smartphone, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import type { Account } from '../types';
 
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
-const ACCOUNT_TYPE_ICONS: Record<string, React.ReactNode> = {
-  BANK: <Building size={20} className="text-blue-600" />,
-  CASH: <Banknote size={20} className="text-green-600" />,
-  MOBILE_WALLET: <Smartphone size={20} className="text-purple-600" />,
-  OTHER: <Wallet size={20} className="text-gray-600" />,
+const ACCOUNT_TYPE_CONFIG: Record<string, { label: string; icon: typeof Building2; gradient: string }> = {
+  BANK: {
+    label: 'Bank Account',
+    icon: Building2,
+    gradient: 'from-brand-600 to-indigo-700 text-white',
+  },
+  CASH: {
+    label: 'Cash Reserve',
+    icon: Banknote,
+    gradient: 'from-emerald-600 to-teal-700 text-white',
+  },
+  MOBILE_WALLET: {
+    label: 'Mobile Banking',
+    icon: Smartphone,
+    gradient: 'from-purple-600 to-pink-600 text-white',
+  },
+  OTHER: {
+    label: 'Other Fund',
+    icon: Wallet,
+    gradient: 'from-slate-700 to-slate-900 text-white',
+  },
 };
 
 export default function AccountsPage() {
@@ -39,7 +55,8 @@ export default function AccountsPage() {
     mutationFn: (data: any) => accountsApi.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      toast.success('Account created!');
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      toast.success('New account created!');
       resetForm();
     },
   });
@@ -48,7 +65,8 @@ export default function AccountsPage() {
     mutationFn: ({ id, data }: { id: string; data: any }) => accountsApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
-      toast.success('Account updated!');
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      toast.success('Account details updated');
       resetForm();
     },
   });
@@ -57,6 +75,7 @@ export default function AccountsPage() {
     mutationFn: (id: string) => accountsApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success('Account deleted');
     },
   });
@@ -98,100 +117,193 @@ export default function AccountsPage() {
     }
   };
 
-  if (isLoading) return <LoadingSpinner />;
-  if (isError) return <QueryError onRetry={() => refetch()} />;
+  if (isLoading) return <LoadingSpinner message="Loading account balances..." />;
+  if (isError) return <QueryError title="Failed to load accounts" onRetry={() => refetch()} />;
+
+  const totalBalance = accounts?.reduce((sum: number, acc: Account) => sum + (acc.current_balance || 0), 0) || 0;
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header & Total Overview */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Accounts</h1>
-          <p className="text-gray-500">Manage your money accounts</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+            Accounts & Portfolios
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Total Net Funds across all liquidity channels: <strong className="text-brand-600 dark:text-brand-400">{formatCurrency(totalBalance)}</strong>
+          </p>
         </div>
-        <button onClick={() => { resetForm(); setShowForm(true); }} className="btn-primary">
-          <Plus size={16} className="mr-1" /> New Account
+
+        <button
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="btn-primary text-xs font-semibold px-3.5 py-2 shadow-sm shadow-brand-500/20"
+        >
+          <Plus size={15} />
+          <span>Add Account</span>
         </button>
       </div>
 
+      {/* Account Cards Grid */}
       {accounts && accounts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {accounts.map((acc: Account) => (
-            <div key={acc.account_id} className="card hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                    {ACCOUNT_TYPE_ICONS[acc.account_type] || <Wallet size={20} />}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {accounts.map((acc: Account) => {
+            const config = ACCOUNT_TYPE_CONFIG[acc.account_type] || ACCOUNT_TYPE_CONFIG.OTHER;
+            const Icon = config.icon;
+
+            return (
+              <div
+                key={acc.account_id}
+                className="relative overflow-hidden rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-[#111726] shadow-sm hover:shadow-md transition-all group flex flex-col justify-between"
+              >
+                {/* Top Card Banner */}
+                <div className={`p-5 bg-gradient-to-r ${config.gradient} flex items-center justify-between`}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                      <Icon size={20} className="text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm text-white tracking-tight">{acc.name}</h3>
+                      <p className="text-[11px] text-white/80 font-medium">{config.label}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{acc.name}</h3>
-                    <p className="text-xs text-gray-500">{acc.account_type.replace('_', ' ')}</p>
+
+                  <div className="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => openEdit(acc)}
+                      className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                      title="Edit Account"
+                    >
+                      <Edit size={14} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm('Delete this account?')) deleteMutation.mutate(acc.account_id);
+                      }}
+                      className="p-1.5 rounded-lg bg-white/10 hover:bg-rose-500/40 text-white transition-colors"
+                      title="Delete Account"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                 </div>
-                <div className="flex gap-1">
-                  <button onClick={() => openEdit(acc)} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
-                    <Edit size={16} />
-                  </button>
-                  <button onClick={() => {
-                    if (confirm('Delete this account?')) deleteMutation.mutate(acc.account_id);
-                  }} className="p-2 hover:bg-red-50 rounded-lg text-red-400">
-                    <Trash2 size={16} />
-                  </button>
+
+                {/* Card Body */}
+                <div className="p-5 space-y-3">
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider">
+                      Current Available Balance
+                    </span>
+                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-0.5">
+                      {formatCurrency(acc.current_balance)}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span>Opening: <strong className="text-slate-700 dark:text-slate-300">{formatCurrency(acc.opening_balance)}</strong></span>
+                    <span className="text-[11px]">{new Date(acc.opening_balance_date).toLocaleDateString()}</span>
+                  </div>
+
+                  {acc.notes && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/50 line-clamp-2">
+                      {acc.notes}
+                    </p>
+                  )}
                 </div>
               </div>
-              <div className="text-2xl font-bold text-gray-900">{formatCurrency(acc.current_balance)}</div>
-              <p className="text-xs text-gray-500 mt-1">Opening: {formatCurrency(acc.opening_balance)}</p>
-              {acc.notes && <p className="text-xs text-gray-500 mt-2 line-clamp-2">{acc.notes}</p>}
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <EmptyState
-          title="No accounts yet"
-          description="Create your first account to start tracking your money."
+          title="No money accounts configured"
+          description="Add your bank accounts, mobile wallets, or cash reserves to track balances."
           action={
-            <button onClick={() => setShowForm(true)} className="btn-primary">
-              <Plus size={16} className="mr-1" /> Add Account
+            <button onClick={() => setShowForm(true)} className="btn-primary text-xs font-semibold px-4 py-2">
+              <Plus size={15} /> Add First Account
             </button>
           }
         />
       )}
 
-      <Modal isOpen={showForm} onClose={resetForm} title={editingAccount ? 'Edit Account' : 'New Account'}>
+      {/* Modal Form */}
+      <Modal
+        isOpen={showForm}
+        onClose={resetForm}
+        title={editingAccount ? 'Edit Account Details' : 'Create New Account'}
+      >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="label">Account Name</label>
-            <input type="text" className="input" placeholder="e.g. Dutch-Bangla Bank" value={formName}
-              onChange={(e) => setFormName(e.target.value)} required autoFocus />
+            <label className="label">Account Label / Title</label>
+            <input
+              type="text"
+              className="input"
+              placeholder="e.g. Dutch-Bangla Bank Savings"
+              value={formName}
+              onChange={(e) => setFormName(e.target.value)}
+              required
+              autoFocus
+            />
           </div>
+
           <div>
             <label className="label">Account Type</label>
-            <select className="input" value={formType} onChange={(e) => setFormType(e.target.value)}>
-              <option value="BANK">Bank</option>
-              <option value="CASH">Cash</option>
-              <option value="MOBILE_WALLET">Mobile Wallet</option>
-              <option value="OTHER">Other</option>
+            <select
+              className="input text-xs font-semibold"
+              value={formType}
+              onChange={(e) => setFormType(e.target.value)}
+            >
+              <option value="BANK">Bank Account</option>
+              <option value="CASH">Cash Reserve</option>
+              <option value="MOBILE_WALLET">Mobile Wallet (bKash/Nagad/Rocket)</option>
+              <option value="OTHER">Other Fund</option>
             </select>
           </div>
-          <div>
-            <label className="label">Opening Balance (৳)</label>
-            <input type="number" className="input" step="0.01" value={formBalance}
-              onChange={(e) => setFormBalance(e.target.value)} />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="label">Opening Balance (৳)</label>
+              <input
+                type="number"
+                className="input font-mono font-bold"
+                step="0.01"
+                value={formBalance}
+                onChange={(e) => setFormBalance(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="label">Opening Date</label>
+              <input
+                type="date"
+                className="input"
+                value={formBalanceDate}
+                onChange={(e) => setFormBalanceDate(e.target.value)}
+              />
+            </div>
           </div>
+
           <div>
-            <label className="label">Opening Balance Date</label>
-            <input type="date" className="input" value={formBalanceDate}
-              onChange={(e) => setFormBalanceDate(e.target.value)} />
+            <label className="label">Notes / Description</label>
+            <textarea
+              className="input"
+              rows={2}
+              placeholder="Optional account notes, IBAN, or branch info..."
+              value={formNotes}
+              onChange={(e) => setFormNotes(e.target.value)}
+            />
           </div>
-          <div>
-            <label className="label">Notes</label>
-            <textarea className="input" rows={2} placeholder="Optional notes..."
-              value={formNotes} onChange={(e) => setFormNotes(e.target.value)} />
-          </div>
-          <div className="flex gap-2 pt-2">
-            <button type="submit" className="btn-primary flex-1">
-              {editingAccount ? 'Update' : 'Create'} Account
+
+          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            <button type="button" className="btn-secondary flex-1 text-xs" onClick={resetForm}>
+              Cancel
             </button>
-            <button type="button" className="btn-secondary" onClick={resetForm}>Cancel</button>
+            <button
+              type="submit"
+              className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
+              {editingAccount ? 'Save Changes' : 'Create Account'}
+            </button>
           </div>
         </form>
       </Modal>

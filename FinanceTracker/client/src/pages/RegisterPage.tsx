@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { authApi } from '../api/client';
 import toast from 'react-hot-toast';
+import ThemeToggle from '../components/ThemeToggle';
+import { Mail, Lock, User, Eye, EyeOff, TrendingUp, ShieldCheck, CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 
 type Step = 'register' | 'verify';
 
@@ -14,12 +16,12 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const cooldownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Clean up timer on unmount
   useEffect(() => {
     return () => {
       if (cooldownTimerRef.current) {
@@ -28,7 +30,6 @@ export default function RegisterPage() {
     };
   }, []);
 
-  // Start cooldown timer
   const startCooldown = () => {
     if (cooldownTimerRef.current) {
       clearInterval(cooldownTimerRef.current);
@@ -85,9 +86,8 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await authApi.verifyEmail({ email, code: verificationCode });
-      // Fetch the real user data now that the session is set server-side
       await checkAuth();
-      toast.success('Email verified! Welcome to Finance Tracker.');
+      toast.success('Email verified! Welcome to FinanceFlow.');
       navigate('/');
     } catch (error: any) {
       const msg = error.response?.data?.error?.message || 'Verification failed';
@@ -109,102 +109,227 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">💰 Finance Tracker</h1>
-          <p className="text-gray-500 mt-2">
-            {step === 'register' ? 'Create your account' : 'Verify your email'}
-          </p>
-        </div>
+    <div className="min-h-screen flex bg-slate-50 dark:bg-[#0b0f19] text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      {/* Left Column Hero (Desktop) */}
+      <div className="hidden lg:flex flex-1 relative bg-gradient-to-br from-slate-900 via-slate-950 to-brand-950 p-12 flex-col justify-between overflow-hidden border-r border-slate-800">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <div className={`flex items-center gap-2 ${step === 'register' ? 'text-primary-600' : 'text-green-600'}`}>
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold
-              ${step === 'register' ? 'bg-primary-100 text-primary-700' : 'bg-green-100 text-green-700'}`}>
-              {step === 'register' ? '1' : '✓'}
-            </div>
-            <span className="text-sm font-medium">Register</span>
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-500 to-emerald-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+            <TrendingUp size={22} strokeWidth={2.5} />
           </div>
-          <div className="w-8 h-px bg-gray-300" />
-          <div className={`flex items-center gap-2 ${step === 'verify' ? 'text-primary-600' : 'text-gray-400'}`}>
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold
-              ${step === 'verify' ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'}`}>
-              2
-            </div>
-            <span className="text-sm font-medium">Verify</span>
+          <div>
+            <h1 className="text-xl font-bold text-white tracking-tight">
+              Finance<span className="text-brand-400">Flow</span>
+            </h1>
+            <p className="text-xs font-medium text-slate-400">Next-Gen Financial Intelligence</p>
           </div>
         </div>
 
-        <div className="card">
+        <div className="relative z-10 max-w-lg space-y-6 my-auto">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <ShieldCheck className="w-3.5 h-3.5" /> Start Your Financial Journey
+          </span>
+          <h2 className="text-3xl font-extrabold text-white leading-tight">
+            Join Thousands Building Wealth Smarter
+          </h2>
+
+          <div className="space-y-3 pt-2">
+            {[
+              'Unified multi-currency account management',
+              'Automated monthly budget cap notifications',
+              'Debt & loan repayment amortization tools',
+              'Export-ready CSV & PDF financial reports',
+            ].map((text, i) => (
+              <div key={i} className="flex items-center gap-3 text-sm text-slate-300">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="relative z-10 text-xs text-slate-500 flex items-center justify-between border-t border-slate-800/80 pt-4">
+          <span>© 2026 FinanceFlow Inc.</span>
+          <span>Bank-grade 256-bit encryption</span>
+        </div>
+      </div>
+
+      {/* Right Column Form */}
+      <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 lg:p-16 max-w-xl mx-auto w-full">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 lg:hidden">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white">
+              <TrendingUp size={18} strokeWidth={2.5} />
+            </div>
+            <span className="font-bold text-slate-900 dark:text-white">FinanceFlow</span>
+          </div>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
+        </div>
+
+        <div className="my-auto py-8">
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              {step === 'register' ? 'Create your account' : 'Verify your email'}
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
+              {step === 'register'
+                ? 'Get started with your free financial tracking dashboard.'
+                : `We sent a 6-digit verification code to ${email}`}
+            </p>
+          </div>
+
+          {/* Stepper Progress */}
+          <div className="flex items-center gap-3 mb-6 p-2 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80">
+            <div className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              step === 'register'
+                ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
+                : 'text-slate-500 dark:text-slate-400'
+            }`}>
+              <span className="w-5 h-5 rounded-full bg-brand-500 text-white flex items-center justify-center text-[10px]">1</span>
+              <span>Account Setup</span>
+            </div>
+            <div className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-xs font-bold transition-all ${
+              step === 'verify'
+                ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
+                : 'text-slate-400 dark:text-slate-500'
+            }`}>
+              <span className="w-5 h-5 rounded-full bg-slate-300 dark:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center text-[10px]">2</span>
+              <span>Email Verification</span>
+            </div>
+          </div>
+
           {step === 'register' ? (
             <form onSubmit={handleRegister} className="space-y-4">
               <div>
                 <label className="label">Full Name</label>
-                <input type="text" className="input" placeholder="John Doe" value={fullName}
-                  onChange={(e) => setFullName(e.target.value)} required autoFocus />
+                <div className="relative">
+                  <User className="absolute left-3.5 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    className="input pl-10"
+                    placeholder="John Doe"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    autoFocus
+                  />
+                </div>
               </div>
+
               <div>
-                <label className="label">Email</label>
-                <input type="email" className="input" placeholder="you@example.com" value={email}
-                  onChange={(e) => setEmail(e.target.value)} required />
+                <label className="label">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="email"
+                    className="input pl-10"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
+
               <div>
                 <label className="label">Password</label>
-                <input type="password" className="input" placeholder="Min. 8 characters" value={password}
-                  onChange={(e) => setPassword(e.target.value)} required />
-                <p className="text-xs text-gray-500 mt-1">Must include uppercase, lowercase, and a number</p>
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    className="input pl-10 pr-10"
+                    placeholder="Min. 8 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-1">Must contain uppercase, lowercase, and a number.</p>
               </div>
+
               <div>
                 <label className="label">Confirm Password</label>
-                <input type="password" className="input" placeholder="Re-enter password" value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)} required />
+                <div className="relative">
+                  <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
+                  <input
+                    type="password"
+                    className="input pl-10"
+                    placeholder="Re-enter password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
-              <button type="submit" className="btn-primary w-full" disabled={loading}>
-                {loading ? 'Creating account...' : 'Create Account'}
+
+              <button
+                type="submit"
+                className="btn-primary w-full py-3 text-sm font-semibold shadow-lg shadow-brand-500/20"
+                disabled={loading}
+              >
+                {loading ? 'Creating Account...' : 'Continue to Verification'}
               </button>
             </form>
           ) : (
             <form onSubmit={handleVerify} className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-                <p className="font-medium">Verification code sent!</p>
-                <p className="mt-1">We sent a 6-digit code to <strong>{email}</strong></p>
+              <div className="p-4 rounded-2xl bg-brand-50/50 dark:bg-brand-950/30 border border-brand-200/60 dark:border-brand-900/60 text-xs text-brand-900 dark:text-brand-200">
+                <p className="font-semibold">Verification Code Sent!</p>
+                <p className="mt-1">Enter the 6-digit passcode delivered to <strong>{email}</strong>.</p>
               </div>
 
               <div>
-                <label className="label">Verification Code</label>
-                <input type="text" className="input text-center text-2xl tracking-[0.5em] font-mono"
-                  placeholder="000000" maxLength={6}
-                  value={verificationCode} onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
-                  required autoFocus />
+                <label className="label">6-Digit Code</label>
+                <input
+                  type="text"
+                  className="input text-center text-2xl tracking-[0.5em] font-mono font-bold py-3"
+                  placeholder="000000"
+                  maxLength={6}
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))}
+                  required
+                  autoFocus
+                />
               </div>
 
-              <button type="submit" className="btn-primary w-full" disabled={loading}>
-                {loading ? 'Verifying...' : 'Verify Email'}
+              <button
+                type="submit"
+                className="btn-primary w-full py-3 text-sm font-semibold shadow-lg shadow-brand-500/20"
+                disabled={loading}
+              >
+                {loading ? 'Verifying...' : 'Complete Registration'}
               </button>
 
-              <div className="text-center">
-                <button type="button" onClick={handleResend}
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={handleResend}
                   disabled={resendCooldown > 0}
-                  className="text-sm text-primary-600 hover:text-primary-700 disabled:text-gray-400 disabled:cursor-not-allowed">
-                  {resendCooldown > 0
-                    ? `Resend code in ${resendCooldown}s`
-                    : 'Didn\'t receive the code? Resend'}
+                  className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline disabled:opacity-50 disabled:no-underline"
+                >
+                  {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Didn't get code? Resend"}
                 </button>
               </div>
             </form>
           )}
 
-          <p className="mt-4 text-center text-sm text-gray-500">
-            {step === 'register' ? (
-              <>Already have an account? <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">Sign In</Link></>
-            ) : (
-              <button onClick={() => setStep('register')} className="text-primary-600 hover:text-primary-700 font-medium">
-                ← Back to registration
-              </button>
-            )}
-          </p>
+          <div className="mt-8 text-center pt-6 border-t border-slate-100 dark:border-slate-800/80">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Already have an account?{' '}
+              <Link to="/login" className="font-bold text-brand-600 dark:text-brand-400 hover:underline">
+                Sign In
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

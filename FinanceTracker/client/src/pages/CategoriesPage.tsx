@@ -6,7 +6,7 @@ import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
-import { Plus, Tag, Edit, Trash2 } from 'lucide-react';
+import { Plus, Tag, Edit, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import type { Category } from '../types';
 
 export default function CategoriesPage() {
@@ -64,123 +64,202 @@ export default function CategoriesPage() {
     }
   };
 
-  if (isLoading) return <LoadingSpinner />;
-  if (isError) return <QueryError onRetry={() => refetch()} />;
+  if (isLoading) return <LoadingSpinner message="Loading financial categories..." />;
+  if (isError) return <QueryError title="Failed to load categories" onRetry={() => refetch()} />;
 
   const incomeCategories = categories?.filter((c: Category) => c.type === 'INCOME') || [];
   const expenseCategories = categories?.filter((c: Category) => c.type === 'EXPENSE') || [];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-500">Manage income and expense categories</p>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+            Financial Categories
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Organize transactions for budgeting and expense analytics.
+          </p>
         </div>
-        <button onClick={() => { resetForm(); setShowForm(true); }} className="btn-primary">
-          <Plus size={16} className="mr-1" /> New Category
+
+        <button
+          onClick={() => { resetForm(); setShowForm(true); }}
+          className="btn-primary text-xs font-semibold px-3.5 py-2 shadow-sm shadow-brand-500/20"
+        >
+          <Plus size={15} />
+          <span>New Category</span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income Categories */}
-        <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-green-500"></span>
-            Income Categories
-          </h2>
-          {incomeCategories.length > 0 ? (
-            <div className="space-y-2">
-              {incomeCategories.map((cat: Category) => (
-                <div key={cat.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <div className="flex items-center gap-2">
-                    <Tag size={14} className="text-gray-400" />
-                    <span className="text-sm text-gray-900">{cat.name}</span>
-                  </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => {
-                      setEditingCategory(cat);
-                      setFormName(cat.name);
-                      setFormType(cat.type);
-                      setShowForm(true);
-                    }} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
-                      <Edit size={16} />
-                    </button>
-                    <button onClick={() => {
-                      if (confirm('Deactivate this category?')) deleteMutation.mutate(cat.id);
-                    }} className="p-2 hover:bg-red-50 rounded-lg text-red-400">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+        <div className="card p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                  <TrendingUp size={16} />
                 </div>
-              ))}
+                <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  Income Categories ({incomeCategories.length})
+                </h2>
+              </div>
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-4">No income categories</p>
-          )}
+
+            {incomeCategories.length > 0 ? (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                {incomeCategories.map((cat: Category) => (
+                  <div
+                    key={cat.id}
+                    className="flex items-center justify-between py-3 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 px-2 rounded-xl transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Tag size={15} className="text-emerald-500" />
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">{cat.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          setEditingCategory(cat);
+                          setFormName(cat.name);
+                          setFormType(cat.type);
+                          setShowForm(true);
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        title="Edit Category"
+                      >
+                        <Edit size={14} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm('Deactivate this income category?')) deleteMutation.mutate(cat.id);
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        title="Deactivate Category"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 py-8 text-center">No income categories configured.</p>
+            )}
+          </div>
         </div>
 
         {/* Expense Categories */}
-        <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-red-500"></span>
-            Expense Categories
-          </h2>
-          {expenseCategories.length > 0 ? (
-            <div className="space-y-2">
-              {expenseCategories.map((cat: Category) => (
-                <div key={cat.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                  <div className="flex items-center gap-2">
-                    <Tag size={14} className="text-gray-400" />
-                    <span className="text-sm text-gray-900">{cat.name}</span>
-                  </div>
-                  <div className="flex gap-1">
-                    <button onClick={() => {
-                      setEditingCategory(cat);
-                      setFormName(cat.name);
-                      setFormType(cat.type);
-                      setShowForm(true);
-                    }} className="p-2 hover:bg-gray-100 rounded-lg text-gray-400">
-                      <Edit size={16} />
-                    </button>
-                    <button onClick={() => {
-                      if (confirm('Deactivate this category?')) deleteMutation.mutate(cat.id);
-                    }} className="p-2 hover:bg-red-50 rounded-lg text-red-400">
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
+        <div className="card p-6 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-slate-100 dark:border-slate-800/80">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
+                  <TrendingDown size={16} />
                 </div>
-              ))}
+                <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                  Expense Categories ({expenseCategories.length})
+                </h2>
+              </div>
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-4">No expense categories</p>
-          )}
+
+            {expenseCategories.length > 0 ? (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                {expenseCategories.map((cat: Category) => (
+                  <div
+                    key={cat.id}
+                    className="flex items-center justify-between py-3 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 px-2 rounded-xl transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Tag size={15} className="text-rose-500" />
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">{cat.name}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          setEditingCategory(cat);
+                          setFormName(cat.name);
+                          setFormType(cat.type);
+                          setShowForm(true);
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        title="Edit Category"
+                      >
+                        <Edit size={14} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm('Deactivate this expense category?')) deleteMutation.mutate(cat.id);
+                        }}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        title="Deactivate Category"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 py-8 text-center">No expense categories configured.</p>
+            )}
+          </div>
         </div>
       </div>
 
-      <Modal isOpen={showForm} onClose={resetForm} title={editingCategory ? 'Edit Category' : 'New Category'}>
+      {/* Modal Dialog */}
+      <Modal
+        isOpen={showForm}
+        onClose={resetForm}
+        title={editingCategory ? 'Edit Financial Category' : 'Add New Category'}
+      >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="label">Category Name</label>
-            <input type="text" className="input" placeholder="e.g. Groceries" value={formName}
-              onChange={(e) => setFormName(e.target.value)} required autoFocus />
+            <label className="label">Category Title</label>
+            <input
+              type="text"
+              className="input"
+              placeholder="e.g. Groceries, Consulting, Rent"
+              value={formName}
+              onChange={(e) => setFormName(e.target.value)}
+              required
+              autoFocus
+            />
           </div>
+
           <div>
-            <label className="label">Type</label>
+            <label className="label">Category Flow Type</label>
             {editingCategory ? (
-              <input type="text" className="input bg-gray-50" value={formType === 'INCOME' ? 'Income' : 'Expense'} disabled />
+              <input
+                type="text"
+                className="input bg-slate-100 dark:bg-slate-800 text-slate-500 cursor-not-allowed text-xs font-semibold"
+                value={formType === 'INCOME' ? 'Income' : 'Expense'}
+                disabled
+              />
             ) : (
-              <select className="input" value={formType} onChange={(e) => setFormType(e.target.value as any)}>
-                <option value="INCOME">Income</option>
-                <option value="EXPENSE">Expense</option>
+              <select
+                className="input text-xs font-semibold"
+                value={formType}
+                onChange={(e) => setFormType(e.target.value as any)}
+              >
+                <option value="INCOME">Income Category</option>
+                <option value="EXPENSE">Expense Category</option>
               </select>
             )}
           </div>
-          <div className="flex gap-2 pt-2">
-            <button type="submit" className="btn-primary flex-1">
-              {editingCategory ? 'Update' : 'Create'} Category
+
+          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            <button type="button" className="btn-secondary flex-1 text-xs" onClick={resetForm}>
+              Cancel
             </button>
-            <button type="button" className="btn-secondary" onClick={resetForm}>Cancel</button>
+            <button
+              type="submit"
+              className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
+              disabled={createMutation.isPending || updateMutation.isPending}
+            >
+              {editingCategory ? 'Save Category' : 'Create Category'}
+            </button>
           </div>
         </form>
       </Modal>

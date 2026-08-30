@@ -13,7 +13,7 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
 
   const getVisiblePages = () => {
     const pages: (number | string)[] = [];
-    const delta = 2;
+    const delta = 1;
     const left = Math.max(2, page - delta);
     const right = Math.min(totalPages - 1, page + delta);
 
@@ -26,16 +26,22 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
     return pages;
   };
 
+  const startRecord = (page - 1) * pagination.limit + 1;
+  const endRecord = Math.min(page * pagination.limit, total);
+
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1 py-3">
-      <p className="text-sm text-gray-500">
-        Showing {((page - 1) * pagination.limit) + 1} to {Math.min(page * pagination.limit, total)} of {total}
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-slate-100 dark:border-slate-800/80">
+      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+        Showing <span className="font-semibold text-slate-900 dark:text-slate-100">{startRecord}</span> to{' '}
+        <span className="font-semibold text-slate-900 dark:text-slate-100">{endRecord}</span> of{' '}
+        <span className="font-semibold text-slate-900 dark:text-slate-100">{total}</span> items
       </p>
       <div className="flex items-center gap-1">
         <button
           onClick={() => onPageChange(page - 1)}
           disabled={page === 1}
-          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          aria-label="Previous page"
         >
           <ChevronLeft size={16} />
         </button>
@@ -44,9 +50,13 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
             key={i}
             onClick={() => typeof p === 'number' && onPageChange(p)}
             disabled={typeof p !== 'number'}
-            className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors
-              ${typeof p !== 'number' ? 'cursor-default text-gray-400' :
-                p === page ? 'bg-primary-600 text-white' : 'hover:bg-gray-100 text-gray-700'}`}
+            className={`w-8 h-8 rounded-xl text-xs font-semibold transition-all ${
+              typeof p !== 'number'
+                ? 'cursor-default text-slate-400 dark:text-slate-600'
+                : p === page
+                ? 'bg-brand-600 text-white shadow-sm shadow-brand-500/30'
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
           >
             {p}
           </button>
@@ -54,7 +64,8 @@ export default function Pagination({ pagination, onPageChange }: PaginationProps
         <button
           onClick={() => onPageChange(page + 1)}
           disabled={page === totalPages}
-          className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          aria-label="Next page"
         >
           <ChevronRight size={16} />
         </button>
