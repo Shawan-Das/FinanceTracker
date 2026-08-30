@@ -1,5 +1,4 @@
 import express from 'express';
-import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import helmet from 'helmet';
@@ -64,19 +63,6 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Session management
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: isProduction,
-    httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    sameSite: isProduction ? 'strict' : 'lax',
-  },
-}));
-
 // =============================================================================
 // API Routes
 // =============================================================================
@@ -97,16 +83,33 @@ app.get('/api/health', (_req, res) => {
 });
 
 // =============================================================================
-// Serve React frontend in production
+// Serve React frontend in production (single-server mode)
 // =============================================================================
 if (isProduction) {
-  const clientBuildPath = path.join(__dirname, '../../client/dist');
-  app.use(express.static(clientBuildPath));
+  // Resolve the client build path relative to the compiled server entry point.
+  // When running from FinanceTracker/server/dist/app.js, __dirname = …/server/dist
+  // so the client build lives at FinanceTracker/client/dist.
+  const clientBuildPath = path.resolve(__dirname, '../../client/dist');
+
+  // Serve static assets (JS, CSS, images, etc.)
+  app.use(express.static(clientBuildPath, {
+    maxAge: '1y',           // Cache static assets for 1 year
+    immutable: true,
+    index: false,            // Don't serve index.html for '/' via static
+  }));
 
   // SPA fallback — serve index.html for all non-API routes
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api')) {
-      res.sendFile(path.join(clientBuildPath, 'index.html'));
+      res.sendFile(path.join(clientBuildPath, 'index.html'), (err) => {
+        if (err) {
+          console.error('Failed to serve index.html:', err);
+          res.status(500).json({
+            success: false,
+            error: { code: 'BUILD_MISSING', message: 'Frontend build not found. Run npm run build in the client directory.' },
+          });
+        }
+      });
     }
   });
 }
@@ -126,7 +129,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 });
 
 // =============================================================================
-// Start server
+// Start server (only when run directly, not when imported by Vercel)
 // =============================================================================
 if (require.main === module) {
   app.listen(PORT, () => {

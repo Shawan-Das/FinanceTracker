@@ -135,3 +135,20 @@ up: install dev ## Install dependencies and start dev servers
 fresh: clean install ## Clean install everything
 setup: install db-create ## Full project setup (install + database)
 	@echo "Setup complete! Run 'make dev' to start developing."
+
+# =============================================================================
+# Single-Server Production Deploy
+# =============================================================================
+deploy-setup: install build ## Full production build (install + build client + server)
+	@echo "Build complete! Run 'make start' to start the production server."
+	@echo ""
+	@echo "The server will serve both the API and React frontend from one URL."
+	@echo "Example: http://localhost:3000"
+
+# =============================================================================
+# Start with production .env
+# =============================================================================
+start-prod: ## Start production server (requires .env in server/)
+	@echo "Starting production server (single-server mode)..."
+	@test -f "$(SERVER_DIR)/.env" || (echo "ERROR: $(SERVER_DIR)/.env not found. Copy .env.production.example to .env and configure it." && exit 1)
+	cd "$(SERVER_DIR)" && NODE_ENV=production node dist/app.js

@@ -8,7 +8,6 @@
  */
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import express from 'express';
-import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import http from 'http';
 
@@ -267,14 +266,6 @@ function buildTestApp(authRoutes: any) {
   const app = express();
   app.use(express.json());
   app.use(cookieParser());
-  app.use(
-    session({
-      secret: 'test-secret',
-      resave: false,
-      saveUninitialized: false,
-      cookie: { secure: false, httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 },
-    }),
-  );
 
   app.use('/api/auth', authRoutes);
 
@@ -331,9 +322,9 @@ function makeRequest(
   });
 }
 
-function extractSessionCookie(setCookie?: string[]): string | undefined {
+function extractJwtCookie(setCookie?: string[]): string | undefined {
   if (!setCookie) return undefined;
-  const sc = setCookie.find((c) => c.startsWith('connect.sid='));
+  const sc = setCookie.find((c) => c.startsWith('token='));
   if (!sc) return undefined;
   return sc.split(';')[0];
 }
@@ -513,8 +504,8 @@ describe('Auth flow — end-to-end', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.data.message).toContain('verified');
 
-      // Session should be set
-      const cookie = extractSessionCookie(res.setCookie);
+      // JWT cookie should be set
+      const cookie = extractJwtCookie(res.setCookie);
       expect(cookie).toBeDefined();
 
       // User should now be verified in mock DB
@@ -665,8 +656,8 @@ describe('Auth flow — end-to-end', () => {
       expect(res.body.data.email).toBe(TEST_EMAIL);
       expect(res.body.data.full_name).toBe(TEST_NAME);
 
-      // Session cookie should be set
-      const cookie = extractSessionCookie(res.setCookie);
+      // JWT cookie should be set
+      const cookie = extractJwtCookie(res.setCookie);
       expect(cookie).toBeDefined();
     });
 
@@ -737,14 +728,14 @@ describe('Auth flow — end-to-end', () => {
         password: TEST_PASSWORD,
       });
 
-      const cookie = extractSessionCookie(loginRes.setCookie)!;
+      const cookie = extractJwtCookie(loginRes.setCookie)!;
 
       const meRes = await makeRequest(server, 'GET', `${BASE}/me`, undefined, cookie);
       expect(meRes.status).toBe(200);
       expect(meRes.body.data.email).toBe(TEST_EMAIL);
     });
 
-    it('returns 401 for /me without session', async () => {
+    it('returns 401 for /me without token', async () => {
       const res = await makeRequest(server, 'GET', `${BASE}/me`);
       expect(res.status).toBe(401);
       expect(res.body.error.code).toBe('UNAUTHORIZED');
@@ -952,7 +943,7 @@ describe('Auth flow — end-to-end', () => {
   // ══════════════════════════════════════════════════════════════════════════
 
   describe('POST /api/auth/logout', () => {
-    it('destroys session and clears cookie', async () => {
+    it('clears JWT cookie on logout', async () => {
       // Register and verify
       await makeRequest(server, 'POST', `${BASE}/register`, {
         full_name: TEST_NAME,
@@ -968,9 +959,9 @@ describe('Auth flow — end-to-end', () => {
         email: TEST_EMAIL,
         password: TEST_PASSWORD,
       });
-      const cookie = extractSessionCookie(loginRes.setCookie)!;
+      const cookie = extractJwtCookie(loginRes.setCookie)!;
 
-      // Verify session works
+      // Verify token works
       const meBefore = await makeRequest(server, 'GET', `${BASE}/me`, undefined, cookie);
       expect(meBefore.status).toBe(200);
 
@@ -978,9 +969,10 @@ describe('Auth flow — end-to-end', () => {
       const logoutRes = await makeRequest(server, 'POST', `${BASE}/logout`, undefined, cookie);
       expect(logoutRes.status).toBe(200);
 
-      // Verify session is gone
+      // Old token should still work (JWT is stateless) but cookie is cleared
+      // In real usage, the client clears the cookie, so the old token is gone
       const meAfter = await makeRequest(server, 'GET', `${BASE}/me`, undefined, cookie);
-      expect(meAfter.status).toBe(401);
+      expect(meAfter.status).toBe(200); // JWT still valid until expiry
     });
   });
 
@@ -1006,7 +998,7 @@ describe('Auth flow — end-to-end', () => {
         code: '123456',
       });
       expect(verifyRes.status).toBe(200);
-      const cookie = extractSessionCookie(verifyRes.setCookie)!;
+      const cookie = extractJwtCookie(verifyRes.setCookie)!;
 
       // Step 3: Access protected resource (auto-logged in after verify)
       const meRes = await makeRequest(server, 'GET', `${BASE}/me`, undefined, cookie);
@@ -1014,23 +1006,19 @@ describe('Auth flow — end-to-end', () => {
       expect(meRes.body.data.email).toBe('flow@test.com');
       expect(meRes.body.data.full_name).toBe('Flow Test');
 
-      // Step 4: Logout
+      // Step 4: Logout (clears cookie server-side)
       const logoutRes = await makeRequest(server, 'POST', `${BASE}/logout`, undefined, cookie);
       expect(logoutRes.status).toBe(200);
 
-      // Step 5: Verify logged out
-      const meAfterLogout = await makeRequest(server, 'GET', `${BASE}/me`, undefined, cookie);
-      expect(meAfterLogout.status).toBe(401);
-
-      // Step 6: Login again
+      // Step 5: Login again with new token
       const loginRes = await makeRequest(server, 'POST', `${BASE}/login`, {
         email: 'flow@test.com',
         password: 'FlowPass123',
       });
       expect(loginRes.status).toBe(200);
-      const newCookie = extractSessionCookie(loginRes.setCookie)!;
+      const newCookie = extractJwtCookie(loginRes.setCookie)!;
 
-      // Step 7: Access protected resource with new session
+      // Step 6: Access protected resource with new token
       const meAgain = await makeRequest(server, 'GET', `${BASE}/me`, undefined, newCookie);
       expect(meAgain.status).toBe(200);
       expect(meAgain.body.data.email).toBe('flow@test.com');

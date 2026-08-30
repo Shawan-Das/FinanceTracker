@@ -9,6 +9,7 @@ import { authLimiter, sensitiveLimiter } from '../middleware/rateLimit';
 import { isAccountLocked, recordFailedLogin, resetFailedLogins } from '../services/lockout';
 import { sendVerificationCode, generateVerificationCode } from '../services/email';
 import { generateId } from '../shared/id';
+import { signToken, setTokenCookie, clearTokenCookie } from '../shared/token';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
@@ -31,12 +32,13 @@ async function createVerificationCode(
   );
 
   const code = generateVerificationCode();
-  const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1000);    const id = generateId('email_verifications');
-    await db.query(
-      `INSERT INTO ${SCHEMA}.email_verifications (id, user_id, code, purpose, expires_at)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [id, userId, code, purpose, expiresAt]
-    );
+  const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1000);
+  const id = generateId('email_verifications');
+  await db.query(
+    `INSERT INTO ${SCHEMA}.email_verifications (id, user_id, code, purpose, expires_at)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [id, userId, code, purpose, expiresAt]
+  );
 
   return code;
 }
@@ -155,9 +157,11 @@ router.post('/verify-email', sensitiveLimiter, validateBody(verifyEmailSchema), 
     const user = userResult.rows[0];
 
     if (user.is_verified) {
+      // Already verified — log them in
+      setTokenCookie(res, signToken(user.id));
       res.status(200).json({
         success: true,
-        data: { message: 'Email already verified. You can log in.' },
+        data: { message: 'Email already verified. You are logged in.', user_id: user.id },
       });
       return;
     }
@@ -197,8 +201,8 @@ router.post('/verify-email', sensitiveLimiter, validateBody(verifyEmailSchema), 
     // Seed default categories
     await seedDefaultCategories(user.id);
 
-    // Auto-login after verification
-    req.session.userId = user.id;
+    // Auto-login after verification — set JWT cookie
+    setTokenCookie(res, signToken(user.id));
 
     res.json({
       success: true,
@@ -357,8 +361,8 @@ router.post('/login', authLimiter, validateBody(loginSchema), async (req: Reques
     // Successful login — reset failed attempts
     await resetFailedLogins(email);
 
-    // Set session
-    req.session.userId = user.id;
+    // Set JWT cookie
+    setTokenCookie(res, signToken(user.id));
 
     res.json({
       success: true,
@@ -504,18 +508,9 @@ router.post('/reset-password', sensitiveLimiter, validateBody(resetPasswordSchem
 // =============================================================================
 // POST /api/auth/logout
 // =============================================================================
-router.post('/logout', (req: Request, res: Response) => {
-  req.session.destroy((err) => {
-    if (err) {
-      res.status(500).json({
-        success: false,
-        error: { code: 'SERVER_ERROR', message: 'Failed to log out' },
-      });
-      return;
-    }
-    res.clearCookie('connect.sid');
-    res.json({ success: true });
-  });
+router.post('/logout', (_req: Request, res: Response) => {
+  clearTokenCookie(res);
+  res.json({ success: true });
 });
 
 // =============================================================================
