@@ -242,7 +242,18 @@ export default function TransactionsPage() {
       document.body.removeChild(a);
       setShowVoucherModal(false);
       setSelectedTxForVoucher(null);
-    } catch {
+      toast.success(`${voucherType.charAt(0).toUpperCase() + voucherType.slice(1)} downloaded successfully`);
+    } catch (error: any) {
+      if (error?.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const json = JSON.parse(text);
+          toast.error(json.error?.message || 'Failed to generate voucher');
+          return;
+        } catch {
+          // fallback
+        }
+      }
       toast.error('Failed to generate voucher');
     }
   };

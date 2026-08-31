@@ -117,7 +117,7 @@ export default function LoginPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-white tracking-tight">
-              Finance<span className="text-brand-400">Flow</span>
+              Balqen
             </h1>
             <p className="text-xs font-medium text-slate-400">Next-Gen Financial Intelligence</p>
           </div>
@@ -156,7 +156,7 @@ export default function LoginPage() {
 
         {/* Footer info */}
         <div className="relative z-10 text-xs text-slate-500 flex items-center justify-between border-t border-slate-800/80 pt-4">
-          <span>© 2026 FinanceFlow Inc.</span>
+          <span>© 2026 Balqen Inc.</span>
           <div className="flex gap-4">
             <span className="hover:text-slate-400 cursor-pointer">Privacy Policy</span>
             <span className="hover:text-slate-400 cursor-pointer">Terms of Service</span>
@@ -172,7 +172,7 @@ export default function LoginPage() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white">
               <TrendingUp size={18} strokeWidth={2.5} />
             </div>
-            <span className="font-bold text-slate-900 dark:text-white">FinanceFlow</span>
+            <span className="font-bold text-slate-900 dark:text-white">Balqen</span>
           </div>
           <div className="ml-auto">
             <ThemeToggle />

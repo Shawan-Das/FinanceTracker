@@ -56,7 +56,7 @@ function verificationEmailHtml(code: string, purpose: 'registration' | 'password
 <body>
   <div class="container">
     <div class="header">
-      <h1>💰 Finance Tracker</h1>
+      <h1>💰 Balqen</h1>
     </div>
     <div class="body">
       <h2 style="color: #111827; margin-top: 0;">${title}</h2>
@@ -68,7 +68,7 @@ function verificationEmailHtml(code: string, purpose: 'registration' | 'password
       <p class="text">If you didn't request this, you can safely ignore this email.</p>
     </div>
     <div class="footer">
-      <p>Personal Finance Tracker &copy; ${new Date().getFullYear()}</p>
+      <p>Balqen Finance &copy; ${new Date().getFullYear()}</p>
     </div>
   </div>
 </body>
@@ -83,7 +83,7 @@ function verificationEmailText(code: string, purpose: 'registration' | 'password
 
   return `
 ${title}
-Finance Tracker
+Balqen
 
 ${body}
 
@@ -124,7 +124,7 @@ export async function sendEmail(options: SendEmailOptions): Promise<boolean> {
     }
 
     await transporter.sendMail({
-      from: process.env.EMAIL_FROM || 'Finance Tracker <noreply@financetracker.com>',
+      from: process.env.EMAIL_FROM || 'Balqen <noreply@balqen.com>',
       to: options.to,
       subject: options.subject,
       html: options.html,
@@ -143,8 +143,8 @@ export async function sendVerificationCode(
   purpose: 'registration' | 'password_reset',
 ): Promise<boolean> {
   const subject = purpose === 'registration'
-    ? 'Verify Your Email - Finance Tracker'
-    : 'Reset Your Password - Finance Tracker';
+    ? 'Verify Your Email - Balqen'
+    : 'Reset Your Password - Balqen';
 
   return sendEmail({
     to: email,
@@ -168,15 +168,20 @@ function transactionReceiptHtml(data: {
   direction: 'sent' | 'received';
 }): string {
   const { senderName, recipientName, transactionType, amount, date, description, direction } = data;
-  const formattedAmount = `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  const typeLabel = transactionType.replace(/_/g, ' ');
-  const formattedDate = new Date(date).toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' });
 
-  const accentColor = direction === 'sent' ? '#2563eb' : '#16a34a';
-  const accentBg = direction === 'sent' ? '#eff6ff' : '#f0fdf4';
-  const directionText = direction === 'sent'
-    ? `${senderName} has shared a transaction record with you`
-    : `${senderName} has shared a transaction record with you`;
+  const typeLabel = transactionType.replace(/_/g, ' ');
+  const formattedAmount = `BDT ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formattedDate = new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const isPositive = ['INCOME', 'BORROW', 'LEND_REPAYMENT'].includes(transactionType);
+  const accentColor = isPositive ? '#16a34a' : '#dc2626';
+  const directionText = direction === 'received'
+    ? `${senderName} recorded a payment from you:`
+    : `${senderName} sent you a transaction confirmation:`;
 
   return `
 <!DOCTYPE html>
@@ -184,25 +189,25 @@ function transactionReceiptHtml(data: {
 <head>
   <meta charset="utf-8">
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
-    .container { max-width: 500px; margin: 40px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .header { background: ${accentColor}; padding: 32px; text-align: center; }
-    .header h1 { color: white; margin: 0; font-size: 22px; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f4f5; margin: 0; padding: 20px; }
+    .container { max-width: 520px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .header { background: #0f172a; padding: 24px 32px; text-align: center; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
     .body { padding: 32px; }
-    .text { color: #374151; line-height: 1.6; font-size: 14px; }
-    .amount-box { background: ${accentBg}; border: 2px solid ${accentColor}; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
-    .amount { font-size: 28px; font-weight: bold; color: ${accentColor}; }
-    .details { margin: 20px 0; }
-    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
-    .detail-label { color: #6b7280; font-size: 13px; }
-    .detail-value { color: #111827; font-size: 13px; font-weight: 500; }
-    .footer { padding: 16px 32px; background: #f9fafb; text-align: center; color: #9ca3af; font-size: 12px; }
+    .amount-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0; }
+    .amount { font-size: 28px; font-weight: 800; color: ${accentColor}; font-family: -apple-system, sans-serif; }
+    .details { border-top: 1px solid #f1f5f9; padding-top: 16px; margin-top: 16px; }
+    .detail-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 13px; border-bottom: 1px solid #f8fafc; }
+    .detail-label { color: #64748b; font-weight: 500; }
+    .detail-value { color: #0f172a; font-weight: 600; text-align: right; }
+    .text { color: #374151; line-height: 1.6; font-size: 14px; margin: 0 0 12px; }
+    .footer { padding: 16px 32px; background: #f8fafc; text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #f1f5f9; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1>💰 Finance Tracker</h1>
+      <h1>💰 Balqen</h1>
     </div>
     <div class="body">
       <p class="text">Hi ${recipientName},</p>
@@ -229,11 +234,11 @@ function transactionReceiptHtml(data: {
       </div>
 
       <p class="text" style="font-size: 12px; color: #9ca3af; margin-top: 20px;">
-        This receipt was generated by ${senderName} using Finance Tracker.
+        This receipt was generated by ${senderName} using Balqen.
       </p>
     </div>
     <div class="footer">
-      <p>Personal Finance Tracker &copy; ${new Date().getFullYear()}</p>
+      <p>Balqen Finance &copy; ${new Date().getFullYear()}</p>
     </div>
   </div>
 </body>
@@ -248,9 +253,9 @@ function transactionReceiptText(data: {
   date: string;
   description: string | null;
 }): string {
-  const formattedAmount = `৳${data.amount.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formattedAmount = `BDT ${data.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   return `
-Transaction Receipt - Finance Tracker
+Transaction Receipt - Balqen
 
 Hi ${data.recipientName},
 
@@ -258,9 +263,9 @@ ${data.senderName} has shared a transaction record with you.
 
 Amount: ${formattedAmount}
 Type: ${data.transactionType.replace(/_/g, ' ')}
-Date: ${new Date(data.date).toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' })}${data.description ? `\nDescription: ${data.description}` : ''}
+Date: ${new Date(data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}${data.description ? `\nDescription: ${data.description}` : ''}
 
-This notification was sent by ${data.senderName} using Finance Tracker.
+This notification was sent by ${data.senderName} using Balqen.
   `.trim();
 }
 
@@ -280,7 +285,7 @@ export async function sendTransactionReceipt(options: SendReceiptOptions): Promi
   const direction = ['INCOME', 'BORROW', 'LEND_REPAYMENT'].includes(transactionType) ? 'received' : 'sent';
   const typeLabel = transactionType.replace(/_/g, ' ').toLowerCase();
 
-  const subject = `${typeLabel.replace(/\b\w/g, (c: string) => c.toUpperCase())} ৳${amount.toLocaleString('en-BD')} - ${senderName}`;
+  const subject = `${typeLabel.replace(/\b\w/g, (c: string) => c.toUpperCase())} BDT ${amount.toLocaleString('en-US')} - ${senderName}`;
 
   const html = transactionReceiptHtml({
     senderName,
@@ -308,7 +313,7 @@ export async function sendTransactionReceipt(options: SendReceiptOptions): Promi
       console.log(`   To: ${to}`);
       console.log(`   From: ${senderName}`);
       console.log(`   Subject: ${subject}`);
-      console.log(`   Amount: ৳${amount.toLocaleString('en-BD')}`);
+      console.log(`   Amount: BDT ${amount.toLocaleString('en-US')}`);
       console.log(`   Type: ${transactionType}`);
       console.log('   ═══════════════════════════════════════\n');
       return true;

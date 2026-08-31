@@ -1,8 +1,8 @@
 {
-  "name": "finance-tracker-server",
+  "name": "balqen-server",
   "version": "1.0.0",
   "private": true,
-  "description": "Finance Tracker API Server",
+  "description": "Balqen API Server",
   "main": "dist/app.js",
   "scripts": {
     "dev": "tsx src/app.ts",

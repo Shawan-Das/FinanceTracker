@@ -11,6 +11,7 @@ import {
   BarChart3, PieChart as PieIcon, Landmark, UserCheck, ShieldAlert, ArrowUpRight, ArrowDownRight, Calendar
 } from 'lucide-react';
 import type { Account, Person } from '../types';
+import { formatDateDMY } from '../utils/format';
 
 const toNum = (v: any): number => (typeof v === 'number' ? v : parseFloat(v) || 0);
 
@@ -361,7 +362,7 @@ export default function ReportsPage() {
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
                       {accountStatement.transactions?.map((tx: any) => (
                         <tr key={tx.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40">
-                          <td className="p-3 text-slate-500">{new Date(tx.transaction_date).toLocaleDateString()}</td>
+                          <td className="p-3 text-slate-500">{formatDateDMY(tx.transaction_date)}</td>
                           <td className="p-3 font-bold text-slate-900 dark:text-slate-100">{tx.description || tx.transaction_type}</td>
                           <td className="p-3 text-slate-500">{tx.transaction_type.replace('_', ' ')}</td>
                           <td className={`p-3 text-right font-bold ${

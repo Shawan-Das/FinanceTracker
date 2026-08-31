@@ -82,10 +82,10 @@ export default function Layout() {
               </div>
               <div>
                 <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
-                  Finance<span className="text-brand-500">Flow</span>
+                  Balqen
                 </h1>
                 <p className="text-[10px] uppercase font-semibold text-slate-400 dark:text-slate-500 tracking-wider">
-                  Wealth Platform
+                  Finance & Ledger
                 </p>
               </div>
             </div>

@@ -8,6 +8,7 @@ import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import { Plus, Wallet, Edit, Trash2, Building2, Banknote, Smartphone, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import type { Account } from '../types';
+import { formatDateDMY } from '../utils/format';
 
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -201,7 +202,7 @@ export default function AccountsPage() {
 
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                     <span>Opening: <strong className="text-slate-700 dark:text-slate-300">{formatCurrency(acc.opening_balance)}</strong></span>
-                    <span className="text-[11px]">{new Date(acc.opening_balance_date).toLocaleDateString()}</span>
+                    <span className="text-[11px]">{formatDateDMY(acc.opening_balance_date)}</span>
                   </div>
 
                   {acc.notes && (

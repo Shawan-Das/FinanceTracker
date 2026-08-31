@@ -8,6 +8,7 @@ import Modal from '../components/Modal';
 import toast from 'react-hot-toast';
 import { Plus, CreditCard, AlertTriangle, CheckCircle2, Wrench, FileText, Calendar, ArrowUpRight, ArrowDownRight, Mail } from 'lucide-react';
 import type { Loan, Person, Account } from '../types';
+import { formatDateDMY } from '../utils/format';
 
 const toNum = (v: any): number => (typeof v === 'number' ? v : parseFloat(v) || 0);
 
@@ -130,7 +131,18 @@ export default function LoansPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-    } catch {
+      toast.success('Loan voucher downloaded successfully');
+    } catch (error: any) {
+      if (error?.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const json = JSON.parse(text);
+          toast.error(json.error?.message || 'Failed to generate loan voucher PDF');
+          return;
+        } catch {
+          // fallback
+        }
+      }
       toast.error('Failed to generate loan voucher PDF');
     }
   };
@@ -308,7 +320,7 @@ export default function LoansPage() {
 
                     {loan.due_date && (
                       <p className="text-[11px] text-slate-400 flex items-center gap-1 mb-4">
-                        <Calendar size={13} /> Due Date: {new Date(loan.due_date).toLocaleDateString()}
+                        <Calendar size={13} /> Due Date: {formatDateDMY(loan.due_date)}
                       </p>
                     )}
                   </div>

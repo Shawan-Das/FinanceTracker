@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white shadow-md">
               <TrendingUp size={20} strokeWidth={2.5} />
             </div>
-            <span className="font-bold text-lg text-slate-900 dark:text-white">FinanceFlow</span>
+            <span className="font-bold text-lg text-slate-900 dark:text-white">Balqen</span>
           </div>
           <ThemeToggle />
         </div>

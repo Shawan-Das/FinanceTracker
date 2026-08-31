@@ -11,7 +11,7 @@ export interface VoucherData {
   id: string;
   transaction_type: string;
   transaction_date: string;
-  amount: number;
+  amount: number | string;
   description: string | null;
   reference: string | null;
 
@@ -34,29 +34,122 @@ export interface VoucherData {
 // =============================================================================
 
 const COLORS = {
-  primary: '#2563eb',
-  success: '#16a34a',
-  danger: '#dc2626',
-  warning: '#d97706',
-  gray: '#6b7280',
-  lightGray: '#e5e7eb',
-  darkGray: '#374151',
+  primary: '#2563eb',     // Brand blue
+  success: '#16a34a',     // Green
+  danger: '#dc2626',      // Red
+  warning: '#d97706',     // Amber
+  gray: '#6b7280',        // Slate
+  lightGray: '#e2e8f0',   // Border gray
+  darkGray: '#1e293b',    // Text dark
+  bgLight: '#f8fafc',     // Table row background
   white: '#ffffff',
-  bg: '#f9fafb',
+  accentDark: '#0f172a',
 };
 
-const BDT = (amount: number) =>
-  `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+export const formatBDT = (amount: number | string | null | undefined): string => {
+  const num = typeof amount === 'number' ? amount : parseFloat(String(amount || 0));
+  if (isNaN(num)) return 'BDT 0.00';
+  return `BDT ${num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
 
-const TYPE_LABELS: Record<string, string> = {
-  INCOME: 'Income Receipt',
-  EXPENSE: 'Expense Voucher',
-  TRANSFER: 'Transfer Voucher',
-  LEND: 'Lending Receipt',
-  LEND_REPAYMENT: 'Repayment Received',
-  BORROW: 'Borrowing Receipt',
-  BORROW_REPAYMENT: 'Repayment Voucher',
-  ADJUSTMENT: 'Adjustment Voucher',
+/**
+ * Converts a number to English words for financial vouchers
+ */
+export function numberToWords(amount: number | string): string {
+  const num = typeof amount === 'number' ? amount : parseFloat(String(amount || 0));
+  if (isNaN(num) || num === 0) return 'Zero BDT Only';
+
+  const units = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+    'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen', 'Seventeen', 'Eighteen', 'Nineteen'];
+  const tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+  const convertGroup = (n: number): string => {
+    let groupStr = '';
+    if (n >= 100) {
+      groupStr += `${units[Math.floor(n / 100)]} Hundred `;
+      n %= 100;
+    }
+    if (n >= 20) {
+      groupStr += `${tens[Math.floor(n / 10)]} `;
+      n %= 10;
+    }
+    if (n > 0) {
+      groupStr += `${units[n]} `;
+    }
+    return groupStr.trim();
+  };
+
+  const integerPart = Math.floor(Math.abs(num));
+  const decimalPart = Math.round((Math.abs(num) - integerPart) * 100);
+
+  if (integerPart === 0 && decimalPart === 0) return 'Zero BDT Only';
+
+  let result = '';
+  let current = integerPart;
+
+  const crore = Math.floor(current / 10000000);
+  current %= 10000000;
+  const lakh = Math.floor(current / 100000);
+  current %= 100000;
+  const thousand = Math.floor(current / 1000);
+  current %= 1000;
+  const remainder = current;
+
+  if (crore > 0) result += `${convertGroup(crore)} Crore `;
+  if (lakh > 0) result += `${convertGroup(lakh)} Lakh `;
+  if (thousand > 0) result += `${convertGroup(thousand)} Thousand `;
+  if (remainder > 0) result += `${convertGroup(remainder)} `;
+
+  result = result.trim() + ' BDT';
+
+  if (decimalPart > 0) {
+    result += ` and ${convertGroup(decimalPart)} Paisa`;
+  }
+
+  return `${result} Only`;
+}
+
+const TYPE_TITLES: Record<string, Record<VoucherType, string>> = {
+  INCOME: {
+    receipt: 'MONEY RECEIPT',
+    invoice: 'INCOME INVOICE',
+    voucher: 'CREDIT VOUCHER',
+  },
+  EXPENSE: {
+    receipt: 'PAYMENT RECEIPT',
+    invoice: 'EXPENSE INVOICE',
+    voucher: 'DEBIT VOUCHER',
+  },
+  TRANSFER: {
+    receipt: 'TRANSFER RECEIPT',
+    invoice: 'TRANSFER STATEMENT',
+    voucher: 'TRANSFER VOUCHER',
+  },
+  LEND: {
+    receipt: 'LENDING RECEIPT',
+    invoice: 'LOAN DISBURSEMENT INVOICE',
+    voucher: 'LENDING VOUCHER',
+  },
+  LEND_REPAYMENT: {
+    receipt: 'LOAN REPAYMENT RECEIPT',
+    invoice: 'REPAYMENT SETTLEMENT',
+    voucher: 'REPAYMENT VOUCHER',
+  },
+  BORROW: {
+    receipt: 'BORROWING RECEIPT',
+    invoice: 'BORROWING INVOICE',
+    voucher: 'CREDIT VOUCHER',
+  },
+  BORROW_REPAYMENT: {
+    receipt: 'REPAYMENT RECEIPT',
+    invoice: 'DEBT SETTLEMENT INVOICE',
+    voucher: 'DEBT REPAYMENT VOUCHER',
+  },
+  ADJUSTMENT: {
+    receipt: 'ADJUSTMENT RECEIPT',
+    invoice: 'ADJUSTMENT STATEMENT',
+    voucher: 'JOURNAL VOUCHER',
+  },
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -76,196 +169,307 @@ const TYPE_COLORS: Record<string, string> = {
 
 export function generateVoucherPDF(
   data: VoucherData,
-  voucherType: VoucherType,
+  voucherType: VoucherType = 'voucher',
 ): PDFKit.PDFDocument {
   const doc = new PDFDocument({
     size: 'A4',
-    margin: 50,
+    margin: 0,
     bufferPages: true,
+    autoFirstPage: true,
     info: {
-      Title: `${TYPE_LABELS[data.transaction_type] || 'Voucher'} - ${data.id}`,
-      Author: data.user_name,
-      Subject: `Finance Tracker Voucher`,
+      Title: `${data.id.toUpperCase()} - ${voucherType.toUpperCase()}`,
+      Author: data.user_name || 'Balqen',
+      Subject: `Balqen Financial Document`,
+      Creator: 'Balqen',
     },
   });
 
+  const numAmount = typeof data.amount === 'number' ? data.amount : parseFloat(String(data.amount || 0));
   const typeColor = TYPE_COLORS[data.transaction_type] || COLORS.primary;
-  const label = TYPE_LABELS[data.transaction_type] || 'Voucher';
+  const docTitle = (TYPE_TITLES[data.transaction_type] && TYPE_TITLES[data.transaction_type][voucherType])
+    || `${data.transaction_type.replace('_', ' ')} ${voucherType.toUpperCase()}`;
+
+  const formattedAmount = formatBDT(numAmount);
+  const wordsAmount = numberToWords(numAmount);
+
+  const pageWidth = doc.page.width;
+  const pageHeight = doc.page.height;
+  const contentWidth = pageWidth - 90;
 
   // -------------------------------------------------------------------------
-  // Header
+  // 1. Top Decorative Brand Bar
   // -------------------------------------------------------------------------
+  doc.rect(0, 0, pageWidth, 8).fill(typeColor);
 
-  // Top accent bar
-  doc.rect(0, 0, doc.page.width, 8).fill(typeColor);
-
-  // App name
-  doc.fontSize(10).fillColor(COLORS.gray).text('Finance Tracker', 50, 30);
-
-  // Voucher title
+  // -------------------------------------------------------------------------
+  // 2. Header Section
+  // -------------------------------------------------------------------------
+  // App branding (left)
   doc
-    .fontSize(24)
+    .font('Helvetica-Bold')
+    .fontSize(18)
+    .fillColor(COLORS.darkGray)
+    .text('BALQEN', 45, 28);
+
+  doc
+    .font('Helvetica')
+    .fontSize(9)
+    .fillColor(COLORS.gray)
+    .text('Personal & Business Financial Ledger', 45, 48);
+
+  // Document Title & Type Badge (right)
+  doc
+    .font('Helvetica-Bold')
+    .fontSize(16)
     .fillColor(typeColor)
-    .text(label.toUpperCase(), 50, 50, { continued: false });
+    .text(docTitle, 45, 30, { align: 'right', width: contentWidth });
 
-  // Voucher number
-  doc
-    .fontSize(10)
-    .fillColor(COLORS.gray)
-    .text(`No: ${data.id.toUpperCase()}`, 50, 80);
+  const badgeText = voucherType.toUpperCase();
+  const badgeWidth = 70;
+  const badgeHeight = 18;
+  const badgeX = pageWidth - 45 - badgeWidth;
+  const badgeY = 50;
 
-  // Date on the right
+  doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 3).fill(typeColor);
   doc
-    .fontSize(10)
-    .fillColor(COLORS.gray)
-    .text(`Date: ${new Date(data.transaction_date).toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' })}`, 50, 95);
+    .font('Helvetica-Bold')
+    .fontSize(8)
+    .fillColor(COLORS.white)
+    .text(badgeText, badgeX, badgeY + 5, { width: badgeWidth, align: 'center' });
 
   // Divider
   doc
-    .moveTo(50, 115)
-    .lineTo(doc.page.width - 50, 115)
+    .moveTo(45, 78)
+    .lineTo(pageWidth - 45, 78)
     .strokeColor(COLORS.lightGray)
     .lineWidth(1)
     .stroke();
 
   // -------------------------------------------------------------------------
-  // Status badge
+  // 3. Metadata Bar (Document No, Date, Issuer)
   // -------------------------------------------------------------------------
-  const badgeY = 130;
-  doc.roundedRect(50, badgeY, 120, 24, 4).fill(typeColor);
-  doc.fontSize(10).fillColor(COLORS.white).text(label, 58, badgeY + 7, { width: 104, align: 'center' });
+  const metaY = 90;
+  const colW = contentWidth / 3;
+
+  // Col 1: Voucher/Doc No
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.gray).text('DOCUMENT NO', 45, metaY);
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.darkGray).text(data.id.toUpperCase(), 45, metaY + 12);
+
+  // Col 2: Date
+  const dateFormatted = new Date(data.transaction_date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.gray).text('TRANSACTION DATE', 45 + colW, metaY);
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.darkGray).text(dateFormatted, 45 + colW, metaY + 12);
+
+  // Col 3: Issued By
+  doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.gray).text('ACCOUNT HOLDER', 45 + colW * 2, metaY);
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.darkGray).text(data.user_name || 'Authorized User', 45 + colW * 2, metaY + 12);
 
   // -------------------------------------------------------------------------
-  // Amount (prominent)
+  // 4. Prominent Amount Display Card
   // -------------------------------------------------------------------------
-  const amountY = 170;
-  doc.fontSize(12).fillColor(COLORS.gray).text('Amount', 50, amountY);
+  const cardY = 130;
+  const cardH = 72;
 
-  const amountColor = ['INCOME', 'LEND_REPAYMENT', 'BORROW'].includes(data.transaction_type)
-    ? COLORS.success
-    : ['EXPENSE', 'LEND', 'BORROW_REPAYMENT'].includes(data.transaction_type)
-    ? COLORS.danger
-    : COLORS.primary;
+  // Background Card
+  doc.roundedRect(45, cardY, contentWidth, cardH, 6).fillAndStroke(COLORS.bgLight, COLORS.lightGray);
 
-  doc.fontSize(32).fillColor(amountColor).text(BDT(data.amount), 50, amountY + 18, { width: doc.page.width - 100 });
+  // Amount Label
+  doc
+    .font('Helvetica-Bold')
+    .fontSize(9)
+    .fillColor(COLORS.gray)
+    .text('TOTAL TRANSACTION AMOUNT', 60, cardY + 12);
+
+  // Amount Value
+  doc
+    .font('Helvetica-Bold')
+    .fontSize(22)
+    .fillColor(typeColor)
+    .text(formattedAmount, 60, cardY + 26);
+
+  // In Words
+  doc
+    .font('Helvetica-Oblique')
+    .fontSize(9)
+    .fillColor(COLORS.darkGray)
+    .text(`In Words: ${wordsAmount}`, 60, cardY + 53, { width: contentWidth - 30 });
 
   // -------------------------------------------------------------------------
-  // Details table
+  // 5. Transfer Diagram (If Transfer)
   // -------------------------------------------------------------------------
-  let y = amountY + 70;
+  let currentY = cardY + cardH + 18;
 
-  const drawRow = (label: string, value: string, isLast = false) => {
-    // Alternate row background
-    if (!isLast) {
-      doc.rect(50, y, doc.page.width - 100, 28).fill(COLORS.bg);
+  if (data.transaction_type === 'TRANSFER' && (data.from_account_name || data.to_account_name)) {
+    doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.darkGray).text('Transfer Flow', 45, currentY);
+    currentY += 16;
+
+    const flowBoxW = (contentWidth - 60) / 2;
+    const flowBoxH = 40;
+
+    // From Box
+    doc.roundedRect(45, currentY, flowBoxW, flowBoxH, 4).fillAndStroke(COLORS.bgLight, COLORS.lightGray);
+    doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.gray).text('SOURCE (FROM)', 55, currentY + 7);
+    doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.darkGray).text(data.from_account_name || 'Source Account', 55, currentY + 20);
+
+    // Arrow in center
+    const arrowCenterX = 45 + flowBoxW + 30;
+    const arrowY = currentY + flowBoxH / 2;
+    doc.moveTo(arrowCenterX - 18, arrowY).lineTo(arrowCenterX + 18, arrowY).strokeColor(typeColor).lineWidth(2).stroke();
+    doc.moveTo(arrowCenterX + 12, arrowY - 4).lineTo(arrowCenterX + 18, arrowY).lineTo(arrowCenterX + 12, arrowY + 4).stroke();
+
+    // To Box
+    const toX = 45 + flowBoxW + 60;
+    doc.roundedRect(toX, currentY, flowBoxW, flowBoxH, 4).fillAndStroke(COLORS.bgLight, COLORS.lightGray);
+    doc.font('Helvetica-Bold').fontSize(8).fillColor(COLORS.gray).text('DESTINATION (TO)', toX + 10, currentY + 7);
+    doc.font('Helvetica-Bold').fontSize(10).fillColor(COLORS.darkGray).text(data.to_account_name || 'Destination Account', toX + 10, currentY + 20);
+
+    currentY += flowBoxH + 18;
+  }
+
+  // -------------------------------------------------------------------------
+  // 6. Details Table
+  // -------------------------------------------------------------------------
+  doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.darkGray).text('Transaction Summary', 45, currentY);
+  currentY += 16;
+
+  const tableRows: Array<{ label: string; value: string }> = [
+    { label: 'Transaction ID', value: data.id },
+    { label: 'Transaction Type', value: data.transaction_type.replace(/_/g, ' ') },
+    { label: 'Category', value: data.category_name || 'General / Uncategorized' },
+    { label: 'Account', value: data.account_name || (data.from_account_name ? `${data.from_account_name} -> ${data.to_account_name}` : '-') },
+  ];
+
+  if (data.person_name) {
+    const roleLabel = ['LEND', 'LEND_REPAYMENT'].includes(data.transaction_type)
+      ? 'Associated Person (Borrower/Lender)'
+      : 'Associated Person (Lender/Borrower)';
+    tableRows.push({ label: roleLabel, value: data.person_name });
+  }
+
+  if (data.reference) {
+    tableRows.push({ label: 'Reference / Invoice #', value: data.reference });
+  }
+
+  if (data.description) {
+    tableRows.push({ label: 'Notes / Description', value: data.description });
+  }
+
+  const rowHeight = 24;
+  tableRows.forEach((row, index) => {
+    const isEven = index % 2 === 0;
+    if (isEven) {
+      doc.rect(45, currentY, contentWidth, rowHeight).fill(COLORS.bgLight);
     }
 
-    doc.fontSize(10).fillColor(COLORS.gray).text(label, 60, y + 8, { width: 180 });
-    doc.fontSize(10).fillColor(COLORS.darkGray).text(value || '-', 240, y + 8, { width: doc.page.width - 300 });
-    y += 28;
-  };
+    doc
+      .font('Helvetica-Bold')
+      .fontSize(9)
+      .fillColor(COLORS.gray)
+      .text(row.label, 55, currentY + 7, { width: 170 });
 
-  // Section title
-  doc.fontSize(12).fillColor(COLORS.darkGray).text('Transaction Details', 50, y - 5);
-  y += 20;
+    doc
+      .font('Helvetica')
+      .fontSize(9)
+      .fillColor(COLORS.darkGray)
+      .text(row.value || '-', 230, currentY + 7, { width: contentWidth - 195 });
 
-  drawRow('Transaction ID', data.id);
-  drawRow('Type', `${data.transaction_type.replace('_', ' ')} (${label})`);
-  drawRow('Date', new Date(data.transaction_date).toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric' }));
-  drawRow('Account', data.account_name || (data.from_account_name ? `${data.from_account_name} → ${data.to_account_name}` : '-'));
-  drawRow('Person', data.person_name || '-');
-  drawRow('Category', data.category_name || '-');
-  drawRow('Description', data.description || '-');
-  drawRow('Reference', data.reference || '-', true);
+    currentY += rowHeight;
+  });
 
-  // -------------------------------------------------------------------------
-  // Transfer details (if applicable)
-  // -------------------------------------------------------------------------
-  if (data.transaction_type === 'TRANSFER' && data.from_account_name && data.to_account_name) {
-    y += 15;
-    doc.fontSize(12).fillColor(COLORS.darkGray).text('Transfer Details', 50, y);
-    y += 20;
-
-    // Transfer arrow diagram
-    const arrowY = y;
-    const boxW = 180;
-    const boxH = 50;
-    const fromX = 50;
-    const toX = doc.page.width - 50 - boxW;
-
-    // From box
-    doc.roundedRect(fromX, arrowY, boxW, boxH, 6).fillAndStroke(COLORS.bg, COLORS.lightGray);
-    doc.fontSize(9).fillColor(COLORS.gray).text('FROM', fromX + 10, arrowY + 8, { width: boxW - 20 });
-    doc.fontSize(11).fillColor(COLORS.darkGray).text(data.from_account_name, fromX + 10, arrowY + 24, { width: boxW - 20 });
-
-    // Arrow
-    const arrowStartX = fromX + boxW + 10;
-    const arrowEndX = toX - 10;
-    const arrowMidY = arrowY + boxH / 2;
-    doc.moveTo(arrowStartX, arrowMidY).lineTo(arrowEndX, arrowMidY).strokeColor(typeColor).lineWidth(2).stroke();
-    // Arrowhead
-    doc.moveTo(arrowEndX - 8, arrowMidY - 5).lineTo(arrowEndX, arrowMidY).lineTo(arrowEndX - 8, arrowMidY + 5).stroke();
-
-    // Amount in middle
-    doc.fontSize(12).fillColor(typeColor).text(BDT(data.amount), arrowStartX, arrowMidY - 20, {
-      width: arrowEndX - arrowStartX,
-      align: 'center',
-    });
-
-    // To box
-    doc.roundedRect(toX, arrowY, boxW, boxH, 6).fillAndStroke(COLORS.bg, COLORS.lightGray);
-    doc.fontSize(9).fillColor(COLORS.gray).text('TO', toX + 10, arrowY + 8, { width: boxW - 20 });
-    doc.fontSize(11).fillColor(COLORS.darkGray).text(data.to_account_name, toX + 10, arrowY + 24, { width: boxW - 20 });
-
-    y = arrowY + boxH + 15;
-  }
-
-  // -------------------------------------------------------------------------
-  // Person balance summary (for lending/borrowing)
-  // -------------------------------------------------------------------------
-  if (['LEND', 'LEND_REPAYMENT', 'BORROW', 'BORROW_REPAYMENT'].includes(data.transaction_type) && data.person_name) {
-    y += 10;
-    doc.fontSize(12).fillColor(COLORS.darkGray).text('Party Details', 50, y);
-    y += 20;
-
-    const personType = data.transaction_type.startsWith('LEND') ? 'Lender / Borrower' : 'Borrower / Lender';
-    drawRow(personType, data.person_name);
-    drawRow('Direction', data.transaction_type.startsWith('LEND')
-      ? (data.transaction_type === 'LEND' ? 'You lent money to this person' : 'This person returned money to you')
-      : (data.transaction_type === 'BORROW' ? 'You borrowed money from this person' : 'You returned money to this person'),
-    true);
-  }
-
-  // -------------------------------------------------------------------------
-  // Footer
-  // -------------------------------------------------------------------------
-  const pageHeight = doc.page.height;
-
-  // Divider
+  // Table bottom border
   doc
-    .moveTo(50, pageHeight - 80)
-    .lineTo(doc.page.width - 50, pageHeight - 80)
+    .moveTo(45, currentY)
+    .lineTo(pageWidth - 45, currentY)
     .strokeColor(COLORS.lightGray)
     .lineWidth(1)
     .stroke();
 
-  // Footer text
-  doc.fontSize(9).fillColor(COLORS.gray).text(
-    `Generated by Finance Tracker on ${new Date().toLocaleDateString('en-BD', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
-    50,
-    pageHeight - 70,
-    { width: doc.page.width - 100, align: 'center' },
-  );
+  // -------------------------------------------------------------------------
+  // 7. Signatures & Verification Area
+  // -------------------------------------------------------------------------
+  const sigY = pageHeight - 140;
 
-  doc.fontSize(8).fillColor(COLORS.gray).text(
-    `This is a computer-generated document. No signature is required.`,
-    50,
-    pageHeight - 55,
-    { width: doc.page.width - 100, align: 'center' },
-  );
+  // Signature lines
+  const sigBoxW = 160;
+  const leftSigX = 55;
+  const rightSigX = pageWidth - 45 - sigBoxW;
 
-  // Bottom accent bar
-  doc.rect(0, pageHeight - 8, doc.page.width, 8).fill(typeColor);
+  // Left: Prepared By
+  doc.moveTo(leftSigX, sigY + 35).lineTo(leftSigX + sigBoxW, sigY + 35).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
+  doc.font('Helvetica').fontSize(8).fillColor(COLORS.gray).text('Prepared By / Account Owner', leftSigX, sigY + 40, { width: sigBoxW, align: 'center' });
+  doc.font('Helvetica-Bold').fontSize(9).fillColor(COLORS.darkGray).text(data.user_name || 'Authorized User', leftSigX, sigY + 20, { width: sigBoxW, align: 'center' });
+
+  // Right: Verified / Authorized
+  doc.moveTo(rightSigX, sigY + 35).lineTo(rightSigX + sigBoxW, sigY + 35).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
+  doc.font('Helvetica').fontSize(8).fillColor(COLORS.gray).text('Authorized Signature / Seal', rightSigX, sigY + 40, { width: sigBoxW, align: 'center' });
+
+  // -------------------------------------------------------------------------
+  // 8. Footer
+  // -------------------------------------------------------------------------
+  const footerY = pageHeight - 65;
+
+  doc.moveTo(45, footerY).lineTo(pageWidth - 45, footerY).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
+
+  const generatedDate = new Date().toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  doc
+    .font('Helvetica')
+    .fontSize(8)
+    .fillColor(COLORS.gray)
+    .text(
+      `Generated by Balqen on ${generatedDate} | Document ID: ${data.id.toUpperCase()}`,
+      45,
+      footerY + 10,
+      { width: contentWidth, align: 'center' }
+    );
+
+  doc
+    .font('Helvetica')
+    .fontSize(7)
+    .fillColor(COLORS.gray)
+    .text(
+      'This is a verified computer-generated document and is valid without physical seal.',
+      45,
+      footerY + 22,
+      { width: contentWidth, align: 'center' }
+    );
+
+  // Bottom Accent Bar
+  doc.rect(0, pageHeight - 6, pageWidth, 6).fill(typeColor);
 
   return doc;
+}
+
+/**
+ * Helper to generate PDF as a Buffer for 100% reliable delivery in Node & Serverless
+ */
+export async function generateVoucherBuffer(
+  data: VoucherData,
+  voucherType: VoucherType = 'voucher',
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = generateVoucherPDF(data, voucherType);
+      const chunks: Buffer[] = [];
+
+      doc.on('data', (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', (err) => reject(err));
+
+      doc.end();
+    } catch (err) {
+      reject(err);
+    }
+  });
 }

@@ -4,7 +4,7 @@ import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
 import { generateId } from '../shared/id';
-import { generateVoucherPDF, VoucherData, VoucherType } from '../services/voucher';
+import { generateVoucherBuffer, VoucherData, VoucherType } from '../services/voucher';
 import { sendTransactionReceipt } from '../services/email';
 
 const router = Router();
@@ -242,7 +242,7 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
       transaction_date: loan.start_date,
       amount: parseFloat(loan.principal_amount),
       description: loan.description || label,
-      reference: `Interest: ৳${parseFloat(loan.interest_amount).toLocaleString()} | Repaid: ৳${parseFloat(loan.total_repaid).toLocaleString()} | Remaining: ৳${parseFloat(loan.remaining_amount).toLocaleString()}`,
+      reference: `Interest: BDT ${parseFloat(loan.interest_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })} | Repaid: BDT ${parseFloat(loan.total_repaid).toLocaleString('en-US', { minimumFractionDigits: 2 })} | Remaining: BDT ${parseFloat(loan.remaining_amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
       account_name: null,
       person_name: loan.person_name,
       category_name: `Loan (${loan.status})`,
@@ -250,13 +250,13 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
       user_email: user.email,
     };
 
-    const pdfDoc = generateVoucherPDF(voucherData, voucherType);
+    const pdfBuffer = await generateVoucherBuffer(voucherData, voucherType);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="loan-${loan.id}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
 
-    pdfDoc.pipe(res);
-    pdfDoc.end();
+    res.send(pdfBuffer);
   } catch (error) {
     console.error('Generate loan voucher error:', error);
     res.status(500).json({

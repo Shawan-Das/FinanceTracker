@@ -4,6 +4,7 @@ import { useTheme, Theme } from '../contexts/ThemeContext';
 import { authApi } from '../api/client';
 import toast from 'react-hot-toast';
 import { User, Lock, Save, Sun, Moon, Monitor, ShieldCheck, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { formatDateDMY } from '../utils/format';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -143,7 +144,7 @@ export default function SettingsPage() {
               <input
                 type="text"
                 className="input bg-slate-100 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-semibold cursor-not-allowed"
-                value={user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                value={user?.created_at ? formatDateDMY(user.created_at) : 'N/A'}
                 disabled
               />
             </div>

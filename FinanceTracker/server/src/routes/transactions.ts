@@ -5,7 +5,7 @@ import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody, validateQuery } from '../middleware/validation';
 import { generateId } from '../shared/id';
 
-import { generateVoucherPDF, VoucherType } from '../services/voucher';
+import { generateVoucherBuffer, VoucherType } from '../services/voucher';
 import { sendTransactionReceipt } from '../services/email';
 
 const router = Router();
@@ -256,8 +256,8 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
       }
     }
 
-    // Generate PDF
-    const pdfDoc = generateVoucherPDF(
+    // Generate PDF Buffer
+    const pdfBuffer = await generateVoucherBuffer(
       {
         id: tx.id,
         transaction_type: tx.transaction_type,
@@ -279,9 +279,9 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
     // Set response headers for PDF download
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${voucherType}-${tx.id}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
 
-    pdfDoc.pipe(res);
-    pdfDoc.end();
+    res.send(pdfBuffer);
   } catch (error) {
     console.error('Generate voucher error:', error);
     res.status(500).json({
