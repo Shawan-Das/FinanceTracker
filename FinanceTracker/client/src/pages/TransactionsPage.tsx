@@ -6,6 +6,8 @@ import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Pagination from '../components/Pagination';
 import Modal from '../components/Modal';
+import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { Plus, Filter, Trash2, Edit, Download, FileText, Search, X, Check, ArrowLeftRight, Mail } from 'lucide-react';
 import type { Transaction, TransactionType, Account, Person, Category } from '../types';
@@ -27,13 +29,13 @@ const TRANSACTION_TYPES: TransactionType[] = [
 
 export default function TransactionsPage() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [showVoucherModal, setShowVoucherModal] = useState(false);
-  const [selectedTxForVoucher, setSelectedTxForVoucher] = useState<Transaction | null>(null);
-  const [voucherType, setVoucherType] = useState<'receipt' | 'invoice' | 'voucher'>('voucher');
+  const [voucherReportData, setVoucherReportData] = useState<VoucherReportData | null>(null);
+  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -227,35 +229,23 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleGenerateVoucher = async () => {
-    if (!selectedTxForVoucher) return;
-    try {
-      const response = await transactionsApi.voucher(selectedTxForVoucher.id, voucherType);
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${voucherType}-${selectedTxForVoucher.id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      setShowVoucherModal(false);
-      setSelectedTxForVoucher(null);
-      toast.success(`${voucherType.charAt(0).toUpperCase() + voucherType.slice(1)} downloaded successfully`);
-    } catch (error: any) {
-      if (error?.response?.data instanceof Blob) {
-        try {
-          const text = await error.response.data.text();
-          const json = JSON.parse(text);
-          toast.error(json.error?.message || 'Failed to generate voucher');
-          return;
-        } catch {
-          // fallback
-        }
-      }
-      toast.error('Failed to generate voucher');
-    }
+  const handleOpenVoucher = (tx: Transaction) => {
+    setVoucherReportData({
+      id: tx.id,
+      transaction_type: tx.transaction_type,
+      transaction_date: tx.transaction_date,
+      amount: tx.amount,
+      description: tx.description,
+      reference: tx.reference,
+      account_name: tx.account_name,
+      person_name: tx.person_name,
+      category_name: tx.category_name,
+      user_name: user?.full_name,
+      user_email: user?.email,
+      from_account_name: tx.transfer?.from_account_name,
+      to_account_name: tx.transfer?.to_account_name,
+    });
+    setIsVoucherModalOpen(true);
   };
 
   const filteredCategories = categories?.filter((c: Category) => {
@@ -475,13 +465,9 @@ export default function TransactionsPage() {
                             <Edit size={15} />
                           </button>
                           <button
-                            onClick={() => {
-                              setSelectedTxForVoucher(tx);
-                              setVoucherType('voucher');
-                              setShowVoucherModal(true);
-                            }}
+                            onClick={() => handleOpenVoucher(tx)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                            title="PDF Voucher / Receipt"
+                            title="Voucher, Invoice & Receipt"
                           >
                             <FileText size={15} />
                           </button>
@@ -553,15 +539,11 @@ export default function TransactionsPage() {
                         <span>Edit</span>
                       </button>
                       <button
-                        onClick={() => {
-                          setSelectedTxForVoucher(tx);
-                          setVoucherType('voucher');
-                          setShowVoucherModal(true);
-                        }}
+                        onClick={() => handleOpenVoucher(tx)}
                         className="px-2 py-1 rounded-lg text-xs text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 bg-slate-100 dark:bg-slate-800 flex items-center gap-1"
                       >
                         <FileText size={12} />
-                        <span>PDF</span>
+                        <span>Voucher</span>
                       </button>
                       <button
                         onClick={() => {
@@ -780,75 +762,12 @@ export default function TransactionsPage() {
         </form>
       </Modal>
 
-      {/* Voucher Generation Modal */}
-      <Modal
-        isOpen={showVoucherModal}
-        onClose={() => { setShowVoucherModal(false); setSelectedTxForVoucher(null); }}
-        title="Generate PDF Financial Document"
-      >
-        <div className="space-y-4">
-          {selectedTxForVoucher && (
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 text-xs space-y-1">
-              <p className="font-semibold text-slate-900 dark:text-slate-100">
-                Transaction: <span className="font-normal">{selectedTxForVoucher.description || selectedTxForVoucher.transaction_type}</span>
-              </p>
-              <p className="text-slate-600 dark:text-slate-400">
-                Amount: <span className="font-bold text-slate-900 dark:text-slate-100">{formatCurrency(selectedTxForVoucher.amount)}</span>
-              </p>
-            </div>
-          )}
-
-          <div>
-            <label className="label">Document Format</label>
-            <div className="space-y-2">
-              {([
-                { value: 'voucher', label: 'Transaction Voucher', description: 'Internal audit & accounting record' },
-                { value: 'receipt', label: 'Payment Receipt', description: 'Official acknowledgment of payment received' },
-                { value: 'invoice', label: 'Commercial Invoice', description: 'Bill statement for debt or goods' },
-              ] as const).map((opt) => (
-                <label
-                  key={opt.value}
-                  className={`flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-                    voucherType === opt.value
-                      ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/40'
-                      : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/40'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="voucherType"
-                    value={opt.value}
-                    checked={voucherType === opt.value}
-                    onChange={(e) => setVoucherType(e.target.value as any)}
-                    className="mt-1"
-                  />
-                  <div>
-                    <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{opt.label}</p>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">{opt.description}</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <button
-              onClick={handleGenerateVoucher}
-              className="btn-primary flex-1 text-xs py-2.5 flex items-center justify-center gap-1.5 shadow-md shadow-brand-500/20"
-            >
-              <FileText size={15} />
-              <span>Download PDF</span>
-            </button>
-            <button
-              type="button"
-              className="btn-secondary text-xs py-2.5"
-              onClick={() => { setShowVoucherModal(false); setSelectedTxForVoucher(null); }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </Modal>
+      {/* Printable Voucher, Invoice & Receipt Report Modal */}
+      <VoucherModal
+        isOpen={isVoucherModalOpen}
+        onClose={() => setIsVoucherModalOpen(false)}
+        data={voucherReportData}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { dashboardApi, transactionsApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import QueryError from '../components/QueryError';
+import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -79,6 +80,8 @@ export default function DashboardPage() {
   const [isQuickOpen, setIsQuickOpen] = useState(false);
   const [isCreatePresetOpen, setIsCreatePresetOpen] = useState(false);
   const [presetTab, setPresetTab] = useState<'smart' | 'custom'>('smart');
+  const [voucherReportData, setVoucherReportData] = useState<VoucherReportData | null>(null);
+  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
   // Load custom user presets from localStorage
   const storageKey = `balqen_custom_presets_${user?.id || 'guest'}`;
@@ -164,22 +167,21 @@ export default function DashboardPage() {
     setIsQuickOpen(true);
   };
 
-  const handleDownloadVoucher = async (tx: Transaction) => {
-    try {
-      const res = await transactionsApi.voucher(tx.id, 'voucher');
-      const blob = new Blob([res.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `VOUCHER-${tx.id.toUpperCase()}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      toast.success('Voucher PDF downloaded');
-    } catch (err) {
-      toast.error('Failed to download voucher');
-    }
+  const handleOpenVoucher = (tx: Transaction) => {
+    setVoucherReportData({
+      id: tx.id,
+      transaction_type: tx.transaction_type,
+      transaction_date: tx.transaction_date,
+      amount: tx.amount,
+      description: tx.description,
+      reference: tx.reference,
+      account_name: tx.account_name,
+      person_name: tx.person_name,
+      category_name: tx.category_name,
+      user_name: user?.full_name,
+      user_email: user?.email,
+    });
+    setIsVoucherModalOpen(true);
   };
 
   if (summaryLoading) return <LoadingSpinner message="Assembling financial command center..." />;
@@ -858,9 +860,9 @@ export default function DashboardPage() {
                       </td>
                       <td className="py-3 text-right whitespace-nowrap">
                         <button
-                          onClick={() => handleDownloadVoucher(tx)}
+                          onClick={() => handleOpenVoucher(tx)}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/60 transition-colors"
-                          title="Download Official Voucher PDF"
+                          title="View Official Voucher & Invoice"
                         >
                           <FileText size={15} />
                         </button>
@@ -919,9 +921,9 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <button
-                      onClick={() => handleDownloadVoucher(tx)}
+                      onClick={() => handleOpenVoucher(tx)}
                       className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-2xs transition-colors"
-                      title="Download Voucher"
+                      title="View Voucher"
                     >
                       <FileText size={13} />
                     </button>
@@ -950,6 +952,13 @@ export default function DashboardPage() {
         isOpen={isCreatePresetOpen}
         onClose={() => setIsCreatePresetOpen(false)}
         onSavePreset={handleSaveCustomPreset}
+      />
+
+      {/* Printable Voucher, Invoice & Receipt Report Modal */}
+      <VoucherModal
+        isOpen={isVoucherModalOpen}
+        onClose={() => setIsVoucherModalOpen(false)}
+        data={voucherReportData}
       />
     </div>
   );

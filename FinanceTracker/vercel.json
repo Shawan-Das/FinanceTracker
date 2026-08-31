@@ -1,10 +1,5 @@
 {
   "outputDirectory": "public",
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "api/data/**"
-    }
-  },
   "routes": [
     {
       "src": "/api/(.*)",

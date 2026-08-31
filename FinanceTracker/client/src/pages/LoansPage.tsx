@@ -5,6 +5,8 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
+import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import { Plus, CreditCard, AlertTriangle, CheckCircle2, Wrench, FileText, Calendar, ArrowUpRight, ArrowDownRight, Mail } from 'lucide-react';
 import type { Loan, Person, Account } from '../types';
@@ -17,9 +19,12 @@ const formatCurrency = (amount: number) =>
 
 export default function LoansPage() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showRepayForm, setShowRepayForm] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+  const [voucherReportData, setVoucherReportData] = useState<VoucherReportData | null>(null);
+  const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
   // Create loan form
   const [direction, setDirection] = useState<'BORROWED' | 'LENT'>('LENT');
@@ -119,32 +124,23 @@ export default function LoansPage() {
     setSelectedLoan(null);
   };
 
-  const handleDownloadVoucher = async (loan: Loan) => {
-    try {
-      const response = await loansApi.voucher(loan.id, 'voucher');
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `loan-${loan.id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      toast.success('Loan voucher downloaded successfully');
-    } catch (error: any) {
-      if (error?.response?.data instanceof Blob) {
-        try {
-          const text = await error.response.data.text();
-          const json = JSON.parse(text);
-          toast.error(json.error?.message || 'Failed to generate loan voucher PDF');
-          return;
-        } catch {
-          // fallback
-        }
-      }
-      toast.error('Failed to generate loan voucher PDF');
-    }
+  const handleOpenVoucher = (loan: Loan) => {
+    setVoucherReportData({
+      id: loan.id,
+      transaction_type: loan.direction === 'LENT' ? 'LEND' : 'BORROW',
+      transaction_date: loan.start_date,
+      amount: loan.principal_amount,
+      description: loan.description || (loan.direction === 'LENT'
+        ? `Loan lent to ${loan.person_name || 'Unknown'}`
+        : `Loan borrowed from ${loan.person_name || 'Unknown'}`),
+      reference: null,
+      account_name: null,
+      person_name: loan.person_name,
+      category_name: `Loan (${loan.status})`,
+      user_name: user?.full_name,
+      user_email: user?.email,
+    });
+    setIsVoucherModalOpen(true);
   };
 
   const handleCreate = (e: React.FormEvent) => {
@@ -333,9 +329,9 @@ export default function LoansPage() {
                       Record Payment
                     </button>
                     <button
-                      onClick={() => handleDownloadVoucher(loan)}
+                      onClick={() => handleOpenVoucher(loan)}
                       className="btn-secondary text-xs p-2"
-                      title="Download Loan Voucher PDF"
+                      title="View Loan Voucher & Statement"
                     >
                       <FileText size={16} />
                     </button>
@@ -714,6 +710,13 @@ export default function LoansPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Printable Voucher, Invoice & Receipt Report Modal */}
+      <VoucherModal
+        isOpen={isVoucherModalOpen}
+        onClose={() => setIsVoucherModalOpen(false)}
+        data={voucherReportData}
+      />
     </div>
   );
 }

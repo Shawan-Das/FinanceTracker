@@ -104,7 +104,6 @@ export const transactionsApi = {
   export: (params?: any) => api.get('/transactions/export', { params, responseType: 'blob' }),
   voucher: (id: string, type?: string) => api.get(`/transactions/${id}/voucher`, {
     params: { type: type || 'voucher' },
-    responseType: 'blob',
   }),
 };
 
@@ -123,7 +122,6 @@ export const loansApi = {
   fixOrphaned: (data: { account_id: string }) => api.post('/loans/fix-orphaned', data),
   voucher: (id: string, type?: string) => api.get(`/loans/${id}/voucher`, {
     params: { type: type || 'voucher' },
-    responseType: 'blob',
   }),
 };
 

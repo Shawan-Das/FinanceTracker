@@ -5,7 +5,6 @@ import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody, validateQuery } from '../middleware/validation';
 import { generateId } from '../shared/id';
 
-import { generateVoucherBuffer, VoucherType } from '../services/voucher';
 import { sendTransactionReceipt } from '../services/email';
 
 const router = Router();
@@ -198,14 +197,13 @@ router.get('/export', async (req: Request, res: Response) => {
 });
 
 // =============================================================================
-// GET /api/transactions/:id/voucher — Generate PDF voucher for a transaction
+// GET /api/transactions/:id/voucher — Get structured voucher/invoice report data
 // (Must be defined BEFORE /:id so Express doesn't treat 'voucher' as an ID)
 // =============================================================================
 router.get('/:id/voucher', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
     const txId = req.params.id;
-    const voucherType: VoucherType = (req.query.type as VoucherType) || 'voucher';
 
     // Fetch transaction with all related data
     const txResult = await db.query(
@@ -256,9 +254,9 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
       }
     }
 
-    // Generate PDF Buffer
-    const pdfBuffer = await generateVoucherBuffer(
-      {
+    res.json({
+      success: true,
+      data: {
         id: tx.id,
         transaction_type: tx.transaction_type,
         transaction_date: tx.transaction_date,
@@ -273,20 +271,12 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
         from_account_name: fromAccountName,
         to_account_name: toAccountName,
       },
-      voucherType,
-    );
-
-    // Set response headers for PDF download
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${voucherType}-${tx.id}.pdf"`);
-    res.setHeader('Content-Length', pdfBuffer.length);
-
-    res.send(pdfBuffer);
+    });
   } catch (error) {
-    console.error('Generate voucher error:', error);
+    console.error('Get voucher report error:', error);
     res.status(500).json({
       success: false,
-      error: { code: 'SERVER_ERROR', message: 'Failed to generate voucher' },
+      error: { code: 'SERVER_ERROR', message: 'Failed to generate voucher report data' },
     });
   }
 });

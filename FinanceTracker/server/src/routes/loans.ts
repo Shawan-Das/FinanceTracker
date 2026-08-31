@@ -4,7 +4,6 @@ import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
 import { validateBody } from '../middleware/validation';
 import { generateId } from '../shared/id';
-import { generateVoucherBuffer, VoucherData, VoucherType } from '../services/voucher';
 import { sendTransactionReceipt } from '../services/email';
 
 const router = Router();
@@ -194,7 +193,6 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
     const loanId = req.params.id;
-    const voucherType: VoucherType = (req.query.type as VoucherType) || 'voucher';
 
     const loanResult = await db.query(
       `SELECT l.*,
@@ -230,13 +228,13 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
     );
     const user = userResult.rows[0] || { full_name: 'User', email: '' };
 
-    // Build a synthetic VoucherData from loan data
+    // Build a synthetic voucher report data from loan
     const direction = loan.direction === 'LENT' ? 'Lend' : 'Borrow';
     const label = loan.direction === 'LENT'
       ? `Loan ${direction} to ${loan.person_name || 'Unknown'}`
       : `Loan ${direction} from ${loan.person_name || 'Unknown'}`;
 
-    const voucherData: VoucherData = {
+    const voucherData = {
       id: loan.id,
       transaction_type: loan.direction === 'LENT' ? 'LEND' : 'BORROW',
       transaction_date: loan.start_date,
@@ -250,18 +248,15 @@ router.get('/:id/voucher', async (req: Request, res: Response) => {
       user_email: user.email,
     };
 
-    const pdfBuffer = await generateVoucherBuffer(voucherData, voucherType);
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="loan-${loan.id}.pdf"`);
-    res.setHeader('Content-Length', pdfBuffer.length);
-
-    res.send(pdfBuffer);
+    res.json({
+      success: true,
+      data: voucherData,
+    });
   } catch (error) {
     console.error('Generate loan voucher error:', error);
     res.status(500).json({
       success: false,
-      error: { code: 'SERVER_ERROR', message: 'Failed to generate loan voucher' },
+      error: { code: 'SERVER_ERROR', message: 'Failed to generate loan voucher report' },
     });
   }
 });

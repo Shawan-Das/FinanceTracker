@@ -99,3 +99,22 @@
     @apply bg-[#f4f7fa]/90 dark:bg-slate-900/80 backdrop-blur-md border border-[#cbd5e1] dark:border-slate-800/60 shadow-lg;
   }
 }
+
+/* Print Optimization for Vouchers, Invoices and Receipts */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  aside, header, nav, .print\:hidden {
+    display: none !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+}
