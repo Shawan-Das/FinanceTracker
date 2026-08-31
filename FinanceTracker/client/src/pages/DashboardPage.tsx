@@ -144,6 +144,21 @@ export default function DashboardPage() {
     queryFn: () => dashboardApi.peopleSummary().then((r) => r.data.data),
   });
 
+  const formattedCategoryData = useMemo(() => {
+    if (!categoryData || !Array.isArray(categoryData) || categoryData.length === 0) return [];
+    return categoryData
+      .map((cat: any) => ({
+        ...cat,
+        category_name: cat.category_name || 'Uncategorized',
+        total: toNum(cat.total),
+      }))
+      .filter((c: any) => c.total > 0);
+  }, [categoryData]);
+
+  const smartSuggestions = useMemo(() => {
+    return detectSmartSuggestions(recentTx || []);
+  }, [recentTx]);
+
   const handleOpenQuickPreset = (preset: QuickPreset) => {
     setQuickPreset(preset);
     setIsQuickOpen(true);
@@ -179,15 +194,15 @@ export default function DashboardPage() {
   const firstName = user?.full_name ? user.full_name.split(' ')[0] : 'User';
 
   // Compute Account Balances breakdown
-  const bankBalance = s.accounts
+  const bankBalance = s?.accounts
     ?.filter((a: any) => a.account_type === 'BANK')
     .reduce((sum: number, a: any) => sum + toNum(a.current_balance), 0) || 0;
 
-  const cashBalance = s.accounts
+  const cashBalance = s?.accounts
     ?.filter((a: any) => a.account_type === 'CASH')
     .reduce((sum: number, a: any) => sum + toNum(a.current_balance), 0) || 0;
 
-  const walletBalance = s.accounts
+  const walletBalance = s?.accounts
     ?.filter((a: any) => a.account_type === 'MOBILE_WALLET')
     .reduce((sum: number, a: any) => sum + toNum(a.current_balance), 0) || 0;
 
@@ -195,18 +210,7 @@ export default function DashboardPage() {
   const totalIncomeThisYear = monthlyData?.reduce((acc: number, curr: any) => acc + curr.income, 0) || 0;
   const totalExpenseThisYear = monthlyData?.reduce((acc: number, curr: any) => acc + curr.expense, 0) || 0;
   const avgMonthlyBurn = monthlyData && monthlyData.length > 0 ? totalExpenseThisYear / monthlyData.length : 0;
-  const runwayMonths = avgMonthlyBurn > 0 ? (s.totalAccountBalance / avgMonthlyBurn).toFixed(1) : '∞';
-
-  const formattedCategoryData = useMemo(() => {
-    if (!categoryData || !Array.isArray(categoryData) || categoryData.length === 0) return [];
-    return categoryData
-      .map((cat: any) => ({
-        ...cat,
-        category_name: cat.category_name || 'Uncategorized',
-        total: toNum(cat.total),
-      }))
-      .filter((c: any) => c.total > 0);
-  }, [categoryData]);
+  const runwayMonths = avgMonthlyBurn > 0 && s ? (s.totalAccountBalance / avgMonthlyBurn).toFixed(1) : '∞';
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -281,7 +285,6 @@ export default function DashboardPage() {
 
       {/* 2. ⚡ Smart Fast Transactions & Custom Shortcuts */}
       {(() => {
-        const smartSuggestions = detectSmartSuggestions(recentTx || []);
         const activePresets =
           presetTab === 'custom'
             ? customPresets
