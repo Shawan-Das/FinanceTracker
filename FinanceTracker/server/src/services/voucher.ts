@@ -10,7 +10,7 @@ export interface VoucherData {
   // Transaction info
   id: string;
   transaction_type: string;
-  transaction_date: string;
+  transaction_date: string | Date;
   amount: number | string;
   description: string | null;
   reference: string | null;
@@ -256,7 +256,9 @@ export function generateVoucherPDF(
   doc.font('Helvetica-Bold').fontSize(11).fillColor(COLORS.darkGray).text(data.id.toUpperCase(), 45, metaY + 12);
 
   // Col 2: Date
-  const dateFormatted = new Date(data.transaction_date).toLocaleDateString('en-US', {
+  const rawDate = data.transaction_date instanceof Date ? data.transaction_date : new Date(data.transaction_date || Date.now());
+  const validDate = isNaN(rawDate.getTime()) ? new Date() : rawDate;
+  const dateFormatted = validDate.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

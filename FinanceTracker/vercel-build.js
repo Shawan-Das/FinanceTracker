@@ -45,6 +45,14 @@ execSync(
 const size = fs.statSync(path.join(DIR, 'api', '_server.js')).size;
 console.log(`Bundled server to api/_server.js (${Math.round(size/1024)}KB)`);
 
+// 2b. Copy PDFKit AFM font files and data into api/data for serverless PDF generation
+const pdfkitDataSrc = path.join(DIR, 'node_modules', 'pdfkit', 'js', 'data');
+const pdfkitDataDest = path.join(DIR, 'api', 'data');
+if (fs.existsSync(pdfkitDataSrc)) {
+  copyDir(pdfkitDataSrc, pdfkitDataDest);
+  console.log('Copied PDFKit AFM font files to api/data/');
+}
+
 // 3. Build React client
 console.log('Building client...');
 execSync('npm run build', { cwd: path.join(DIR, 'client'), stdio: 'inherit' });
