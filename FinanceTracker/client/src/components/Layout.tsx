@@ -18,9 +18,11 @@ import {
   PlusCircle,
   Bell,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Command
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import GlobalSearchModal from './GlobalSearchModal';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -38,7 +40,19 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Global Ctrl+K / Cmd+K listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Close sidebar on route change in mobile/tablet
   useEffect(() => {
@@ -189,17 +203,28 @@ export default function Layout() {
 
           {/* Header Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Quick Search Input (Laptop/Desktop) */}
-            <div className="hidden md:flex items-center relative w-48 lg:w-64">
-              <Search className="absolute left-3 w-4 h-4 text-slate-400 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search transactions, accounts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all"
-              />
-            </div>
+            {/* Quick Search Button (Laptop/Desktop) */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="hidden md:flex items-center justify-between w-48 lg:w-64 pl-3 pr-2 py-1.5 text-xs bg-slate-100 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl text-slate-400 hover:border-brand-500/50 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-all cursor-pointer text-left group"
+            >
+              <div className="flex items-center gap-2">
+                <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-brand-500 transition-colors" />
+                <span className="truncate">Search records...</span>
+              </div>
+              <kbd className="hidden lg:inline-flex items-center gap-0.5 text-[10px] font-bold text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-1.5 py-0.5 rounded shadow-2xs">
+                Ctrl K
+              </kbd>
+            </button>
+
+            {/* Mobile Search Button */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="md:hidden p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+              title="Search"
+            >
+              <Search size={18} />
+            </button>
 
             {/* Quick Add Button */}
             <button
@@ -210,10 +235,11 @@ export default function Layout() {
               <span>New Entry</span>
             </button>
 
-            {/* Notifications Button Placeholder */}
+            {/* Notifications Button */}
             <button
+              onClick={() => navigate('/loans')}
               className="p-2.5 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors relative"
-              title="Notifications"
+              title="Loan Tracker & Notifications"
             >
               <Bell size={18} />
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
@@ -225,10 +251,85 @@ export default function Layout() {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto pb-24 lg:pb-8">
           <Outlet />
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#111726]/95 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800/80 px-2 py-1 flex items-center justify-around shadow-lg">
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
+              isActive
+                ? 'text-brand-600 dark:text-brand-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`
+          }
+        >
+          <LayoutDashboard size={19} />
+          <span className="mt-0.5">Home</span>
+        </NavLink>
+
+        <NavLink
+          to="/transactions"
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
+              isActive
+                ? 'text-brand-600 dark:text-brand-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`
+          }
+        >
+          <ArrowLeftRight size={19} />
+          <span className="mt-0.5">Ledger</span>
+        </NavLink>
+
+        {/* Center Quick Add Action */}
+        <button
+          onClick={() => navigate('/transactions')}
+          className="w-11 h-11 -mt-4 rounded-full bg-gradient-to-tr from-brand-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-brand-500/35 active:scale-95 transition-transform"
+          title="New Entry"
+        >
+          <PlusCircle size={22} />
+        </button>
+
+        <NavLink
+          to="/accounts"
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
+              isActive
+                ? 'text-brand-600 dark:text-brand-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`
+          }
+        >
+          <Wallet size={19} />
+          <span className="mt-0.5">Accounts</span>
+        </NavLink>
+
+        <NavLink
+          to="/loans"
+          className={({ isActive }) =>
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
+              isActive
+                ? 'text-brand-600 dark:text-brand-400 font-bold'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            }`
+          }
+        >
+          <CreditCard size={19} />
+          <span className="mt-0.5">Loans</span>
+        </NavLink>
+      </nav>
+
+      {/* Global Command & Search Palette */}
+      <GlobalSearchModal
+        isOpen={searchOpen}
+        onClose={() => setSearchOpen(false)}
+      />
     </div>
   );
 }

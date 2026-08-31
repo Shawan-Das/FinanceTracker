@@ -415,7 +415,8 @@ export default function TransactionsPage() {
           <QueryError title="Failed to load transaction records" onRetry={() => refetchTx()} />
         ) : data?.data && data.data.length > 0 ? (
           <>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View (sm+) */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
@@ -501,6 +502,82 @@ export default function TransactionsPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Card List View (Phones) */}
+            <div className="sm:hidden divide-y divide-slate-100 dark:divide-slate-800/80 p-2">
+              {data.data.map((tx: Transaction) => (
+                <div key={tx.id} className="p-3 space-y-2 hover:bg-slate-50/60 dark:hover:bg-slate-900/40 rounded-xl transition-colors">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                        {tx.description || tx.transaction_type.replace('_', ' ')}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
+                        <span>{new Date(tx.transaction_date).toLocaleDateString('en-BD', { month: 'short', day: 'numeric' })}</span>
+                        {tx.account_name && (
+                          <>
+                            <span>•</span>
+                            <span className="font-medium text-slate-600 dark:text-slate-300 truncate max-w-[100px]">{tx.account_name}</span>
+                          </>
+                        )}
+                        {tx.category_name && (
+                          <>
+                            <span>•</span>
+                            <span className="text-brand-600 dark:text-brand-400 font-semibold">{tx.category_name}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className={`text-sm font-extrabold ${
+                        getEffect(tx) === '+' ? 'text-emerald-600 dark:text-emerald-400' :
+                        getEffect(tx) === '-' ? 'text-rose-600 dark:text-rose-400' : 'text-slate-700 dark:text-slate-300'
+                      }`}>
+                        {getEffect(tx)}{formatCurrency(tx.amount)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Mobile Actions Ribbon */}
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-100/60 dark:border-slate-800/40 text-xs">
+                    <span className="badge badge-neutral text-[9px] uppercase">
+                      {tx.transaction_type.replace('_', ' ')}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => openEdit(tx)}
+                        className="px-2 py-1 rounded-lg text-xs text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 bg-slate-100 dark:bg-slate-800 flex items-center gap-1"
+                      >
+                        <Edit size={12} />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedTxForVoucher(tx);
+                          setVoucherType('voucher');
+                          setShowVoucherModal(true);
+                        }}
+                        className="px-2 py-1 rounded-lg text-xs text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 bg-slate-100 dark:bg-slate-800 flex items-center gap-1"
+                      >
+                        <FileText size={12} />
+                        <span>PDF</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm('Are you sure you want to delete this transaction?')) {
+                            deleteMutation.mutate(tx.id);
+                          }
+                        }}
+                        className="p-1 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                        title="Delete"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {data.pagination && (

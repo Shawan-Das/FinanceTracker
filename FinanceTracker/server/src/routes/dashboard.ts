@@ -237,15 +237,16 @@ router.get('/expense-by-category', async (req: Request, res: Response) => {
     }
 
     const result = await db.query(
-      `SELECT c.name AS category_name, c.color,
-              COALESCE(SUM(t.amount), 0) AS total
+      `SELECT COALESCE(c.name, 'Uncategorized') AS category_name,
+              COALESCE(c.color, '#6366f1') AS color,
+              COALESCE(SUM(t.amount), 0)::float AS total
        FROM ${SCHEMA}.transactions t
        LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1
          AND t.deleted_at IS NULL
          AND t.transaction_type = 'EXPENSE'
          ${dateCondition}
-       GROUP BY c.name, c.color
+       GROUP BY COALESCE(c.name, 'Uncategorized'), c.color
        ORDER BY total DESC`,
       values
     );
