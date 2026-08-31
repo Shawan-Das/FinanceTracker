@@ -39,7 +39,7 @@ execSync('npx tsc', { cwd: path.join(DIR, 'server'), stdio: 'inherit' });
 console.log('Bundling server...');
 const esbuildBin = path.join(DIR, 'node_modules', '.bin', 'esbuild');
 execSync(
-  `"${esbuildBin}" server/dist/app.js --bundle --platform=node --outfile=api/_server.js --external:bcrypt --external:@mapbox/node-pre-gyp`,
+  `"${esbuildBin}" server/dist/app.js --bundle --platform=node --outfile=api/_server.js --external:bcrypt --external:@mapbox/node-pre-gyp --external:pdfkit --external:pg`,
   { cwd: DIR, stdio: 'inherit' }
 );
 const size = fs.statSync(path.join(DIR, 'api', '_server.js')).size;
