@@ -126,16 +126,16 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
       <div
-        className="relative w-full max-w-2xl bg-white dark:bg-[#111726] rounded-2xl shadow-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-150"
+        className="relative w-full max-w-2xl bg-[#f4f7fa] dark:bg-[#111726] rounded-2xl shadow-2xl border border-[#cbd5e1] dark:border-slate-800 overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Header Input */}
-        <div className="flex items-center px-4 border-b border-slate-100 dark:border-slate-800/80">
-          <Search className="w-5 h-5 text-slate-400 shrink-0" />
+        <div className="flex items-center px-4 border-b border-[#cbd5e1] dark:border-slate-800/80 bg-[#eaf0f7] dark:bg-slate-900/40">
+          <Search className="w-5 h-5 text-slate-500 shrink-0" />
           <input
             ref={inputRef}
             type="text"
-            className="w-full px-3 py-4 text-sm bg-transparent border-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none"
+            className="w-full px-3 py-4 text-sm bg-transparent border-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 focus:outline-none"
             placeholder="Type a command, transaction, account, contact, or category..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -148,7 +148,7 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
               <X size={16} />
             </button>
           )}
-          <div className="hidden sm:flex items-center gap-1 text-[10px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+          <div className="hidden sm:flex items-center gap-1 text-[10px] font-semibold text-slate-600 dark:text-slate-400 bg-[#dce4ee] dark:bg-slate-800 px-2 py-0.5 rounded">
             <span>ESC to close</span>
           </div>
         </div>

@@ -290,7 +290,7 @@ export default function DashboardPage() {
             : QUICK_PRESETS;
 
         return (
-          <div className="card p-5 sm:p-6 bg-gradient-to-r from-slate-50 to-brand-50/20 dark:from-[#111726] dark:to-slate-900 border border-slate-200/80 dark:border-slate-800">
+          <div className="card p-5 sm:p-6 bg-gradient-to-r from-[#e5edf5] to-brand-100/30 dark:from-[#111726] dark:to-slate-900 border border-[#cbd5e1] dark:border-slate-800">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
@@ -300,7 +300,7 @@ export default function DashboardPage() {
                   <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                     <span>⚡ Quick 1-Click Transactions</span>
                   </h2>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     {presetTab === 'smart'
                       ? 'Smart patterns learned from your recent transactions'
                       : 'Your personalized quick transaction shortcuts'}
@@ -310,12 +310,12 @@ export default function DashboardPage() {
 
               {/* Tabs & Create Action */}
               <div className="flex items-center gap-2">
-                <div className="flex rounded-xl bg-slate-200/70 dark:bg-slate-800/80 p-0.5 text-xs font-semibold">
+                <div className="flex rounded-xl bg-[#d5dfea] dark:bg-slate-800/80 p-0.5 text-xs font-semibold">
                   <button
                     onClick={() => setPresetTab('smart')}
                     className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
                       presetTab === 'smart'
-                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                        ? 'bg-[#f4f7fa] dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                     onClick={() => setPresetTab('custom')}
                     className={`px-3 py-1 rounded-lg transition-all flex items-center gap-1.5 ${
                       presetTab === 'custom'
-                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
+                        ? 'bg-[#f4f7fa] dark:bg-slate-900 text-slate-900 dark:text-white shadow-xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
@@ -357,13 +357,13 @@ export default function DashboardPage() {
                   <div
                     key={preset.id}
                     onClick={() => handleOpenQuickPreset(preset)}
-                    className={`w-36 shrink-0 sm:w-auto snap-start p-3 rounded-2xl bg-white dark:bg-slate-900/80 border ${preset.color} hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all text-left flex flex-col justify-between group cursor-pointer relative`}
+                    className={`w-36 shrink-0 sm:w-auto snap-start p-3 rounded-2xl bg-[#eaf0f7] dark:bg-slate-900/80 border ${preset.color} hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all text-left flex flex-col justify-between group cursor-pointer relative`}
                   >
                     {/* Delete button if custom preset */}
                     {presetTab === 'custom' && (
                       <button
                         onClick={(e) => handleDeleteCustomPreset(preset.id, e)}
-                        className="absolute top-2 right-2 w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 w-5 h-5 rounded-full bg-[#d0dbe7] dark:bg-slate-800 text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                         title="Delete shortcut"
                       >
                         ×

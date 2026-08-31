@@ -40,14 +40,14 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
 
       {/* Modal Container */}
       <div
-        className={`relative bg-white dark:bg-[#111726] rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-2xl ${maxWidth} w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 z-10`}
+        className={`relative bg-[#f4f7fa] dark:bg-[#111726] rounded-2xl border border-[#cbd5e1] dark:border-slate-800 shadow-2xl ${maxWidth} w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 z-10`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/50 dark:bg-slate-900/40">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#cbd5e1] dark:border-slate-800/80 bg-[#e4ebf4] dark:bg-slate-900/40">
           <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            className="p-1.5 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[#d0dbe7] dark:hover:bg-slate-800 rounded-xl transition-colors"
             aria-label="Close modal"
           >
             <X size={18} />
