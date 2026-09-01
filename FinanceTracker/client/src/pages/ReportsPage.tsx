@@ -382,7 +382,7 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {/* Person Statement */}
+      {/* Person Statement — Accounting Ledger */}
       {activeTab === 'person' && (
         <div className="space-y-4">
           <div className="card p-4">
@@ -400,97 +400,149 @@ export default function ReportsPage() {
           </div>
 
           {personLoading ? (
-            <LoadingSpinner message="Retrieving contact history..." />
+            <LoadingSpinner message="Retrieving contact ledger..." />
           ) : personError ? (
-            <QueryError title="Failed to load person statement" onRetry={() => refetchPerson()} />
+            <QueryError title="Failed to load person ledger" onRetry={() => refetchPerson()} />
           ) : (
             personStatement && (
               <div className="space-y-4">
-                {/* Balance Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="stat-card">
-                    <span className="text-xs text-slate-500 font-semibold uppercase">They Owe You</span>
-                    <p className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-1">
-                      {formatCurrency(Math.max(0, toNum(personStatement.balance?.amount_they_owe_you)))}
-                    </p>
-                  </div>
-                  <div className="stat-card">
-                    <span className="text-xs text-slate-500 font-semibold uppercase">You Owe Them</span>
-                    <p className="text-xl font-extrabold text-rose-600 dark:text-rose-400 mt-1">
-                      {formatCurrency(Math.max(0, toNum(personStatement.balance?.amount_you_owe_them)))}
-                    </p>
-                  </div>
-                  <div className="stat-card">
-                    <span className="text-xs text-slate-500 font-semibold uppercase">Net Settled Balance</span>
-                    <p className="text-xl font-extrabold text-slate-900 dark:text-slate-100 mt-1">
-                      {formatCurrency(toNum(personStatement.balance?.amount_they_owe_you) - toNum(personStatement.balance?.amount_you_owe_them))}
-                    </p>
+                {/* Accounting Header */}
+                <div className="card p-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+                        Ledger Account: {personStatement.person?.name}
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Personal account showing all debit & credit transactions
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 text-xs">
+                      <div className="text-center">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
+                        <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400">
+                          {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
+                        <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400">
+                          {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
+                        </span>
+                      </div>
+                      <div className="text-center pl-3 border-l border-slate-200 dark:border-slate-700">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Balance c/d</span>
+                        {(() => {
+                          const bal = toNum(personStatement.balance?.amount_they_owe_you) - toNum(personStatement.balance?.amount_you_owe_them);
+                          const isDr = bal >= 0;
+                          return (
+                            <span className={`text-sm font-extrabold ${isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                              {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
+                            </span>
+                          );
+                        })()}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Detailed Ledger Table */}
+                {/* Proper Accounting Ledger Table */}
                 {personStatement.transactions && personStatement.transactions.length > 0 && (
                   <div className="card p-0 overflow-hidden">
-                    <div className="p-4 border-b border-slate-100 dark:border-slate-800">
-                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                        Transaction Ledger with {personStatement.person?.name}
-                      </h3>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        Running balance: positive = they owe you, negative = you owe them
-                      </p>
-                    </div>
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
                           <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
-                            <th className="p-3">Date</th>
-                            <th className="p-3">Description</th>
-                            <th className="p-3">Type</th>
-                            <th className="p-3">Account</th>
-                            <th className="p-3 text-right">Amount</th>
-                            <th className="p-3 text-right">Effect</th>
-                            <th className="p-3 text-right">Running Balance</th>
+                            <th className="p-3 w-[100px]">Date</th>
+                            <th className="p-3">Particulars</th>
+                            <th className="p-3 w-[130px]">Type</th>
+                            <th className="p-3 w-[120px] text-right">Debit (৳)</th>
+                            <th className="p-3 w-[120px] text-right">Credit (৳)</th>
+                            <th className="p-3 w-[150px] text-right">Balance</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
-                          {personStatement.transactions.map((tx: any) => (
-                            <tr key={tx.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40">
-                              <td className="p-3 text-slate-500 whitespace-nowrap">{formatDateDMY(tx.transaction_date)}</td>
-                              <td className="p-3 font-bold text-slate-900 dark:text-slate-100 max-w-[200px] truncate">
-                                {tx.description || tx.transaction_type.replace('_', ' ')}
-                              </td>
-                              <td className="p-3">
-                                <span className={`badge text-[10px] ${
-                                  tx.transaction_type === 'LEND' ? 'badge-warning' :
-                                  tx.transaction_type === 'BORROW' ? 'badge-info' :
-                                  tx.transaction_type === 'LEND_REPAYMENT' ? 'badge-success' :
-                                  tx.transaction_type === 'BORROW_REPAYMENT' ? 'badge-danger' :
-                                  'badge-neutral'
-                                }`}>
-                                  {tx.transaction_type.replace('_', ' ')}
-                                </span>
-                              </td>
-                              <td className="p-3 text-slate-500">{tx.account_name || '-'}</td>
-                              <td className="p-3 text-right font-bold text-slate-900 dark:text-slate-100">
-                                {formatCurrency(tx.amount)}
-                              </td>
-                              <td className={`p-3 text-right font-bold ${
-                                parseFloat(tx.effect) > 0 ? 'text-emerald-600 dark:text-emerald-400' :
-                                parseFloat(tx.effect) < 0 ? 'text-rose-600 dark:text-rose-400' :
-                                'text-slate-400'
-                              }`}>
-                                {parseFloat(tx.effect) > 0 ? '+' : ''}{formatCurrency(parseFloat(tx.effect))}
-                              </td>
-                              <td className={`p-3 text-right font-extrabold ${
-                                tx.running_balance > 0 ? 'text-emerald-600 dark:text-emerald-400' :
-                                tx.running_balance < 0 ? 'text-rose-600 dark:text-rose-400' :
-                                'text-slate-400'
-                              }`}>
-                                {tx.running_balance > 0 ? '+' : ''}{formatCurrency(tx.running_balance)}
-                              </td>
-                            </tr>
-                          ))}
+                          {personStatement.transactions.map((tx: any) => {
+                            const debit = toNum(tx.debit);
+                            const credit = toNum(tx.credit);
+                            const bal = toNum(tx.running_balance);
+                            const isDr = bal >= 0;
+                            return (
+                              <tr key={tx.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40">
+                                <td className="p-3 text-slate-500 whitespace-nowrap font-medium">
+                                  {formatDateDMY(tx.transaction_date)}
+                                </td>
+                                <td className="p-3">
+                                  <div className="font-bold text-slate-900 dark:text-slate-100 max-w-[220px] truncate">
+                                    {tx.description || tx.transaction_type.replace('_', ' ').toLowerCase()}
+                                  </div>
+                                  {tx.account_name && (
+                                    <div className="text-[10px] text-slate-400 mt-0.5">via {tx.account_name}</div>
+                                  )}
+                                </td>
+                                <td className="p-3">
+                                  <span className={`badge text-[10px] ${
+                                    tx.transaction_type === 'LEND' ? 'badge-warning' :
+                                    tx.transaction_type === 'BORROW' ? 'badge-info' :
+                                    tx.transaction_type === 'LEND_REPAYMENT' ? 'badge-success' :
+                                    tx.transaction_type === 'BORROW_REPAYMENT' ? 'badge-danger' :
+                                    'badge-neutral'
+                                  }`}>
+                                    {tx.transaction_type.replace('_', ' ')}
+                                  </span>
+                                </td>
+                                <td className="p-3 text-right font-bold font-mono">
+                                  {debit > 0 ? (
+                                    <span className="text-emerald-600 dark:text-emerald-400">
+                                      {formatCurrency(debit)}
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-300 dark:text-slate-700">—</span>
+                                  )}
+                                </td>
+                                <td className="p-3 text-right font-bold font-mono">
+                                  {credit > 0 ? (
+                                    <span className="text-rose-600 dark:text-rose-400">
+                                      {formatCurrency(credit)}
+                                    </span>
+                                  ) : (
+                                    <span className="text-slate-300 dark:text-slate-700">—</span>
+                                  )}
+                                </td>
+                                <td className="p-3 text-right font-extrabold font-mono">
+                                  <span className={isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
+                                    {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
+                        {/* Totals row */}
+                        <tfoot>
+                          <tr className="bg-slate-50/80 dark:bg-slate-900/60 border-t-2 border-slate-200 dark:border-slate-700">
+                            <td className="p-3" colSpan={3}>
+                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Totals</span>
+                            </td>
+                            <td className="p-3 text-right font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+                              {formatCurrency(personStatement.transactions.reduce((s: number, t: any) => s + toNum(t.debit), 0))}
+                            </td>
+                            <td className="p-3 text-right font-extrabold font-mono text-rose-600 dark:text-rose-400">
+                              {formatCurrency(personStatement.transactions.reduce((s: number, t: any) => s + toNum(t.credit), 0))}
+                            </td>
+                            <td className="p-3 text-right">
+                              {(() => {
+                                const bal = toNum(personStatement.balance?.amount_they_owe_you) - toNum(personStatement.balance?.amount_you_owe_them);
+                                const isDr = bal >= 0;
+                                return (
+                                  <span className={`font-extrabold font-mono text-sm ${isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                    {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
+                                  </span>
+                                );
+                              })()}
+                            </td>
+                          </tr>
+                        </tfoot>
                       </table>
                     </div>
                   </div>
@@ -554,10 +606,10 @@ export default function ReportsPage() {
                   </div>
                 )}
 
-                {/* Empty state if no transactions */}
+                {/* Empty state */}
                 {(!personStatement.transactions || personStatement.transactions.length === 0) && (
                   <div className="card p-8 text-center">
-                    <p className="text-sm text-slate-400">No lending/borrowing transactions found with this person.</p>
+                    <p className="text-sm text-slate-400">No transactions found in this person's ledger.</p>
                   </div>
                 )}
               </div>
