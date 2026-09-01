@@ -304,7 +304,9 @@ LEFT JOIN (
 ) transfer_out ON transfer_out.account_id = a.id
 WHERE a.is_active = TRUE;
 
--- View: Person balances (receivable and payable)
+-- View: Person balances (receivable and payable) — NET calculation
+-- When you both lend to and borrow from the same person, balances are netted.
+-- e.g. Lend 1000 + Borrow 200 → net: they owe you 800
 DROP VIEW IF EXISTS finance_tracker.v_person_balances;
 
 CREATE VIEW finance_tracker.v_person_balances AS
@@ -324,14 +326,27 @@ SELECT
     COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0) AS total_lent_repaid,
     COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0) AS total_borrowed,
     COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0) AS total_borrow_repaid,
+    -- Net balance: positive means they owe you, negative means you owe them
     GREATEST(
-        COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0)
-        - COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0),
+        (
+            COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0)
+            - COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0)
+        )
+        - (
+            COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0)
+            - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0)
+        ),
         0
     ) AS amount_they_owe_you,
     GREATEST(
-        COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0)
-        - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0),
+        (
+            COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0)
+            - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0)
+        )
+        - (
+            COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0)
+            - COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0)
+        ),
         0
     ) AS amount_you_owe_them
 FROM finance_tracker.people p

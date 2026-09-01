@@ -464,12 +464,27 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
     await client.query('BEGIN');
 
     const txId = generateId('transactions');
+    let linkedLoanId = loan_id || null;
+
+    // Auto-create a loan record for LEND/BORROW transactions (so they appear in Loans menu)
+    if ((transaction_type === 'LEND' || transaction_type === 'BORROW') && !linkedLoanId) {
+      const loanId = generateId('loans');
+      const loanDirection = transaction_type === 'LEND' ? 'LENT' : 'BORROWED';
+      await client.query(
+        `INSERT INTO ${SCHEMA}.loans
+         (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, description)
+         VALUES ($1, $2, $3, $4, $5, 0, $6, $7)`,
+        [loanId, userId, person_id || null, loanDirection, amount, transaction_date, description || null]
+      );
+      linkedLoanId = loanId;
+    }
+
     const txResult = await client.query(
       `INSERT INTO ${SCHEMA}.transactions
        (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, category_id, loan_id, description, reference)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
-      [txId, userId, transaction_type, transaction_date, amount, account_id || null, person_id || null, category_id || null, loan_id || null, description || null, reference || null]
+      [txId, userId, transaction_type, transaction_date, amount, account_id || null, person_id || null, category_id || null, linkedLoanId, description || null, reference || null]
     );
     const tx = txResult.rows[0];
 

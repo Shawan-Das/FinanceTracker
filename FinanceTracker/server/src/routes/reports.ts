@@ -273,13 +273,27 @@ router.get('/person-statement', async (req: Request, res: Response) => {
     const person = pResult.rows[0];
 
     const txResult = await db.query(
-      `SELECT t.*, a.name as account_name
+      `SELECT t.*, a.name as account_name,
+              CASE
+                WHEN t.transaction_type = 'LEND' THEN -t.amount
+                WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount
+                WHEN t.transaction_type = 'BORROW' THEN t.amount
+                WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN -t.amount
+                ELSE 0
+              END AS effect
        FROM ${SCHEMA}.transactions t
        LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
        WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
        ORDER BY t.transaction_date ASC, t.created_at ASC`,
       [userId, personId]
     );
+
+    // Calculate running net balance for the ledger
+    let runningBalance = 0;
+    const transactions = txResult.rows.map((tx: any) => {
+      runningBalance += parseFloat(tx.effect);
+      return { ...tx, running_balance: runningBalance };
+    });
 
     const balanceResult = await db.query(
       `SELECT * FROM ${SCHEMA}.v_person_balances
@@ -318,7 +332,7 @@ router.get('/person-statement', async (req: Request, res: Response) => {
       data: {
         person,
         balance,
-        transactions: txResult.rows,
+        transactions,
         loans: loansResult.rows,
       },
     });

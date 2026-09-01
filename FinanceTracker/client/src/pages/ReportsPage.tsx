@@ -406,6 +406,7 @@ export default function ReportsPage() {
           ) : (
             personStatement && (
               <div className="space-y-4">
+                {/* Balance Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="stat-card">
                     <span className="text-xs text-slate-500 font-semibold uppercase">They Owe You</span>
@@ -426,6 +427,139 @@ export default function ReportsPage() {
                     </p>
                   </div>
                 </div>
+
+                {/* Detailed Ledger Table */}
+                {personStatement.transactions && personStatement.transactions.length > 0 && (
+                  <div className="card p-0 overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        Transaction Ledger with {personStatement.person?.name}
+                      </h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">
+                        Running balance: positive = they owe you, negative = you owe them
+                      </p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
+                            <th className="p-3">Date</th>
+                            <th className="p-3">Description</th>
+                            <th className="p-3">Type</th>
+                            <th className="p-3">Account</th>
+                            <th className="p-3 text-right">Amount</th>
+                            <th className="p-3 text-right">Effect</th>
+                            <th className="p-3 text-right">Running Balance</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                          {personStatement.transactions.map((tx: any) => (
+                            <tr key={tx.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40">
+                              <td className="p-3 text-slate-500 whitespace-nowrap">{formatDateDMY(tx.transaction_date)}</td>
+                              <td className="p-3 font-bold text-slate-900 dark:text-slate-100 max-w-[200px] truncate">
+                                {tx.description || tx.transaction_type.replace('_', ' ')}
+                              </td>
+                              <td className="p-3">
+                                <span className={`badge text-[10px] ${
+                                  tx.transaction_type === 'LEND' ? 'badge-warning' :
+                                  tx.transaction_type === 'BORROW' ? 'badge-info' :
+                                  tx.transaction_type === 'LEND_REPAYMENT' ? 'badge-success' :
+                                  tx.transaction_type === 'BORROW_REPAYMENT' ? 'badge-danger' :
+                                  'badge-neutral'
+                                }`}>
+                                  {tx.transaction_type.replace('_', ' ')}
+                                </span>
+                              </td>
+                              <td className="p-3 text-slate-500">{tx.account_name || '-'}</td>
+                              <td className="p-3 text-right font-bold text-slate-900 dark:text-slate-100">
+                                {formatCurrency(tx.amount)}
+                              </td>
+                              <td className={`p-3 text-right font-bold ${
+                                parseFloat(tx.effect) > 0 ? 'text-emerald-600 dark:text-emerald-400' :
+                                parseFloat(tx.effect) < 0 ? 'text-rose-600 dark:text-rose-400' :
+                                'text-slate-400'
+                              }`}>
+                                {parseFloat(tx.effect) > 0 ? '+' : ''}{formatCurrency(parseFloat(tx.effect))}
+                              </td>
+                              <td className={`p-3 text-right font-extrabold ${
+                                tx.running_balance > 0 ? 'text-emerald-600 dark:text-emerald-400' :
+                                tx.running_balance < 0 ? 'text-rose-600 dark:text-rose-400' :
+                                'text-slate-400'
+                              }`}>
+                                {tx.running_balance > 0 ? '+' : ''}{formatCurrency(tx.running_balance)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Loans with this person */}
+                {personStatement.loans && personStatement.loans.length > 0 && (
+                  <div className="card p-0 overflow-hidden">
+                    <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                        Loan Agreements with {personStatement.person?.name}
+                      </h3>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
+                            <th className="p-3">Direction</th>
+                            <th className="p-3">Principal</th>
+                            <th className="p-3">Interest</th>
+                            <th className="p-3">Repaid</th>
+                            <th className="p-3">Remaining</th>
+                            <th className="p-3">Status</th>
+                            <th className="p-3">Start Date</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                          {personStatement.loans.map((loan: any) => (
+                            <tr key={loan.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40">
+                              <td className="p-3">
+                                <span className={`badge text-[10px] ${loan.direction === 'LENT' ? 'badge-warning' : 'badge-info'}`}>
+                                  {loan.direction === 'LENT' ? 'Lent' : 'Borrowed'}
+                                </span>
+                              </td>
+                              <td className="p-3 font-bold text-slate-900 dark:text-slate-100">
+                                {formatCurrency(toNum(loan.principal_amount))}
+                              </td>
+                              <td className="p-3 text-slate-500">{formatCurrency(toNum(loan.interest_amount))}</td>
+                              <td className="p-3 font-bold text-emerald-600 dark:text-emerald-400">
+                                {formatCurrency(toNum(loan.total_repaid))}
+                              </td>
+                              <td className="p-3 font-bold text-amber-600 dark:text-amber-400">
+                                {formatCurrency(toNum(loan.remaining_amount))}
+                              </td>
+                              <td className="p-3">
+                                <span className={`badge text-[10px] ${
+                                  loan.status === 'ACTIVE' ? 'badge-warning' :
+                                  loan.status === 'PAID' ? 'badge-success' :
+                                  loan.status === 'OVERDUE' ? 'badge-danger' :
+                                  'badge-neutral'
+                                }`}>
+                                  {loan.status}
+                                </span>
+                              </td>
+                              <td className="p-3 text-slate-500">{formatDateDMY(loan.start_date)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty state if no transactions */}
+                {(!personStatement.transactions || personStatement.transactions.length === 0) && (
+                  <div className="card p-8 text-center">
+                    <p className="text-sm text-slate-400">No lending/borrowing transactions found with this person.</p>
+                  </div>
+                )}
               </div>
             )
           )}
