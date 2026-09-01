@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import toast from 'react-hot-toast';
 import { Plus, Wallet, Edit, Trash2, Building2, Banknote, Smartphone, ShieldCheck, ArrowUpRight } from 'lucide-react';
 import type { Account } from '../types';
@@ -40,6 +41,7 @@ export default function AccountsPage() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
+  const [deletingAccount, setDeletingAccount] = useState<Account | null>(null);
 
   const [formName, setFormName] = useState('');
   const [formType, setFormType] = useState('BANK');
@@ -178,9 +180,7 @@ export default function AccountsPage() {
                       <Edit size={14} />
                     </button>
                     <button
-                      onClick={() => {
-                        if (confirm('Delete this account?')) deleteMutation.mutate(acc.account_id);
-                      }}
+                      onClick={() => setDeletingAccount(acc)}
                       className="p-1.5 rounded-lg bg-white/10 hover:bg-rose-500/40 text-white transition-colors"
                       title="Delete Account"
                     >
@@ -308,6 +308,23 @@ export default function AccountsPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Delete Account Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deletingAccount}
+        onClose={() => setDeletingAccount(null)}
+        onConfirm={() => {
+          if (deletingAccount) {
+            deleteMutation.mutate(deletingAccount.account_id);
+            setDeletingAccount(null);
+          }
+        }}
+        title="Delete Account"
+        message={`Are you sure you want to delete ${deletingAccount?.name}? This action cannot be undone and will affect associated transactions.`}
+        confirmText="Delete Account"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

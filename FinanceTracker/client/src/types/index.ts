@@ -102,6 +102,7 @@ export interface Loan {
   due_date: string | null;
   status: 'ACTIVE' | 'PAID' | 'OVERDUE' | 'CANCELLED';
   description: string | null;
+  source?: 'MANUAL' | 'AUTO';
   repayments?: LoanRepayment[];
 }
 

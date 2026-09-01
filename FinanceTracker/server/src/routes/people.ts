@@ -246,6 +246,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const userId = getUserId(req);
     const personId = req.params.id;
 
+    // Check for outstanding balances
     const balanceResult = await db.query(
       `SELECT * FROM ${SCHEMA}.v_person_balances
        WHERE user_id = $1 AND person_id = $2`,
@@ -264,6 +265,42 @@ router.delete('/:id', async (req: Request, res: Response) => {
         });
         return;
       }
+    }
+
+    // Check for existing active transactions referencing this person
+    const txResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
+       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`,
+      [userId, personId]
+    );
+
+    if (parseInt(txResult.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'PERSON_HAS_TRANSACTIONS',
+          message: 'Cannot delete a person with existing transactions. Set them inactive instead.',
+        },
+      });
+      return;
+    }
+
+    // Check for existing active loans referencing this person
+    const loanResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA}.loans
+       WHERE user_id = $1 AND person_id = $2`,
+      [userId, personId]
+    );
+
+    if (parseInt(loanResult.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'PERSON_HAS_LOANS',
+          message: 'Cannot delete a person with existing loans. Set them inactive instead.',
+        },
+      });
+      return;
     }
 
     const result = await db.query(

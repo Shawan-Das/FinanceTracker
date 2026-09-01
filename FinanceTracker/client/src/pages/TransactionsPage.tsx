@@ -6,6 +6,7 @@ import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Pagination from '../components/Pagination';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -33,6 +34,7 @@ export default function TransactionsPage() {
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [deletingTxId, setDeletingTxId] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [voucherReportData, setVoucherReportData] = useState<VoucherReportData | null>(null);
   const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
@@ -206,6 +208,7 @@ export default function TransactionsPage() {
   const showFromAccount = formType !== 'ADJUSTMENT';
   const showToAccount = formType === 'TRANSFER';
   const showCategory = ['INCOME', 'EXPENSE'].includes(formType);
+  const showReceiptToggle = !editingTx && ['LEND', 'BORROW', 'LEND_REPAYMENT', 'BORROW_REPAYMENT'].includes(formType);
 
   const handleExport = async (format: 'csv' | 'json') => {
     try {
@@ -472,11 +475,7 @@ export default function TransactionsPage() {
                             <FileText size={15} />
                           </button>
                           <button
-                            onClick={() => {
-                              if (confirm('Are you sure you want to delete this transaction record?')) {
-                                deleteMutation.mutate(tx.id);
-                              }
-                            }}
+                            onClick={() => setDeletingTxId(tx.id)}
                             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                             title="Delete"
                           >
@@ -561,7 +560,6 @@ export default function TransactionsPage() {
                 </div>
               ))}
             </div>
-
             {data.pagination && (
               <Pagination pagination={data.pagination} onPageChange={setPage} />
             )}
@@ -595,7 +593,11 @@ export default function TransactionsPage() {
             <select
               className="input text-xs font-semibold"
               value={formType}
-              onChange={(e) => { setFormType(e.target.value as TransactionType); setFormCategoryId(''); }}
+              onChange={(e) => {
+                const next = e.target.value as TransactionType;
+                setFormType(next);
+                setFormCategoryId('');
+              }}
             >
               {TRANSACTION_TYPES.map((t) => (
                 <option key={t} value={t}>{t.replace('_', ' ')}</option>
@@ -621,7 +623,7 @@ export default function TransactionsPage() {
               <label className="label">Date</label>
               <input
                 type="date"
-                className="input"
+                className="input text-xs"
                 value={formDate}
                 onChange={(e) => setFormDate(e.target.value)}
                 required
@@ -633,12 +635,12 @@ export default function TransactionsPage() {
             <div>
               <label className="label">{showToAccount ? 'Source Account' : 'Account'}</label>
               <select
-                className="input"
+                className="input text-xs font-medium"
                 value={formAccountId}
                 onChange={(e) => setFormAccountId(e.target.value)}
                 required
               >
-                <option value="">Select account</option>
+                <option value="">Select account...</option>
                 {accounts?.map((a: Account) => (
                   <option key={a.account_id} value={a.account_id}>
                     {a.account_name} ({formatCurrency(a.current_balance)})
@@ -652,17 +654,19 @@ export default function TransactionsPage() {
             <div>
               <label className="label">Destination Account</label>
               <select
-                className="input"
+                className="input text-xs font-medium"
                 value={formToAccountId}
                 onChange={(e) => setFormToAccountId(e.target.value)}
                 required
               >
-                <option value="">Select destination account</option>
-                {accounts?.filter((a: Account) => String(a.account_id) !== formAccountId).map((a: Account) => (
-                  <option key={a.account_id} value={a.account_id}>
-                    {a.account_name} ({formatCurrency(a.current_balance)})
-                  </option>
-                ))}
+                <option value="">Select destination account...</option>
+                {accounts
+                  ?.filter((a: Account) => String(a.account_id) !== formAccountId)
+                  .map((a: Account) => (
+                    <option key={a.account_id} value={a.account_id}>
+                      {a.account_name} ({formatCurrency(a.current_balance)})
+                    </option>
+                  ))}
               </select>
             </div>
           )}
@@ -671,14 +675,16 @@ export default function TransactionsPage() {
             <div>
               <label className="label">Person / Contact</label>
               <select
-                className="input"
+                className="input text-xs font-medium"
                 value={formPersonId}
                 onChange={(e) => setFormPersonId(e.target.value)}
                 required
               >
-                <option value="">Select person</option>
+                <option value="">Select contact...</option>
                 {people?.map((p: Person) => (
-                  <option key={p.id} value={p.id}>{p.name}</option>
+                  <option key={p.id} value={p.id}>
+                    {p.name} {p.phone ? `(${p.phone})` : ''}
+                  </option>
                 ))}
               </select>
             </div>
@@ -686,55 +692,60 @@ export default function TransactionsPage() {
 
           {showCategory && (
             <div>
-              <label className="label">Category</label>
+              <label className="label">Classification Category</label>
               <select
-                className="input"
+                className="input text-xs font-medium"
                 value={formCategoryId}
                 onChange={(e) => setFormCategoryId(e.target.value)}
+                required
               >
-                <option value="">Select category</option>
+                <option value="">Choose category...</option>
                 {filteredCategories?.map((c: Category) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
             </div>
           )}
 
           <div>
-            <label className="label">Description / Purpose</label>
+            <label className="label">Description / Particulars (Optional)</label>
             <input
               type="text"
-              className="input"
-              placeholder="e.g. Monthly Grocery Payment"
+              className="input text-xs"
+              placeholder="e.g. Office lunch, Client milestone payment..."
               value={formDescription}
               onChange={(e) => setFormDescription(e.target.value)}
             />
           </div>
 
           <div>
-            <label className="label">Reference / Memo</label>
+            <label className="label">Reference / Voucher No (Optional)</label>
             <input
               type="text"
-              className="input"
-              placeholder="Optional check #, invoice #, memo"
+              className="input text-xs font-mono"
+              placeholder="e.g. INV-9042, CHQ-882"
               value={formReference}
               onChange={(e) => setFormReference(e.target.value)}
             />
           </div>
 
-          {!editingTx && ['LEND', 'BORROW', 'LEND_REPAYMENT', 'BORROW_REPAYMENT'].includes(formType) && (
-            <div className="p-3.5 rounded-xl bg-brand-50/60 dark:bg-brand-950/40 border border-brand-200/60 dark:border-brand-900/60">
-              <label className="flex items-start gap-3 cursor-pointer">
+          {/* Automated Receipt Dispatch Toggle */}
+          {showReceiptToggle && (
+            <div className="p-3.5 rounded-xl bg-brand-50/60 dark:bg-brand-950/40 border border-brand-200/70 dark:border-brand-900/60">
+              <label className="flex items-start gap-3 cursor-pointer select-none">
                 <input
                   type="checkbox"
                   checked={formSendReceipt}
                   onChange={(e) => setFormSendReceipt(e.target.checked)}
-                  className="mt-0.5"
+                  className="mt-0.5 rounded text-brand-600 focus:ring-brand-500 w-4 h-4"
                 />
                 <div>
-                  <p className="text-xs font-bold text-brand-900 dark:text-brand-200 flex items-center gap-1.5">
-                    <Mail size={14} /> Send Email PDF Receipt to Contact
-                  </p>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-brand-900 dark:text-brand-200">
+                    <Mail size={13} className="text-brand-600 dark:text-brand-400" />
+                    <span>Send PDF receipt via Email</span>
+                  </div>
                   <p className="text-[11px] text-brand-700 dark:text-brand-300 mt-0.5">
                     Automatically dispatch an official transaction receipt to their registered email address.
                   </p>
@@ -767,6 +778,23 @@ export default function TransactionsPage() {
         isOpen={isVoucherModalOpen}
         onClose={() => setIsVoucherModalOpen(false)}
         data={voucherReportData}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deletingTxId}
+        onClose={() => setDeletingTxId(null)}
+        onConfirm={() => {
+          if (deletingTxId) {
+            deleteMutation.mutate(deletingTxId);
+            setDeletingTxId(null);
+          }
+        }}
+        title="Delete Transaction"
+        message="Are you sure you want to delete this transaction record? This will adjust your account balances accordingly."
+        confirmText="Delete Transaction"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

@@ -145,6 +145,24 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const userId = getUserId(req);
     const categoryId = req.params.id;
 
+    // Check for existing active transactions referencing this category
+    const txResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
+       WHERE user_id = $1 AND category_id = $2 AND deleted_at IS NULL`,
+      [userId, categoryId]
+    );
+
+    if (parseInt(txResult.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'CATEGORY_HAS_TRANSACTIONS',
+          message: 'Cannot delete a category with existing transactions. Set it inactive instead.',
+        },
+      });
+      return;
+    }
+
     const result = await db.query(
       `UPDATE ${SCHEMA}.categories SET is_active = FALSE, updated_at = NOW()
        WHERE user_id = $1 AND id = $2

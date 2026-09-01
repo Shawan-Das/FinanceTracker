@@ -5,10 +5,13 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
 import { useAuth } from '../contexts/AuthContext';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useTheme } from '../contexts/ThemeContext';
 import toast from 'react-hot-toast';
-import { Plus, CreditCard, AlertTriangle, CheckCircle2, Wrench, FileText, Calendar, ArrowUpRight, ArrowDownRight, Mail } from 'lucide-react';
+import { Plus, CreditCard, AlertTriangle, CheckCircle2, Wrench, FileText, Calendar, ArrowUpRight, ArrowDownRight, Mail, Trash2, Zap, PenLine, CircleDollarSign, ChevronDown, ChevronUp, Clock, ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
 import type { Loan, Person, Account } from '../types';
 import { formatDateDMY } from '../utils/format';
 
@@ -20,9 +23,12 @@ const formatCurrency = (amount: number) =>
 export default function LoansPage() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showRepayForm, setShowRepayForm] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+  const [deletingLoanId, setDeletingLoanId] = useState<string | null>(null);
   const [voucherReportData, setVoucherReportData] = useState<VoucherReportData | null>(null);
   const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
@@ -36,6 +42,21 @@ export default function LoansPage() {
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
   const [loanSendReceipt, setLoanSendReceipt] = useState(false);
+
+  // Add funds form
+  const [expandedLoanId, setExpandedLoanId] = useState<string | null>(null);
+
+  const { data: expandedLoanDetail, isLoading: detailLoading } = useQuery({
+    queryKey: ['loans', expandedLoanId],
+    queryFn: () => loansApi.get(expandedLoanId!).then((r) => r.data.data),
+    enabled: !!expandedLoanId,
+  });
+
+  const [showAddFundsForm, setShowAddFundsForm] = useState(false);
+  const [addFundsAmount, setAddFundsAmount] = useState('');
+  const [addFundsAccountId, setAddFundsAccountId] = useState('');
+  const [addFundsDate, setAddFundsDate] = useState(new Date().toISOString().split('T')[0]);
+  const [addFundsDescription, setAddFundsDescription] = useState('');
 
   // Fix orphaned loans
   const [showFixForm, setShowFixForm] = useState(false);
@@ -81,6 +102,27 @@ export default function LoansPage() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => loansApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      toast.success('Loan deleted successfully!');
+      setDeletingLoanId(null);
+    },
+  });
+
+  const addFundsMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => loansApi.addFunds(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      toast.success('Funds added to loan successfully!');
+      setShowAddFundsForm(false);
+      resetAddFundsForm();
+    },
+  });
+
   const createMutation = useMutation({
     mutationFn: (data: any) => loansApi.create(data),
     onSuccess: () => {
@@ -113,6 +155,14 @@ export default function LoansPage() {
     setDueDate('');
     setDescription('');
     setLoanSendReceipt(false);
+  };
+
+  const resetAddFundsForm = () => {
+    setAddFundsAmount('');
+    setAddFundsAccountId('');
+    setAddFundsDate(new Date().toISOString().split('T')[0]);
+    setAddFundsDescription('');
+    setSelectedLoan(null);
   };
 
   const resetRepayForm = () => {
@@ -169,6 +219,29 @@ export default function LoansPage() {
         account_id: repayAccountId,
         notes: repayNotes || undefined,
         send_receipt: repaySendReceipt,
+      },
+    });
+  };
+
+  const openAddFunds = (loan: Loan) => {
+    setSelectedLoan(loan);
+    setAddFundsAmount('');
+    setAddFundsAccountId('');
+    setAddFundsDate(new Date().toISOString().split('T')[0]);
+    setAddFundsDescription('');
+    setShowAddFundsForm(true);
+  };
+
+  const handleAddFunds = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedLoan) return;
+    addFundsMutation.mutate({
+      id: selectedLoan.id,
+      data: {
+        amount: parseFloat(addFundsAmount),
+        account_id: addFundsAccountId,
+        date: addFundsDate || undefined,
+        description: addFundsDescription || undefined,
       },
     });
   };
@@ -273,13 +346,24 @@ export default function LoansPage() {
                           <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">
                             {isLent ? 'Lent to' : 'Borrowed from'} {loan.person_name || 'Contact'}
                           </h3>
-                          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                            isLent
-                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
-                              : 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
-                          }`}>
-                            {loan.direction}
-                          </span>
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                              isLent
+                                ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                                : 'bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                            }`}>
+                              {loan.direction}
+                            </span>
+                            {loan.source === 'AUTO' ? (
+                              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300 flex items-center gap-1">
+                                <Zap size={10} /> Auto
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 flex items-center gap-1">
+                                <PenLine size={10} /> Manual
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -315,9 +399,170 @@ export default function LoansPage() {
                     </div>
 
                     {loan.due_date && (
-                      <p className="text-[11px] text-slate-400 flex items-center gap-1 mb-4">
+                      <p className="text-[11px] text-slate-400 flex items-center gap-1 mb-3">
                         <Calendar size={13} /> Due Date: {formatDateDMY(loan.due_date)}
                       </p>
+                    )}
+
+                    {/* Transaction History Toggle */}
+                    <button
+                      onClick={() => setExpandedLoanId(expandedLoanId === loan.id ? null : loan.id)}
+                      className="w-full flex items-center justify-center gap-1.5 text-[11px] font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition-colors py-1.5 rounded-lg hover:bg-brand-50 dark:hover:bg-brand-950/30 mb-1"
+                    >
+                      <Clock size={12} />
+                      {expandedLoanId === loan.id ? 'Hide' : 'View'} Transaction History
+                      {expandedLoanId === loan.id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                    </button>
+
+                    {/* Expanded Transaction Timeline */}
+                    {expandedLoanId === loan.id && (
+                      <div className="mt-2 mb-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60">
+                        {detailLoading ? (
+                          <p className="text-[10px] text-slate-400 text-center py-2">Loading history...</p>
+                        ) : expandedLoanDetail?.transactions?.length > 0 ? (
+                          <div>
+                            {/* Summary Stats */}
+                            {(() => {
+                              const txs = expandedLoanDetail.transactions;
+                              const totalAdded = txs
+                                .filter((t: any) => t.transaction_type === 'LEND' || t.transaction_type === 'BORROW')
+                                .reduce((s: number, t: any) => s + toNum(t.amount), 0);
+                              const totalRepaid = txs
+                                .filter((t: any) => t.transaction_type === 'LEND_REPAYMENT' || t.transaction_type === 'BORROW_REPAYMENT')
+                                .reduce((s: number, t: any) => s + toNum(t.amount), 0);
+                              const net = totalAdded - totalRepaid;
+                              return (
+                                <div className="grid grid-cols-3 gap-2 mb-3 pb-3 border-b border-slate-200/60 dark:border-slate-700/60">
+                                  <div className="text-center">
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total Added</p>
+                                    <p className="text-sm font-extrabold font-mono text-emerald-600 dark:text-emerald-400">{formatCurrency(totalAdded)}</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Total Repaid</p>
+                                    <p className="text-sm font-extrabold font-mono text-rose-600 dark:text-rose-400">{formatCurrency(totalRepaid)}</p>
+                                  </div>
+                                  <div className="text-center">
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Net Outstanding</p>
+                                    <p className={`text-sm font-extrabold font-mono ${net >= 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>{formatCurrency(net)}</p>
+                                  </div>
+                                </div>
+                              );
+                            })()}                            {/* Balance Trend Mini-Chart */}
+                            {expandedLoanDetail.transactions.length > 1 && (
+                              <div className="mb-3">
+                                {(() => {
+                                  let r = 0;
+                                  const chartData = expandedLoanDetail.transactions.map((tx: any) => {
+                                    const isA = tx.transaction_type === 'LEND' || tx.transaction_type === 'BORROW';
+                                    r += isA ? toNum(tx.amount) : -toNum(tx.amount);
+                                    return {
+                                      date: tx.transaction_date,
+                                      balance: Math.max(r, 0),
+                                    };
+                                  });
+                                  return (
+                                    <div className="h-28 w-full">
+                                      <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
+                                          <defs>
+                                            <linearGradient id="loanBalGrad" x1="0" y1="0" x2="0" y2="1">
+                                              <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.3} />
+                                              <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.02} />
+                                            </linearGradient>
+                                          </defs>
+                                          <XAxis
+                                            dataKey="date"
+                                            tick={{ fontSize: 8, fill: isDark ? '#64748b' : '#94a3b8' }}
+                                            axisLine={false}
+                                            tickLine={false}
+                                          />
+                                          <YAxis hide domain={[0, 'auto']} />
+                                          <Tooltip
+                                            formatter={(v: number) => [formatCurrency(v), 'Outstanding']}
+                                            labelFormatter={(l: string) => formatDateDMY(l)}
+                                            contentStyle={{
+                                              fontSize: 10,
+                                              borderRadius: 8,
+                                              border: 'none',
+                                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                              padding: '6px 10px',
+                                            }}
+                                          />
+                                          <Area
+                                            type="stepAfter"
+                                            dataKey="balance"
+                                            stroke="#f59e0b"
+                                            strokeWidth={2}
+                                            fill="url(#loanBalGrad)"
+                                            dot={{ r: 3, fill: '#f59e0b', stroke: '#fff', strokeWidth: 1.5 }}
+                                            activeDot={{ r: 4, fill: '#f59e0b' }}
+                                          />
+                                        </AreaChart>
+                                      </ResponsiveContainer>
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+                            )}
+                            {/* Timeline with Running Balance */}
+                            <div className="space-y-0">
+                              {(() => {
+                                let running = 0;
+                                return expandedLoanDetail.transactions.map((tx: any, i: number) => {
+                                  const isAdd = tx.transaction_type === 'LEND' || tx.transaction_type === 'BORROW';
+                                  running += isAdd ? toNum(tx.amount) : -toNum(tx.amount);
+                                  return (
+                                    <div key={tx.id} className="flex gap-3 relative">
+                                      {/* Vertical line */}
+                                      {i < expandedLoanDetail.transactions.length - 1 && (
+                                        <div className="absolute left-[7px] top-5 w-px h-full bg-slate-200 dark:bg-slate-700" />
+                                      )}
+                                      {/* Dot */}
+                                      <div className={`relative z-10 w-[15px] h-[15px] rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center ${
+                                        isAdd ? 'bg-emerald-100 dark:bg-emerald-950/60' : 'bg-rose-100 dark:bg-rose-950/60'
+                                      }`}>
+                                        <div className={`w-2 h-2 rounded-full ${
+                                          isAdd ? 'bg-emerald-500' : 'bg-rose-500'
+                                        }`} />
+                                      </div>
+                                      {/* Content */}
+                                      <div className="flex-1 pb-3 min-w-0">
+                                        <div className="flex items-center justify-between gap-2">
+                                          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                                            {formatDateDMY(tx.transaction_date)}
+                                          </span>
+                                          <span className={`text-[10px] font-extrabold font-mono ${
+                                            isAdd ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                                          }`}>
+                                            {isAdd ? '+' : '-'}{formatCurrency(toNum(tx.amount))}
+                                          </span>
+                                        </div>
+                                        <div className="flex items-center justify-between gap-2">
+                                          <p className="text-[10px] text-slate-600 dark:text-slate-300 font-medium truncate">
+                                            {tx.description || tx.transaction_type.replace(/_/g, ' ').toLowerCase()}
+                                          </p>
+                                          <span className={`text-[9px] font-bold font-mono px-1.5 py-0.5 rounded ${
+                                            running >= 0
+                                              ? 'bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400'
+                                              : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400'
+                                          }`}>
+                                            bal: {formatCurrency(running)}
+                                          </span>
+                                        </div>
+                                        {tx.account_name && (
+                                          <p className="text-[9px] text-slate-400">via {tx.account_name}</p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                });
+                              })()}
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-[10px] text-slate-400 text-center py-2">No transactions recorded yet</p>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -329,11 +574,26 @@ export default function LoansPage() {
                       Record Payment
                     </button>
                     <button
+                      onClick={() => openAddFunds(loan)}
+                      className="flex-1 text-xs py-2 font-semibold rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60 transition-all flex items-center justify-center gap-1.5"
+                      title="Add more funds to this loan"
+                    >
+                      <CircleDollarSign size={14} />
+                      Add More
+                    </button>
+                    <button
                       onClick={() => handleOpenVoucher(loan)}
                       className="btn-secondary text-xs p-2"
                       title="View Loan Voucher & Statement"
                     >
                       <FileText size={16} />
+                    </button>
+                    <button
+                      onClick={() => setDeletingLoanId(loan.id)}
+                      className="text-xs p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/60 border border-rose-200 dark:border-rose-900/60 transition-all"
+                      title="Delete Loan"
+                    >
+                      <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
@@ -362,6 +622,7 @@ export default function LoansPage() {
                     <th className="p-4">Direction</th>
                     <th className="p-4">Principal Amount</th>
                     <th className="p-4">Status</th>
+                    <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
@@ -371,9 +632,29 @@ export default function LoansPage() {
                       <td className="p-4 text-slate-500 dark:text-slate-400 font-medium">{loan.direction}</td>
                       <td className="p-4 font-bold text-slate-900 dark:text-slate-100">{formatCurrency(toNum(loan.principal_amount))}</td>
                       <td className="p-4">
-                        <span className="badge badge-success text-[10px]">
-                          {loan.status}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="badge badge-success text-[10px]">
+                            {loan.status}
+                          </span>
+                          {loan.source === 'AUTO' ? (
+                            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300 flex items-center gap-0.5">
+                              <Zap size={9} /> Auto
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 flex items-center gap-0.5">
+                              <PenLine size={9} /> Manual
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4 text-right">
+                        <button
+                          onClick={() => setDeletingLoanId(loan.id)}
+                          className="text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 transition-colors p-1"
+                          title="Delete Loan"
+                        >
+                          <Trash2 size={14} />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -579,6 +860,35 @@ export default function LoansPage() {
                 onChange={(e) => setRepayAmount(e.target.value)}
                 required
               />
+              {/* Quick Select Buttons */}
+              <div className="flex gap-1.5 mt-2">
+                {([
+                  { label: '25%', fraction: 0.25 },
+                  { label: '50%', fraction: 0.5 },
+                  { label: '75%', fraction: 0.75 },
+                  { label: 'Full', fraction: 1 },
+                ]).map(({ label, fraction }) => {
+                  const amt = Math.round(toNum(selectedLoan.remaining_amount) * fraction * 100) / 100;
+                  const isActive = parseFloat(repayAmount) === amt;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => setRepayAmount(String(amt))}
+                      className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all ${
+                        isActive
+                          ? 'bg-brand-600 dark:bg-brand-500 text-white border-brand-600 dark:border-brand-500'
+                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-brand-400'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-[10px] text-slate-400 mt-1.5">
+                Remaining: {formatCurrency(toNum(selectedLoan.remaining_amount))} — enter any amount for partial repayment
+              </p>
             </div>
 
             <div>
@@ -659,6 +969,101 @@ export default function LoansPage() {
         )}
       </Modal>
 
+      {/* Modal: Add More Funds */}
+      <Modal
+        isOpen={showAddFundsForm}
+        onClose={() => { setShowAddFundsForm(false); resetAddFundsForm(); }}
+        title="Add More Funds to Loan"
+      >
+        {selectedLoan && (
+          <form onSubmit={handleAddFunds} className="space-y-4">
+            <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800/60 text-xs space-y-1">
+              <p className="font-semibold text-slate-900 dark:text-slate-100">
+                {selectedLoan.direction === 'LENT' ? 'Lending more to' : 'Borrowing more from'}{' '}
+                <span className="font-normal">{selectedLoan.person_name || 'Contact'}</span>
+              </p>
+              <p className="text-slate-500 dark:text-slate-400">
+                Current Principal: <strong className="text-slate-700 dark:text-slate-300">{formatCurrency(toNum(selectedLoan.principal_amount))}</strong>
+              </p>
+            </div>
+
+            <div>
+              <label className="label">Additional Amount (৳)</label>
+              <input
+                type="number"
+                className="input font-mono font-bold text-base"
+                step="0.01"
+                min="0.01"
+                placeholder="0.00"
+                value={addFundsAmount}
+                onChange={(e) => setAddFundsAmount(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="label">From Account</label>
+              <select
+                className="input"
+                value={addFundsAccountId}
+                onChange={(e) => setAddFundsAccountId(e.target.value)}
+                required
+              >
+                <option value="">Select account</option>
+                {accounts?.map((a: Account) => (
+                  <option key={a.account_id} value={a.account_id}>
+                    {a.account_name} ({formatCurrency(a.current_balance)})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="label">Date</label>
+              <input
+                type="date"
+                className="input"
+                value={addFundsDate}
+                onChange={(e) => setAddFundsDate(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <label className="label">Description (Optional)</label>
+              <input
+                type="text"
+                className="input"
+                placeholder="e.g. Additional emergency funds"
+                value={addFundsDescription}
+                onChange={(e) => setAddFundsDescription(e.target.value)}
+              />
+            </div>
+
+            <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-900/60 text-xs text-emerald-700 dark:text-emerald-300">
+              This will increase the loan principal and create a matching transaction entry.
+            </div>
+
+            <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+              <button
+                type="button"
+                className="btn-secondary flex-1 text-xs"
+                onClick={() => { setShowAddFundsForm(false); resetAddFundsForm(); }}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="flex-1 text-xs py-2.5 font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-all"
+                disabled={addFundsMutation.isPending}
+              >
+                {addFundsMutation.isPending ? 'Adding...' : 'Add Funds'}
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
       {/* Fix Orphaned Modal */}
       <Modal
         isOpen={showFixForm}
@@ -716,6 +1121,25 @@ export default function LoansPage() {
         isOpen={isVoucherModalOpen}
         onClose={() => setIsVoucherModalOpen(false)}
         data={voucherReportData}
+      />
+
+      {/* Delete Loan Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deletingLoanId}
+        onClose={() => { setDeletingLoanId(null); deleteMutation.reset(); }}
+        onConfirm={() => {
+          if (deletingLoanId) {
+            deleteMutation.mutate(deletingLoanId);
+          }
+        }}
+        title="Delete Loan Agreement"
+        message={deleteMutation.isError
+          ? (deleteMutation.error as any)?.response?.data?.error?.message || 'Cannot delete this loan. It may have existing repayments or linked transactions.'
+          : 'Are you sure you want to delete this loan? This will also remove all associated repayment transactions and cannot be undone.'
+        }
+        confirmText="Delete Loan"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
       />
     </div>
   );

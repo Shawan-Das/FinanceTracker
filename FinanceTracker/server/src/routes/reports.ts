@@ -58,10 +58,19 @@ router.get('/income', async (req: Request, res: Response) => {
       values
     );
 
+    // Transaction count
+    const countResult = await db.query(
+      `SELECT COUNT(*)::int AS count
+       FROM ${SCHEMA}.transactions t
+       WHERE t.user_id = $1 AND t.transaction_type = 'INCOME' AND t.deleted_at IS NULL ${dateCondition}`,
+      values
+    );
+
     res.json({
       success: true,
       data: {
         total: parseFloat(totalResult.rows[0].total),
+        count: countResult.rows[0].count,
         byCategory: byCategory.rows,
         byMonth: byMonth.rows,
       },
@@ -136,10 +145,19 @@ router.get('/expense', async (req: Request, res: Response) => {
       values
     );
 
+    // Transaction count
+    const countResult = await db.query(
+      `SELECT COUNT(*)::int AS count
+       FROM ${SCHEMA}.transactions t
+       WHERE t.user_id = $1 AND t.transaction_type = 'EXPENSE' AND t.deleted_at IS NULL ${dateCondition}`,
+      values
+    );
+
     res.json({
       success: true,
       data: {
         total: parseFloat(totalResult.rows[0].total),
+        count: countResult.rows[0].count,
         byCategory: byCategory.rows,
         byAccount: byAccount.rows,
         byMonth: byMonth.rows,

@@ -142,66 +142,6 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 // Start server (only when run directly, not when imported by Vercel)
 // =============================================================================
 if (require.main === module) {
-  // Run startup migration: update v_person_balances view to net-based calculation
-  (async () => {
-    try {
-      await db.query(`
-        CREATE OR REPLACE VIEW finance_tracker.v_person_balances AS
-        SELECT
-            p.id,
-            p.user_id,
-            p.id AS person_id,
-            p.name,
-            p.name AS person_name,
-            p.phone,
-            p.email,
-            p.notes,
-            p.is_active,
-            p.created_at,
-            p.updated_at,
-            COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0) AS total_lent,
-            COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0) AS total_lent_repaid,
-            COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0) AS total_borrowed,
-            COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0) AS total_borrow_repaid,
-            GREATEST(
-                (
-                    COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0)
-                    - COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0)
-                )
-                - (
-                    COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0)
-                    - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0)
-                ),
-                0
-            ) AS amount_they_owe_you,
-            GREATEST(
-                (
-                    COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW' THEN t.amount ELSE 0 END), 0)
-                    - COALESCE(SUM(CASE WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount ELSE 0 END), 0)
-                )
-                - (
-                    COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND' THEN t.amount ELSE 0 END), 0)
-                    - COALESCE(SUM(CASE WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount ELSE 0 END), 0)
-                ),
-                0
-            ) AS amount_you_owe_them
-        FROM finance_tracker.people p
-        LEFT JOIN finance_tracker.transactions t
-            ON t.person_id = p.id
-            AND t.deleted_at IS NULL
-            AND t.transaction_type IN ('LEND', 'LEND_REPAYMENT', 'BORROW', 'BORROW_REPAYMENT')
-        WHERE p.is_active = TRUE
-        GROUP BY p.id, p.user_id, p.name, p.phone, p.email, p.notes, p.is_active, p.created_at, p.updated_at
-      `);
-      // console.log('✅ v_person_balances view updated (net calculation)');
-    } catch (err: any) {
-      // View may not exist yet if DB hasn't been set up — that's fine
-      if (err.code !== '42P01') {
-        console.error('⚠️  Failed to update v_person_balances view:', err.message);
-      }
-    }
-  })();
-
   app.listen(PORT, () => {
     console.log(`🚀 Balqen API running on http://localhost:${PORT}`);
     console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);

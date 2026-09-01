@@ -186,6 +186,112 @@ router.post('/fix-orphaned', async (req: Request, res: Response) => {
 });
 
 // =============================================================================
+// POST /api/loans/:id/add-funds — Add more principal to an existing active loan
+// (Must be defined BEFORE /:id so Express doesn't treat 'add-funds' as an ID)
+// =============================================================================
+const addFundsSchema = z.object({
+  amount: z.coerce.number().positive('Amount must be greater than zero'),
+  account_id: z.string().min(1, 'Account is required'),
+  date: z.string().optional(),
+  description: z.string().optional(),
+});
+
+router.post('/:id/add-funds', validateBody(addFundsSchema), async (req: Request, res: Response) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const { amount, account_id, date, description } = req.body;
+    const txDate = date || new Date().toISOString().split('T')[0];
+
+    // Verify loan exists, is active, and belongs to user
+    const loanResult = await client.query(
+      `SELECT * FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`,
+      [loanId, userId]
+    );
+    if (loanResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Loan not found' },
+      });
+      return;
+    }
+    const loan = loanResult.rows[0];
+    if (loan.status !== 'ACTIVE') {
+      res.status(400).json({
+        success: false,
+        error: { code: 'LOAN_NOT_ACTIVE', message: `Cannot add funds to a loan with status '${loan.status}'` },
+      });
+      return;
+    }
+
+    // Verify account belongs to user
+    const accCheck = await client.query(
+      `SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`,
+      [account_id, userId]
+    );
+    if (accCheck.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: 'INVALID_ACCOUNT', message: 'Account not found' },
+      });
+      return;
+    }
+
+    await client.query('BEGIN');
+
+    // 1. Increase the loan's principal_amount
+    await client.query(
+      `UPDATE ${SCHEMA}.loans
+       SET principal_amount = principal_amount + $1, updated_at = NOW()
+       WHERE id = $2`,
+      [amount, loanId]
+    );
+
+    // 2. Create the corresponding LEND/BORROW transaction
+    const txType = loan.direction === 'LENT' ? 'LEND' : 'BORROW';
+    const txId = generateId('transactions');
+    await client.query(
+      `INSERT INTO ${SCHEMA}.transactions
+       (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [txId, userId, txType, txDate, amount, account_id, loan.person_id, loanId, description || `Additional funds for loan`]
+    );
+
+    await client.query('COMMIT');
+
+    // Fetch updated loan
+    const updated = await db.query(
+      `SELECT l.*,
+              p.name as person_name,
+              COALESCE(lr.total_repaid, 0) AS total_repaid,
+              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
+       FROM ${SCHEMA}.loans l
+       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
+       LEFT JOIN (
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA}.loan_repayments lr2
+         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
+       ) lr ON lr.loan_id = l.id
+       WHERE l.id = $1`,
+      [loanId]
+    );
+
+    res.status(201).json({ success: true, data: updated.rows[0] });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Add funds error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to add funds to loan' },
+    });
+  } finally {
+    client.release();
+  }
+});
+
+// =============================================================================
 // GET /api/loans/:id/voucher — Generate PDF voucher for a loan
 // (Must be defined BEFORE /:id so Express doesn't treat 'voucher' as an ID)
 // =============================================================================
@@ -304,11 +410,23 @@ router.get('/:id', async (req: Request, res: Response) => {
       [loanId]
     );
 
+    // Full transaction history for this loan (fund additions + repayments)
+    const txHistory = await db.query(
+      `SELECT t.id, t.transaction_type, t.transaction_date, t.amount, t.description,
+              a.name as account_name
+       FROM ${SCHEMA}.transactions t
+       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
+       WHERE t.loan_id = $1 AND t.deleted_at IS NULL
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
+      [loanId]
+    );
+
     res.json({
       success: true,
       data: {
         ...result.rows[0],
         repayments: repayments.rows,
+        transactions: txHistory.rows,
       },
     });
   } catch (error) {
@@ -345,8 +463,8 @@ router.post('/', validateBody(createLoanSchema), async (req: Request, res: Respo
     await client.query('BEGIN');
 
     const result = await client.query(
-      `INSERT INTO ${SCHEMA}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO ${SCHEMA}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description, source)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'MANUAL')
        RETURNING *`,
       [id, userId, person_id || null, direction, principal_amount, interest_amount, start_date, due_date || null, description || null]
     );
@@ -430,6 +548,53 @@ router.patch('/:id', validateBody(updateLoanSchema), async (req: Request, res: R
     const loanId = req.params.id;
     const updates = req.body;
 
+    // Validate status transitions
+    if (updates.status) {
+      const loanResult = await db.query(
+        `SELECT l.*, COALESCE(lr.total_repaid, 0) AS total_repaid
+         FROM ${SCHEMA}.loans l
+         LEFT JOIN (
+           SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+           FROM ${SCHEMA}.loan_repayments lr2
+           INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+           GROUP BY lr2.loan_id
+         ) lr ON lr.loan_id = l.id
+         WHERE l.id = $1 AND l.user_id = $2`,
+        [loanId, userId]
+      );
+
+      if (loanResult.rows.length > 0) {
+        const loan = loanResult.rows[0];
+        const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+        const totalRepaid = parseFloat(loan.total_repaid || '0');
+        const remaining = totalDue - totalRepaid;
+
+        // Prevent marking as PAID if there is still outstanding balance
+        if (updates.status === 'PAID' && remaining > 0) {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'LOAN_HAS_OUTSTANDING_BALANCE',
+              message: `Cannot mark this loan as PAID. Outstanding balance is ৳${remaining.toLocaleString('en-BD', { minimumFractionDigits: 2 })}. Record the remaining repayment first.`,
+            },
+          });
+          return;
+        }
+
+        // Prevent marking as ACTIVE if it is already PAID (unless reverting)
+        if (updates.status === 'ACTIVE' && loan.status === 'PAID') {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: 'CANNOT_REOPEN_PAID_LOAN',
+              message: 'Cannot reopen a fully paid loan. Create a new loan record instead.',
+            },
+          });
+          return;
+        }
+      }
+    }
+
     const ALLOWED_FIELDS = ['due_date', 'status', 'description'];
     const fields: string[] = [];
     const values: any[] = [];
@@ -483,32 +648,17 @@ router.patch('/:id', validateBody(updateLoanSchema), async (req: Request, res: R
 // DELETE /api/loans/:id
 // =============================================================================
 router.delete('/:id', async (req: Request, res: Response) => {
+  const client = await db.getClient();
   try {
     const userId = getUserId(req);
     const loanId = req.params.id;
 
-    const repayResult = await db.query(
-      `SELECT COUNT(*) as count FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`,
-      [loanId]
-    );
-
-    if (parseInt(repayResult.rows[0].count) > 0) {
-      res.status(409).json({
-        success: false,
-        error: {
-          code: 'HAS_REPAYMENTS',
-          message: 'Cannot delete a loan with existing repayments. Cancel it instead.',
-        },
-      });
-      return;
-    }
-
-    const result = await db.query(
-      `DELETE FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2 RETURNING id`,
+    // Verify loan exists and belongs to user
+    const loanCheck = await client.query(
+      `SELECT id, direction, status FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`,
       [loanId, userId]
     );
-
-    if (result.rows.length === 0) {
+    if (loanCheck.rows.length === 0) {
       res.status(404).json({
         success: false,
         error: { code: 'NOT_FOUND', message: 'Loan not found' },
@@ -516,13 +666,90 @@ router.delete('/:id', async (req: Request, res: Response) => {
       return;
     }
 
+    // Check for existing repayments
+    const repaymentCheck = await client.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`,
+      [loanId]
+    );
+
+    if (parseInt(repaymentCheck.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'LOAN_HAS_REPAYMENTS',
+          message: 'Cannot delete a loan with existing repayments. Set its status to CANCELLED instead.',
+        },
+      });
+      return;
+    }
+
+    // Check for linked transactions
+    const txCheck = await client.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
+       WHERE loan_id = $1 AND deleted_at IS NULL`,
+      [loanId]
+    );
+
+    if (parseInt(txCheck.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'LOAN_HAS_TRANSACTIONS',
+          message: 'Cannot delete a loan with linked transactions. Set its status to CANCELLED instead.',
+        },
+      });
+      return;
+    }
+
+    await client.query('BEGIN');
+
+    // 1. Find and soft-delete all repayment transactions linked to this loan
+    const repayTxs = await client.query(
+      `SELECT id FROM ${SCHEMA}.transactions
+       WHERE loan_id = $1 AND transaction_type IN ('LEND_REPAYMENT', 'BORROW_REPAYMENT')
+         AND deleted_at IS NULL`,
+      [loanId]
+    );
+    for (const tx of repayTxs.rows) {
+      await client.query(
+        `UPDATE ${SCHEMA}.transactions SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1`,
+        [tx.id]
+      );
+    }
+
+    // 2. Delete loan_repayments records
+    await client.query(
+      `DELETE FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`,
+      [loanId]
+    );
+
+    // 3. Soft-delete the associated LEND/BORROW transaction
+    await client.query(
+      `UPDATE ${SCHEMA}.transactions
+       SET deleted_at = NOW(), updated_at = NOW()
+       WHERE loan_id = $1 AND transaction_type IN ('LEND', 'BORROW')
+         AND deleted_at IS NULL`,
+      [loanId]
+    );
+
+    // 4. Hard delete the loan record
+    await client.query(
+      `DELETE FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`,
+      [loanId, userId]
+    );
+
+    await client.query('COMMIT');
+
     res.json({ success: true, data: { id: loanId } });
   } catch (error) {
+    await client.query('ROLLBACK');
     console.error('Delete loan error:', error);
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to delete loan' },
     });
+  } finally {
+    client.release();
   }
 });
 

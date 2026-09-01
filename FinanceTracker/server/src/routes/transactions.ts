@@ -472,8 +472,8 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
       const loanDirection = transaction_type === 'LEND' ? 'LENT' : 'BORROWED';
       await client.query(
         `INSERT INTO ${SCHEMA}.loans
-         (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, description)
-         VALUES ($1, $2, $3, $4, $5, 0, $6, $7)`,
+         (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, description, source)
+         VALUES ($1, $2, $3, $4, $5, 0, $6, $7, 'AUTO')`,
         [loanId, userId, person_id || null, loanDirection, amount, transaction_date, description || null]
       );
       linkedLoanId = loanId;
@@ -788,6 +788,35 @@ router.delete('/:id', async (req: Request, res: Response) => {
             );
           }
         }
+      }
+    }
+
+    // If deleting a LEND/BORROW transaction, also clean up the auto-created loan
+    if (tx.transaction_type === 'LEND' || tx.transaction_type === 'BORROW') {
+      if (tx.loan_id) {
+        // Soft-delete any repayment transactions linked to this loan
+        const repayTxs = await client.query(
+          `SELECT id FROM ${SCHEMA}.transactions
+           WHERE loan_id = $1 AND transaction_type IN ('LEND_REPAYMENT', 'BORROW_REPAYMENT')
+             AND deleted_at IS NULL`,
+          [tx.loan_id]
+        );
+        for (const repayTx of repayTxs.rows) {
+          await client.query(
+            `UPDATE ${SCHEMA}.transactions SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1`,
+            [repayTx.id]
+          );
+        }
+        // Delete loan_repayments records
+        await client.query(
+          `DELETE FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`,
+          [tx.loan_id]
+        );
+        // Delete the loan record itself
+        await client.query(
+          `DELETE FROM ${SCHEMA}.loans WHERE id = $1`,
+          [tx.loan_id]
+        );
       }
     }
 

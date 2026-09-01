@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import toast from 'react-hot-toast';
 import { Plus, Edit, Trash2, User, Phone, Mail, ArrowUpRight, ArrowDownRight, CheckCircle2 } from 'lucide-react';
 import type { Person } from '../types';
@@ -16,6 +17,7 @@ export default function PeoplePage() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
+  const [deletingPerson, setDeletingPerson] = useState<Person | null>(null);
 
   const [formName, setFormName] = useState('');
   const [formPhone, setFormPhone] = useState('');
@@ -53,6 +55,7 @@ export default function PeoplePage() {
       queryClient.invalidateQueries({ queryKey: ['people'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       toast.success('Person removed from directory');
+      setDeletingPerson(null);
     },
   });
 
@@ -150,11 +153,7 @@ export default function PeoplePage() {
                         <Edit size={14} />
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm('Remove this person from your contacts directory?')) {
-                            deleteMutation.mutate(p.id);
-                          }
-                        }}
+                        onClick={() => setDeletingPerson(p)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                         title="Delete Contact"
                       >
@@ -285,6 +284,25 @@ export default function PeoplePage() {
           </div>
         </form>
       </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deletingPerson}
+        onClose={() => { setDeletingPerson(null); deleteMutation.reset(); }}
+        onConfirm={() => {
+          if (deletingPerson) {
+            deleteMutation.mutate(deletingPerson.id);
+          }
+        }}
+        title="Remove Person"
+        message={deleteMutation.isError
+          ? (deleteMutation.error as any)?.response?.data?.error?.message || 'Cannot remove this person. They may have active transactions or loans linked to their profile.'
+          : `Are you sure you want to remove ${deletingPerson?.name} from your contacts directory?`
+        }
+        confirmText="Remove Person"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

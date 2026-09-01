@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
 import toast from 'react-hot-toast';
 import { Plus, Tag, Edit, Trash2, TrendingUp, TrendingDown } from 'lucide-react';
 import type { Category } from '../types';
@@ -13,6 +14,7 @@ export default function CategoriesPage() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [formName, setFormName] = useState('');
   const [formType, setFormType] = useState<'INCOME' | 'EXPENSE'>('INCOME');
 
@@ -44,6 +46,7 @@ export default function CategoriesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       toast.success('Category deactivated');
+      setDeletingCategory(null);
     },
   });
 
@@ -132,9 +135,7 @@ export default function CategoriesPage() {
                         <Edit size={14} />
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm('Deactivate this income category?')) deleteMutation.mutate(cat.id);
-                        }}
+                        onClick={() => setDeletingCategory(cat)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                         title="Deactivate Category"
                       >
@@ -189,9 +190,7 @@ export default function CategoriesPage() {
                         <Edit size={14} />
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm('Deactivate this expense category?')) deleteMutation.mutate(cat.id);
-                        }}
+                        onClick={() => setDeletingCategory(cat)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                         title="Deactivate Category"
                       >
@@ -263,6 +262,25 @@ export default function CategoriesPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Delete / Deactivate Category Confirmation Modal */}
+      <ConfirmModal
+        isOpen={!!deletingCategory}
+        onClose={() => { setDeletingCategory(null); deleteMutation.reset(); }}
+        onConfirm={() => {
+          if (deletingCategory) {
+            deleteMutation.mutate(deletingCategory.id);
+          }
+        }}
+        title="Deactivate Category"
+        message={deleteMutation.isError
+          ? (deleteMutation.error as any)?.response?.data?.error?.message || 'Cannot deactivate this category. It may have existing transactions linked to it.'
+          : `Are you sure you want to deactivate the "${deletingCategory?.name}" category?`
+        }
+        confirmText="Deactivate Category"
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }

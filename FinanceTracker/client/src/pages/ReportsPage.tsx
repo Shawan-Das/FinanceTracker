@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { reportsApi, accountsApi, peopleApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -6,12 +6,13 @@ import QueryError from '../components/QueryError';
 import { useTheme } from '../contexts/ThemeContext';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell,
+  PieChart, Pie, Cell, LineChart, Line, Legend,
 } from 'recharts';
 import {
   BarChart3, Landmark, UserCheck, ShieldAlert, ArrowUpRight, ArrowDownRight, Calendar,
   TrendingUp, TrendingDown, Wallet, CreditCard, Users, AlertTriangle, CheckCircle2, Clock,
-  RefreshCw,
+  RefreshCw, Hash, Target, Layers, BarChart as BarChartIcon, FileText, Table2,
+  GitCompareArrows, Download, Printer, Zap,
 } from 'lucide-react';
 import type { Account, Person } from '../types';
 import { formatDateDMY } from '../utils/format';
@@ -23,7 +24,7 @@ const formatCurrency = (amount: number) =>
 
 const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
-type ReportTab = 'position' | 'income' | 'expense' | 'account' | 'person' | 'loan';
+type ReportTab = 'position' | 'income' | 'expense' | 'comparison' | 'account' | 'person' | 'loan';
 
 export default function ReportsPage() {
   const { resolvedTheme } = useTheme();
@@ -34,6 +35,7 @@ export default function ReportsPage() {
   const [dateTo, setDateTo] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState('');
+  const printRef = useRef<HTMLDivElement>(null);
 
   const dateParams = { ...(dateFrom && { from: dateFrom }), ...(dateTo && { to: dateTo }) };
 
@@ -74,6 +76,18 @@ export default function ReportsPage() {
     enabled: activeTab === 'person' && !!selectedPersonId,
   });
 
+  // Comparison report — fetch both income & expense in parallel
+  const { data: compIncome, isLoading: compIncomeLoading } = useQuery({
+    queryKey: ['reports', 'income', 'comparison', dateParams],
+    queryFn: () => reportsApi.income(dateParams).then((r) => r.data.data),
+    enabled: activeTab === 'comparison',
+  });
+  const { data: compExpense, isLoading: compExpenseLoading } = useQuery({
+    queryKey: ['reports', 'expense', 'comparison', dateParams],
+    queryFn: () => reportsApi.expense(dateParams).then((r) => r.data.data),
+    enabled: activeTab === 'comparison',
+  });
+
   // Loan report
   const { data: loanReport, isLoading: loanLoading, isError: loanError, refetch: refetchLoan } = useQuery({
     queryKey: ['reports', 'loan'],
@@ -96,6 +110,7 @@ export default function ReportsPage() {
     { key: 'position', label: 'Financial Position', icon: Landmark },
     { key: 'income', label: 'Income Report', icon: TrendingUp },
     { key: 'expense', label: 'Expense Report', icon: TrendingDown },
+    { key: 'comparison', label: 'Income vs Expense', icon: GitCompareArrows },
     { key: 'account', label: 'Account Statement', icon: BarChart3 },
     { key: 'person', label: 'Person Statement', icon: UserCheck },
     { key: 'loan', label: 'Loan Portfolio', icon: ShieldAlert },
@@ -149,12 +164,49 @@ export default function ReportsPage() {
       </div>
 
       {/* Date Filter Bar */}
-      {['income', 'expense', 'person', 'account'].includes(activeTab) && (
+      {['income', 'expense', 'comparison', 'person', 'account'].includes(activeTab) && (
         <div className="card p-4 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
             <Calendar size={15} />
             <span>Date Range:</span>
           </div>
+
+          {/* Quick Date Presets */}
+          <div className="flex flex-wrap items-center gap-1.5">
+            {([
+              { label: 'This Month', getRange: () => {
+                const now = new Date(); return { from: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`, to: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()).padStart(2,'0')}` };
+              }},
+              { label: 'Last Month', getRange: () => {
+                const d = new Date(); d.setMonth(d.getMonth()-1); return { from: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`, to: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(new Date(d.getFullYear(), d.getMonth()+1, 0).getDate()).padStart(2,'0')}` };
+              }},
+              { label: 'This Quarter', getRange: () => {
+                const now = new Date(); const q = Math.floor(now.getMonth()/3); const start = q*3; return { from: `${now.getFullYear()}-${String(start+1).padStart(2,'0')}-01`, to: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()).padStart(2,'0')}` };
+              }},
+              { label: 'This Year', getRange: () => {
+                const now = new Date(); return { from: `${now.getFullYear()}-01-01`, to: `${now.getFullYear()}-12-31` };
+              }},
+            ]).map(({ label, getRange }) => {
+              const range = getRange();
+              const isActive = dateFrom === range.from && dateTo === range.to;
+              return (
+                <button
+                  key={label}
+                  onClick={() => { setDateFrom(range.from); setDateTo(range.to); }}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
+                    isActive
+                      ? 'bg-brand-600 dark:bg-brand-500 text-white border-brand-600 dark:border-brand-500'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block" />
+
           <div className="flex items-center gap-2">
             <label className="text-xs font-medium text-slate-500">From:</label>
             <input
@@ -173,29 +225,86 @@ export default function ReportsPage() {
               onChange={(e) => setDateTo(e.target.value)}
             />
           </div>
+
           {(dateFrom || dateTo) && (
             <button
               onClick={() => { setDateFrom(''); setDateTo(''); }}
-              className="text-xs text-rose-500 hover:text-rose-700 font-semibold transition-colors ml-auto"
+              className="text-xs text-rose-500 hover:text-rose-700 font-semibold transition-colors"
             >
               Clear Filter
             </button>
           )}
+
+          {/* Print / Export Button */}
+          <button
+            onClick={() => window.print()}
+            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500 transition-all cursor-pointer"
+            title="Print report or export as PDF"
+          >
+            <Printer size={12} />
+            <span>Print / PDF</span>
+          </button>
         </div>
       )}
 
-      {/* ─── FINANCIAL POSITION ─── */}
-      {activeTab === 'position' && (
-        <div>
-          {positionLoading ? (
-            <LoadingSpinner message="Calculating financial position..." />
-          ) : positionError ? (
-            <QueryError title="Failed to load position" onRetry={() => refetchPosition()} />
-          ) : (
-            position && (
-              <div className="space-y-5">
-                {/* 4 Overview Stat Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Print Stylesheet */}
+      <style>{`
+        @media print {
+          body * { visibility: hidden !important; }
+          #report-print-area, #report-print-area * { visibility: visible !important; }
+          #report-print-area {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            padding: 20px !important;
+            background: #ffffff !important;
+            color: #0f172a !important;
+          }
+          .no-print { display: none !important; }
+          .card {
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+            break-inside: avoid;
+          }
+        }
+      `}</style>
+
+      {/* ─── Printable Content Container ─── */}
+      <div id="report-print-area" className="space-y-6">
+        {/* Printable Header - only visible when printing */}
+        <div className="hidden print:block mb-6 border-b border-slate-300 pb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900">FinanceTracker</h1>
+              <p className="text-sm font-semibold text-slate-700 mt-1">
+                {tabs.find((t) => t.key === activeTab)?.label || 'Financial Report'}
+              </p>
+            </div>
+            <div className="text-right text-xs text-slate-500">
+              <p>Generated on: {new Date().toLocaleDateString('en-BD', { dateStyle: 'medium' })}</p>
+              {(dateFrom || dateTo) && (
+                <p className="mt-0.5">
+                  Period: {dateFrom ? formatDateDMY(dateFrom) : 'Beginning'} — {dateTo ? formatDateDMY(dateTo) : 'Present'}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ─── FINANCIAL POSITION ─── */}
+        {activeTab === 'position' && (
+          <div>
+            {positionLoading ? (
+              <LoadingSpinner message="Calculating financial position..." />
+            ) : positionError ? (
+              <QueryError title="Failed to load position" onRetry={() => refetchPosition()} />
+            ) : (
+              position && (
+                <div className="space-y-5">
+                  {/* 4 Overview Stat Cards */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="stat-card">
                     <div className="flex items-center gap-2.5 mb-2">
                       <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
@@ -282,7 +391,7 @@ export default function ReportsPage() {
 
       {/* ─── INCOME REPORT ─── */}
       {activeTab === 'income' && (
-        <div>
+        <div id="report-print-area">
           {incomeLoading ? (
             <LoadingSpinner message="Aggregating income data..." />
           ) : incomeError ? (
@@ -308,6 +417,108 @@ export default function ReportsPage() {
                   )}
                 </div>
 
+                {/* Key Stats Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                        <Hash size={14} className="text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Transactions</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{incomeReport.count ?? incomeReport.byCategory?.length ?? 0}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Total records</span>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-brand-100 dark:bg-brand-950/40 flex items-center justify-center flex-shrink-0">
+                        <Target size={14} className="text-brand-600 dark:text-brand-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Categories</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{incomeReport.byCategory?.length || 0}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Active sources</span>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+                        <Layers size={14} className="text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Months</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{incomeReport.byMonth?.length || 0}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Active months</span>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
+                        <BarChartIcon size={14} className="text-rose-600 dark:text-rose-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Top Source</span>
+                    </div>
+                    <p className="text-lg font-extrabold text-slate-900 dark:text-white truncate">{incomeReport.byCategory?.[0]?.category_name || '—'}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Highest earning</span>
+                  </div>
+                </div>
+
+                {/* Monthly Trend Chart */}
+                {incomeReport.byMonth?.length > 0 && (
+                  <div className="card p-5">
+                    <div className="pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Monthly Income Trend</h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Income trajectory across {incomeReport.byMonth.length} months</p>
+                    </div>
+                    <div className="h-56 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={incomeReport.byMonth} barCategoryGap="20%">
+                          <XAxis dataKey="month" tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => `৳${(v/1000).toFixed(0)}k`} />
+                          <Tooltip content={<CustomTooltip />} />
+                          <Bar dataKey="total" radius={[6, 6, 0, 0]} maxBarSize={40} fill="#10b981">
+                            {incomeReport.byMonth.map((_: any, i: number) => (
+                              <Cell key={i} fill={i === incomeReport.byMonth.length - 1 ? '#059669' : '#10b981'} fillOpacity={0.7 + (i / incomeReport.byMonth.length) * 0.3} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {/* Monthly Summary Table */}
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              <th className="pb-2 pr-4">Month</th>
+                              <th className="pb-2 pr-4 text-right">Income</th>
+                              <th className="pb-2 pr-4 text-right">% of Total</th>
+                              <th className="pb-2 text-right">Avg/Month</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-xs divide-y divide-slate-50 dark:divide-slate-800/50">
+                            {incomeReport.byMonth.map((m: any, i: number) => {
+                              const pct = incomeReport.total > 0 ? (toNum(m.total) / incomeReport.total) * 100 : 0;
+                              const avg = incomeReport.byMonth.length > 0 ? incomeReport.total / incomeReport.byMonth.length : 0;
+                              return (
+                                <tr key={i} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
+                                  <td className="py-1.5 pr-4 font-semibold text-slate-700 dark:text-slate-300">{m.month}</td>
+                                  <td className="py-1.5 pr-4 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">{formatCurrency(toNum(m.total))}</td>
+                                  <td className="py-1.5 pr-4 text-right">
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400">{pct.toFixed(1)}%</span>
+                                  </td>
+                                  <td className="py-1.5 text-right font-mono text-slate-500 dark:text-slate-400">{formatCurrency(avg)}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Category Chart & Breakdown */}
                 {incomeReport.byCategory?.length > 0 ? (
                   <div className="card p-5 space-y-5">
@@ -331,22 +542,48 @@ export default function ReportsPage() {
                       </ResponsiveContainer>
                     </div>
 
-                    {/* Progress Bar Category Breakdown */}
-                    <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
-                      {incomeReport.byCategory.map((cat: any, i: number) => {
-                        const pct = incomeReport.total > 0 ? (toNum(cat.total) / incomeReport.total) * 100 : 0;
-                        return (
-                          <div key={i} className="flex items-center gap-3">
-                            <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
-                            <span className="text-xs text-slate-700 dark:text-slate-300 font-medium flex-1 truncate">{cat.category_name}</span>
-                            <div className="flex-1 max-w-[140px] h-2 rounded-full bg-slate-200/60 dark:bg-slate-800 overflow-hidden">
-                              <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
-                            </div>
-                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 w-[90px] text-right font-mono">{formatCurrency(toNum(cat.total))}</span>
-                            <span className="text-[11px] text-slate-400 font-semibold w-[36px] text-right">{pct.toFixed(0)}%</span>
-                          </div>
-                        );
-                      })}
+                    {/* Category Summary Table */}
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              <th className="pb-2 pr-4">#</th>
+                              <th className="pb-2 pr-4">Category</th>
+                              <th className="pb-2 pr-4 text-right">Amount</th>
+                              <th className="pb-2 pr-4 text-right">% of Total</th>
+                              <th className="pb-2 text-right">Share</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-xs divide-y divide-slate-50 dark:divide-slate-800/50">
+                            {incomeReport.byCategory.map((cat: any, i: number) => {
+                              const pct = incomeReport.total > 0 ? (toNum(cat.total) / incomeReport.total) * 100 : 0;
+                              return (
+                                <tr key={i} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
+                                  <td className="py-2 pr-4 text-slate-400 font-mono text-[10px]">{i + 1}</td>
+                                  <td className="py-2 pr-4">
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                                      <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">{cat.category_name}</span>
+                                    </div>
+                                  </td>
+                                  <td className="py-2 pr-4 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">{formatCurrency(toNum(cat.total))}</td>
+                                  <td className="py-2 pr-4 text-right">
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400">{pct.toFixed(1)}%</span>
+                                  </td>
+                                  <td className="py-2 text-right">
+                                    <div className="inline-flex items-center gap-2">
+                                      <div className="w-16 h-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800 overflow-hidden">
+                                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -362,7 +599,7 @@ export default function ReportsPage() {
 
       {/* ─── EXPENSE REPORT ─── */}
       {activeTab === 'expense' && (
-        <div>
+        <div id="report-print-area">
           {expenseLoading ? (
             <LoadingSpinner message="Aggregating expense metrics..." />
           ) : expenseError ? (
@@ -387,6 +624,140 @@ export default function ReportsPage() {
                     </p>
                   )}
                 </div>
+
+                {/* Key Stats Cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
+                        <Hash size={14} className="text-rose-600 dark:text-rose-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Transactions</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{expenseReport.count ?? expenseReport.byCategory?.length ?? 0}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Total records</span>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-brand-100 dark:bg-brand-950/40 flex items-center justify-center flex-shrink-0">
+                        <Target size={14} className="text-brand-600 dark:text-brand-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Categories</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{expenseReport.byCategory?.length || 0}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Expense types</span>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+                        <Layers size={14} className="text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Months</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{expenseReport.byMonth?.length || 0}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Active months</span>
+                  </div>
+
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
+                        <BarChartIcon size={14} className="text-rose-600 dark:text-rose-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Top Category</span>
+                    </div>
+                    <p className="text-lg font-extrabold text-slate-900 dark:text-white truncate">{expenseReport.byCategory?.[0]?.category_name || '—'}</p>
+                    <span className="text-[10px] text-slate-400 mt-0.5">Highest spending</span>
+                  </div>
+                </div>
+
+                {/* Monthly Trend Chart */}
+                {expenseReport.byMonth?.length > 0 && (
+                  <div className="card p-5">
+                    <div className="pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Monthly Expense Trend</h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Expense trajectory across {expenseReport.byMonth.length} months</p>
+                    </div>
+                    <div className="h-56 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={expenseReport.byMonth} barCategoryGap="20%">
+                          <XAxis dataKey="month" tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => `৳${(v/1000).toFixed(0)}k`} />
+                          <Tooltip content={<CustomTooltip />} />
+                          <Bar dataKey="total" radius={[6, 6, 0, 0]} maxBarSize={40} fill="#f43f5e">
+                            {expenseReport.byMonth.map((_: any, i: number) => (
+                              <Cell key={i} fill={i === expenseReport.byMonth.length - 1 ? '#e11d48' : '#f43f5e'} fillOpacity={0.7 + (i / expenseReport.byMonth.length) * 0.3} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {/* Monthly Summary Table */}
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              <th className="pb-2 pr-4">Month</th>
+                              <th className="pb-2 pr-4 text-right">Expense</th>
+                              <th className="pb-2 pr-4 text-right">% of Total</th>
+                              <th className="pb-2 text-right">Avg/Month</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-xs divide-y divide-slate-50 dark:divide-slate-800/50">
+                            {expenseReport.byMonth.map((m: any, i: number) => {
+                              const pct = expenseReport.total > 0 ? (toNum(m.total) / expenseReport.total) * 100 : 0;
+                              const avg = expenseReport.byMonth.length > 0 ? expenseReport.total / expenseReport.byMonth.length : 0;
+                              return (
+                                <tr key={i} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
+                                  <td className="py-1.5 pr-4 font-semibold text-slate-700 dark:text-slate-300">{m.month}</td>
+                                  <td className="py-1.5 pr-4 text-right font-bold font-mono text-rose-600 dark:text-rose-400">{formatCurrency(toNum(m.total))}</td>
+                                  <td className="py-1.5 pr-4 text-right">
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400">{pct.toFixed(1)}%</span>
+                                  </td>
+                                  <td className="py-1.5 text-right font-mono text-slate-500 dark:text-slate-400">{formatCurrency(avg)}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Expense by Account */}
+                {expenseReport.byAccount?.length > 0 && (
+                  <div className="card p-5">
+                    <div className="pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Expense by Account</h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Which accounts funded these expenses</p>
+                    </div>
+                    <div className="space-y-3">
+                      {expenseReport.byAccount.map((acc: any, i: number) => {
+                        const pct = expenseReport.total > 0 ? (toNum(acc.total) / expenseReport.total) * 100 : 0;
+                        return (
+                          <div key={i} className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                              <CreditCard size={14} className="text-slate-500 dark:text-slate-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{acc.account_name}</span>
+                                <span className="text-xs font-bold font-mono text-rose-600 dark:text-rose-400 ml-2">{formatCurrency(toNum(acc.total))}</span>
+                              </div>
+                              <div className="h-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800 overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-semibold mt-0.5 block text-right">{pct.toFixed(1)}% of total</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {/* Donut Chart & Category Breakdown */}
                 {expenseReport.byCategory?.length > 0 ? (
@@ -419,28 +790,312 @@ export default function ReportsPage() {
                         </ResponsiveContainer>
                       </div>
 
-                      {/* Progress Bar Category List */}
-                      <div className="flex-1 w-full space-y-2.5">
-                        {expenseReport.byCategory.map((cat: any, i: number) => {
-                          const pct = expenseReport.total > 0 ? (toNum(cat.total) / expenseReport.total) * 100 : 0;
-                          return (
-                            <div key={i} className="flex items-center gap-3">
-                              <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
-                              <span className="text-xs text-slate-700 dark:text-slate-300 font-medium flex-1 truncate">{cat.category_name}</span>
-                              <div className="flex-1 max-w-[140px] h-2 rounded-full bg-slate-200/60 dark:bg-slate-800 overflow-hidden">
-                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
-                              </div>
-                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 w-[90px] text-right font-mono">{formatCurrency(toNum(cat.total))}</span>
-                              <span className="text-[11px] text-slate-400 font-semibold w-[36px] text-right">{pct.toFixed(0)}%</span>
-                            </div>
-                          );
-                        })}
+                      {/* Category Summary Table */}
+                      <div className="flex-1 w-full overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              <th className="pb-2 pr-3">#</th>
+                              <th className="pb-2 pr-3">Category</th>
+                              <th className="pb-2 pr-3 text-right">Amount</th>
+                              <th className="pb-2 pr-3 text-right">% of Total</th>
+                              <th className="pb-2 text-right">Share</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-xs divide-y divide-slate-50 dark:divide-slate-800/50">
+                            {expenseReport.byCategory.map((cat: any, i: number) => {
+                              const pct = expenseReport.total > 0 ? (toNum(cat.total) / expenseReport.total) * 100 : 0;
+                              return (
+                                <tr key={i} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
+                                  <td className="py-2 pr-3 text-slate-400 font-mono text-[10px]">{i + 1}</td>
+                                  <td className="py-2 pr-3">
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                                      <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">{cat.category_name}</span>
+                                    </div>
+                                  </td>
+                                  <td className="py-2 pr-3 text-right font-bold font-mono text-rose-600 dark:text-rose-400">{formatCurrency(toNum(cat.total))}</td>
+                                  <td className="py-2 pr-3 text-right">
+                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400">{pct.toFixed(1)}%</span>
+                                  </td>
+                                  <td className="py-2 text-right">
+                                    <div className="inline-flex items-center gap-2">
+                                      <div className="w-16 h-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800 overflow-hidden">
+                                        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
+                                      </div>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
                 ) : (
                   <div className="card p-8 text-center">
                     <p className="text-sm text-slate-400">No expense records found for this period.</p>
+                  </div>
+                )}
+              </div>
+            )
+          )}
+        </div>
+      )}
+
+      {/* ─── INCOME VS EXPENSE COMPARISON ─── */}
+      {activeTab === 'comparison' && (
+        <div>
+          {compIncomeLoading || compExpenseLoading ? (
+            <LoadingSpinner message="Building comparison report..." />
+          ) : (
+            compIncome && compExpense && (
+              <div className="space-y-5">
+                {/* Hero Comparison Stats */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="card p-5 bg-gradient-to-br from-emerald-50/80 to-teal-50/40 dark:from-emerald-950/30 dark:to-teal-950/20 border-emerald-200/70 dark:border-emerald-900/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center flex-shrink-0">
+                        <TrendingUp size={20} className="text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Total Income</p>
+                        <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">{formatCurrency(compIncome.total)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="card p-5 bg-gradient-to-br from-rose-50/80 to-pink-50/40 dark:from-rose-950/30 dark:to-pink-950/20 border-rose-200/70 dark:border-rose-900/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950/60 flex items-center justify-center flex-shrink-0">
+                        <TrendingDown size={20} className="text-rose-600 dark:text-rose-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-rose-700 dark:text-rose-400 uppercase tracking-wider">Total Expense</p>
+                        <p className="text-2xl font-extrabold text-rose-600 dark:text-rose-400">{formatCurrency(compExpense.total)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="card p-5 bg-gradient-to-br from-brand-50/80 to-indigo-50/40 dark:from-brand-950/30 dark:to-indigo-950/20 border-brand-200/70 dark:border-brand-900/50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-950/60 flex items-center justify-center flex-shrink-0">
+                        <Zap size={20} className="text-brand-600 dark:text-brand-400" />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-brand-700 dark:text-brand-400 uppercase tracking-wider">Net Surplus</p>
+                        <p className={`text-2xl font-extrabold ${(compIncome.total - compExpense.total) >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                          {(compIncome.total - compExpense.total) >= 0 ? '+' : ''}{formatCurrency(compIncome.total - compExpense.total)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Insights Row */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                        <Hash size={14} className="text-emerald-600 dark:text-emerald-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Income Txns</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{compIncome.count ?? 0}</p>
+                  </div>
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
+                        <Hash size={14} className="text-rose-600 dark:text-rose-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Expense Txns</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">{compExpense.count ?? 0}</p>
+                  </div>
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-brand-100 dark:bg-brand-950/40 flex items-center justify-center flex-shrink-0">
+                        <Target size={14} className="text-brand-600 dark:text-brand-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Savings Rate</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">
+                      {compIncome.total > 0 ? (((compIncome.total - compExpense.total) / compIncome.total) * 100).toFixed(1) : 0}%
+                    </p>
+                  </div>
+                  <div className="stat-card">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center flex-shrink-0">
+                        <Layers size={14} className="text-amber-600 dark:text-amber-400" />
+                      </div>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avg Monthly Net</span>
+                    </div>
+                    <p className="text-xl font-extrabold text-slate-900 dark:text-white">
+                      {formatCurrency(
+                        (compIncome.byMonth?.length || 1) > 0
+                          ? (compIncome.total - compExpense.total) / (compIncome.byMonth?.length || 1)
+                          : 0
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Monthly Comparison Chart */}
+                {(() => {
+                  // Merge income & expense by month
+                  const monthMap = new Map<string, { month: string; income: number; expense: number }>();
+                  (compIncome.byMonth || []).forEach((m: any) => {
+                    monthMap.set(m.month, { month: m.month, income: toNum(m.total), expense: 0 });
+                  });
+                  (compExpense.byMonth || []).forEach((m: any) => {
+                    const existing = monthMap.get(m.month);
+                    if (existing) existing.expense = toNum(m.total);
+                    else monthMap.set(m.month, { month: m.month, income: 0, expense: toNum(m.total) });
+                  });
+                  const monthlyData = Array.from(monthMap.values()).sort((a, b) => a.month.localeCompare(b.month));
+                  if (monthlyData.length === 0) return null;
+                  return (
+                    <div className="card p-5">
+                      <div className="pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Monthly Income vs Expense</h3>
+                        <p className="text-[11px] text-slate-400 mt-0.5">Side-by-side monthly comparison across {monthlyData.length} months</p>
+                      </div>
+                      <div className="h-72 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={monthlyData} barCategoryGap="25%">
+                            <XAxis dataKey="month" tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} />
+                            <YAxis tick={{ fontSize: 10, fill: isDark ? '#94a3b8' : '#64748b' }} axisLine={false} tickLine={false} tickFormatter={(v) => `৳${(v/1000).toFixed(0)}k`} />
+                            <Tooltip content={<CustomTooltip />} />
+                            <Legend wrapperStyle={{ fontSize: 11, paddingTop: 8 }} />
+                            <Bar dataKey="income" name="Income" radius={[6, 6, 0, 0]} maxBarSize={32} fill="#10b981" fillOpacity={0.85} />
+                            <Bar dataKey="expense" name="Expense" radius={[6, 6, 0, 0]} maxBarSize={32} fill="#f43f5e" fillOpacity={0.85} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      {/* Monthly Comparison Table */}
+                      <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left">
+                            <thead>
+                              <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <th className="pb-2 pr-4">Month</th>
+                                <th className="pb-2 pr-4 text-right">Income</th>
+                                <th className="pb-2 pr-4 text-right">Expense</th>
+                                <th className="pb-2 pr-4 text-right">Net</th>
+                                <th className="pb-2 text-right">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody className="text-xs divide-y divide-slate-50 dark:divide-slate-800/50">
+                              {monthlyData.map((m, i) => {
+                                const net = m.income - m.expense;
+                                return (
+                                  <tr key={i} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
+                                    <td className="py-1.5 pr-4 font-semibold text-slate-700 dark:text-slate-300">{m.month}</td>
+                                    <td className="py-1.5 pr-4 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">{formatCurrency(m.income)}</td>
+                                    <td className="py-1.5 pr-4 text-right font-bold font-mono text-rose-600 dark:text-rose-400">{formatCurrency(m.expense)}</td>
+                                    <td className={`py-1.5 pr-4 text-right font-extrabold font-mono ${net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                      {net >= 0 ? '+' : ''}{formatCurrency(net)}
+                                    </td>
+                                    <td className="py-1.5 text-right">
+                                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${net >= 0 ? 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400'}`}>
+                                        {net >= 0 ? 'Surplus' : 'Deficit'}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Category Comparison */}
+                {(() => {
+                  const incomeByCat = compIncome.byCategory || [];
+                  const expenseByCat = compExpense.byCategory || [];
+                  const allCats = new Map<string, { income: number; expense: number }>();
+                  incomeByCat.forEach((c: any) => { allCats.set(c.category_name, { income: toNum(c.total), expense: allCats.get(c.category_name)?.expense || 0 }); });
+                  expenseByCat.forEach((c: any) => { allCats.set(c.category_name, { income: allCats.get(c.category_name)?.income || 0, expense: toNum(c.total) }); });
+                  const rows = Array.from(allCats.entries())
+                    .map(([name, v]) => ({ name, ...v, net: v.income - v.expense }))
+                    .sort((a, b) => Math.abs(b.net) - Math.abs(a.net));
+                  if (rows.length === 0) return null;
+                  return (
+                    <div className="card p-5">
+                      <div className="pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Category Comparison</h3>
+                        <p className="text-[11px] text-slate-400 mt-0.5">Income and expense across {rows.length} categories</p>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                          <thead>
+                            <tr className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                              <th className="pb-2 pr-4">#</th>
+                              <th className="pb-2 pr-4">Category</th>
+                              <th className="pb-2 pr-4 text-right">Income</th>
+                              <th className="pb-2 pr-4 text-right">Expense</th>
+                              <th className="pb-2 text-right">Net</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-xs divide-y divide-slate-50 dark:divide-slate-800/50">
+                            {rows.map((r, i) => (
+                              <tr key={i} className="hover:bg-slate-50/40 dark:hover:bg-slate-900/30 transition-colors">
+                                <td className="py-2 pr-4 text-slate-400 font-mono text-[10px]">{i + 1}</td>
+                                <td className="py-2 pr-4 font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[180px]">{r.name}</td>
+                                <td className="py-2 pr-4 text-right font-bold font-mono">
+                                  {r.income > 0 ? <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(r.income)}</span> : <span className="text-slate-300 dark:text-slate-700">—</span>}
+                                </td>
+                                <td className="py-2 pr-4 text-right font-bold font-mono">
+                                  {r.expense > 0 ? <span className="text-rose-600 dark:text-rose-400">{formatCurrency(r.expense)}</span> : <span className="text-slate-300 dark:text-slate-700">—</span>}
+                                </td>
+                                <td className="py-2 text-right">
+                                  <span className={`font-extrabold font-mono ${r.net >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                                    {r.net >= 0 ? '+' : ''}{formatCurrency(r.net)}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Expense by Account */}
+                {compExpense.byAccount?.length > 0 && (
+                  <div className="card p-5">
+                    <div className="pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Expense by Account</h3>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Which accounts funded expenses in this period</p>
+                    </div>
+                    <div className="space-y-3">
+                      {compExpense.byAccount.map((acc: any, i: number) => {
+                        const pct = compExpense.total > 0 ? (toNum(acc.total) / compExpense.total) * 100 : 0;
+                        return (
+                          <div key={i} className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                              <CreditCard size={14} className="text-slate-500 dark:text-slate-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">{acc.account_name}</span>
+                                <span className="text-xs font-bold font-mono text-rose-600 dark:text-rose-400 ml-2">{formatCurrency(toNum(acc.total))}</span>
+                              </div>
+                              <div className="h-1.5 rounded-full bg-slate-200/60 dark:bg-slate-800 overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: COLORS[i % COLORS.length] }} />
+                              </div>
+                              <span className="text-[10px] text-slate-400 font-semibold mt-0.5 block text-right">{pct.toFixed(1)}% of total expense</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -899,6 +1554,7 @@ export default function ReportsPage() {
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }

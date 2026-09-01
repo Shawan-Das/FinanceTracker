@@ -118,6 +118,7 @@ export const loansApi = {
   delete: (id: string) => api.delete(`/loans/${id}`),
   repayments: (id: string) => api.get(`/loans/${id}/repayments`),
   createRepayment: (id: string, data: any) => api.post(`/loans/${id}/repayments`, data),
+  addFunds: (id: string, data: any) => api.post(`/loans/${id}/add-funds`, data),
   orphaned: () => api.get('/loans/orphaned'),
   fixOrphaned: (data: { account_id: string }) => api.post('/loans/fix-orphaned', data),
   voucher: (id: string, type?: string) => api.get(`/loans/${id}/voucher`, {
