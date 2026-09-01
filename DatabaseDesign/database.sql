@@ -129,7 +129,8 @@ CREATE TABLE finance_tracker.loans (
     status          VARCHAR(20) NOT NULL DEFAULT 'ACTIVE' CHECK (status IN ('ACTIVE', 'PAID', 'OVERDUE', 'CANCELLED')),
     description     TEXT,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    source VARCHAR(20) NOT NULL DEFAULT 'MANUAL'
 );
 
 CREATE INDEX idx_loans_user_id ON finance_tracker.loans (user_id);
