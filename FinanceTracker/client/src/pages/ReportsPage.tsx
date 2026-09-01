@@ -63,9 +63,10 @@ export default function ReportsPage() {
   });
 
   // Person statement
+  const personDateParams = { person_id: selectedPersonId, ...dateParams };
   const { data: personStatement, isLoading: personLoading, isError: personError, refetch: refetchPerson } = useQuery({
-    queryKey: ['reports', 'person', selectedPersonId],
-    queryFn: () => reportsApi.personStatement({ person_id: selectedPersonId }).then((r) => r.data.data),
+    queryKey: ['reports', 'person', selectedPersonId, dateParams],
+    queryFn: () => reportsApi.personStatement(personDateParams).then((r) => r.data.data),
     enabled: activeTab === 'person' && !!selectedPersonId,
   });
 
@@ -143,7 +144,7 @@ export default function ReportsPage() {
       </div>
 
       {/* Date Filter Bar */}
-      {['income', 'expense'].includes(activeTab) && (
+      {['income', 'expense', 'person'].includes(activeTab) && (
         <div className="card p-4 flex flex-wrap items-center gap-4">
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
             <Calendar size={15} /> Range Filter:

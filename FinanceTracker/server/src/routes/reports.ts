@@ -272,6 +272,23 @@ router.get('/person-statement', async (req: Request, res: Response) => {
 
     const person = pResult.rows[0];
 
+    // Date range filtering
+    const from = req.query.from as string | undefined;
+    const to = req.query.to as string | undefined;
+    let dateCondition = '';
+    const txValues: any[] = [userId, personId];
+    let txParamIndex = 3;
+    if (from) {
+      dateCondition += ` AND t.transaction_date >= $${txParamIndex}`;
+      txValues.push(from);
+      txParamIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND t.transaction_date <= $${txParamIndex}`;
+      txValues.push(to);
+      txParamIndex++;
+    }
+
     const txResult = await db.query(
       `SELECT t.*, a.name as account_name,
               CASE
@@ -284,9 +301,9 @@ router.get('/person-statement', async (req: Request, res: Response) => {
               END AS credit
        FROM ${SCHEMA}.transactions t
        LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
+       WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL ${dateCondition}
        ORDER BY t.transaction_date ASC, t.created_at ASC`,
-      [userId, personId]
+      txValues
     );
 
     // Calculate running balance for the ledger (positive = Dr, negative = Cr)
