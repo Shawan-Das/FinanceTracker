@@ -275,10 +275,10 @@ router.get('/person-statement', async (req: Request, res: Response) => {
     const txResult = await db.query(
       `SELECT t.*, a.name as account_name,
               CASE
-                WHEN t.transaction_type = 'LEND' THEN -t.amount
-                WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount
-                WHEN t.transaction_type = 'BORROW' THEN t.amount
-                WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN -t.amount
+                WHEN t.transaction_type = 'LEND' THEN t.amount
+                WHEN t.transaction_type = 'LEND_REPAYMENT' THEN -t.amount
+                WHEN t.transaction_type = 'BORROW' THEN -t.amount
+                WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN t.amount
                 ELSE 0
               END AS effect
        FROM ${SCHEMA}.transactions t
