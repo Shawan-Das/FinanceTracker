@@ -193,7 +193,7 @@ if (require.main === module) {
         WHERE p.is_active = TRUE
         GROUP BY p.id, p.user_id, p.name, p.phone, p.email, p.notes, p.is_active, p.created_at, p.updated_at
       `);
-      console.log('✅ v_person_balances view updated (net calculation)');
+      // console.log('✅ v_person_balances view updated (net calculation)');
     } catch (err: any) {
       // View may not exist yet if DB hasn't been set up — that's fine
       if (err.code !== '42P01') {

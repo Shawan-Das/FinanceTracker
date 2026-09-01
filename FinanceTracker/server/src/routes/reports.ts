@@ -185,24 +185,43 @@ router.get('/account-statement', async (req: Request, res: Response) => {
 
     const account = accResult.rows[0];
 
-    // Get all transactions for this account
+    // Date range filtering
+    const from = req.query.from as string | undefined;
+    const to = req.query.to as string | undefined;
+    let dateCondition = '';
+    const txValues: any[] = [userId, accountId];
+    let txParamIndex = 3;
+    if (from) {
+      dateCondition += ` AND t.transaction_date >= $${txParamIndex}`;
+      txValues.push(from);
+      txParamIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND t.transaction_date <= $${txParamIndex}`;
+      txValues.push(to);
+      txParamIndex++;
+    }
+
+    // Get all transactions for this account with debit/credit columns
+    // For asset accounts: Debit = increase, Credit = decrease
     const txResult = await db.query(
       `SELECT t.*, p.name as person_name, c.name as category_name,
               CASE
-                WHEN t.transaction_type = 'INCOME' THEN t.amount
-                WHEN t.transaction_type = 'EXPENSE' THEN -t.amount
-                WHEN t.transaction_type = 'LEND' THEN -t.amount
-                WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount
-                WHEN t.transaction_type = 'BORROW' THEN t.amount
-                WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN -t.amount
-                WHEN t.transaction_type = 'TRANSFER' THEN
-                  CASE
-                    WHEN tt.from_account_id = $2 THEN -t.amount
-                    WHEN tt.to_account_id = $2 THEN t.amount
-                    ELSE 0
-                  END
+                WHEN t.transaction_type = 'INCOME'
+                  OR t.transaction_type = 'BORROW'
+                  OR t.transaction_type = 'LEND_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.to_account_id = $2)
+                  THEN t.amount
                 ELSE 0
-              END AS effect
+              END AS debit,
+              CASE
+                WHEN t.transaction_type = 'EXPENSE'
+                  OR t.transaction_type = 'LEND'
+                  OR t.transaction_type = 'BORROW_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.from_account_id = $2)
+                  THEN t.amount
+                ELSE 0
+              END AS credit
        FROM ${SCHEMA}.transactions t
        LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
        LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
@@ -211,15 +230,15 @@ router.get('/account-statement', async (req: Request, res: Response) => {
          AND (t.account_id = $2
               OR tt.from_account_id = $2
               OR tt.to_account_id = $2)
-         AND t.deleted_at IS NULL
+         AND t.deleted_at IS NULL ${dateCondition}
        ORDER BY t.transaction_date ASC, t.created_at ASC`,
-      [userId, accountId]
+      txValues
     );
 
-    // Calculate running balance
+    // Calculate running balance (opening + debits - credits)
     let runningBalance = parseFloat(account.opening_balance);
     const transactions = txResult.rows.map((tx: any) => {
-      runningBalance += parseFloat(tx.effect);
+      runningBalance += parseFloat(tx.debit) - parseFloat(tx.credit);
       return { ...tx, running_balance: runningBalance };
     });
 

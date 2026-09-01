@@ -127,21 +127,21 @@ export default function PeoplePage() {
                 className="card p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
+                  <div className="flex items-start justify-between gap-2 mb-4">
+                    <div className="flex items-center gap-3 min-w-0 flex-1 overflow-hidden">
+                      <div className="w-10 h-10 flex-shrink-0 rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
                         {p.name.charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100">{p.name}</h3>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                          {p.phone && <span className="flex items-center gap-1"><Phone size={11} /> {p.phone}</span>}
-                          {p.email && <span className="flex items-center gap-1"><Mail size={11} /> {p.email}</span>}
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        <h3 className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">{p.name}</h3>
+                        <div className="flex flex-col gap-0.5 text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+                          {p.phone && <span className="flex items-center gap-1 truncate"><Phone size={11} className="flex-shrink-0" /> {p.phone}</span>}
+                          {p.email && <span className="flex items-center gap-1 truncate"><Mail size={11} className="flex-shrink-0" /> {p.email}</span>}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => openEdit(p)}
                         className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -164,6 +164,7 @@ export default function PeoplePage() {
                   </div>
 
                   {/* Financial Status Pills */}
+
                   <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
                     {owesYou && (
                       <div className="flex items-center justify-between p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-900/60 text-xs">
