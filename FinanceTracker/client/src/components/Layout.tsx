@@ -96,7 +96,7 @@ export default function Layout() {
               </div>
               <div>
                 <h1 className="text-base font-bold tracking-tight text-slate-900 dark:text-white leading-tight">
-                  Balqen
+                  BALQEN
                 </h1>
                 <p className="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-500 tracking-wider">
                   Finance & Ledger
@@ -130,10 +130,9 @@ export default function Layout() {
                 to={to}
                 end={to === '/'}
                 className={({ isActive }) =>
-                  `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group ${
-                    isActive
-                      ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20 font-semibold'
-                      : 'text-slate-700 dark:text-slate-400 hover:bg-[#d0dbe7] dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
+                  `flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group ${isActive
+                    ? 'bg-brand-600 text-white shadow-md shadow-brand-500/20 font-semibold'
+                    : 'text-slate-700 dark:text-slate-400 hover:bg-[#d0dbe7] dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-slate-100'
                   }`
                 }
               >
@@ -262,10 +261,9 @@ export default function Layout() {
           to="/"
           end
           className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
-              isActive
-                ? 'text-brand-600 dark:text-brand-400 font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${isActive
+              ? 'text-brand-600 dark:text-brand-400 font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`
           }
         >
@@ -276,10 +274,9 @@ export default function Layout() {
         <NavLink
           to="/transactions"
           className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
-              isActive
-                ? 'text-brand-600 dark:text-brand-400 font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${isActive
+              ? 'text-brand-600 dark:text-brand-400 font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`
           }
         >
@@ -299,10 +296,9 @@ export default function Layout() {
         <NavLink
           to="/accounts"
           className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
-              isActive
-                ? 'text-brand-600 dark:text-brand-400 font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${isActive
+              ? 'text-brand-600 dark:text-brand-400 font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`
           }
         >
@@ -313,10 +309,9 @@ export default function Layout() {
         <NavLink
           to="/loans"
           className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${
-              isActive
-                ? 'text-brand-600 dark:text-brand-400 font-bold'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${isActive
+              ? 'text-brand-600 dark:text-brand-400 font-bold'
+              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
             }`
           }
         >
