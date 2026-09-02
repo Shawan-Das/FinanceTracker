@@ -31,21 +31,17 @@ function copyDir(src, dest) {
   }
 }
 
-// 1. Build TypeScript server
-console.log('Building server...');
-execSync('npx tsc', { cwd: path.join(DIR, 'server'), stdio: 'inherit' });
-
-// 2. Bundle server
+// 1 & 2. Bundle server directly with esbuild (skip tsc — esbuild handles TS natively)
 console.log('Bundling server...');
 const esbuildBin = path.join(DIR, 'node_modules', '.bin', 'esbuild');
 execSync(
-  `"${esbuildBin}" server/dist/app.js --bundle --platform=node --outfile=api/_server.js --external:bcrypt --external:@mapbox/node-pre-gyp --external:pg`,
+  `"${esbuildBin}" server/src/app.ts --bundle --platform=node --outfile=api/_server.js --external:bcrypt --external:@mapbox/node-pre-gyp --external:pg`,
   { cwd: DIR, stdio: 'inherit' }
 );
 const size = fs.statSync(path.join(DIR, 'api', '_server.js')).size;
 console.log(`Bundled server to api/_server.js (${Math.round(size/1024)}KB)`);
 
-// 3. Build React client
+// 3. Build React client (with Vite optimizations already in vite.config.ts)
 console.log('Building client...');
 execSync('npm run build', { cwd: path.join(DIR, 'client'), stdio: 'inherit' });
 

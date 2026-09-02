@@ -9,12 +9,14 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import './index.css';
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 30000,
+      refetchOnReconnect: false,
+      staleTime: 60_000,       // 1 min default stale time
+      gcTime: 5 * 60_000,      // 5 min garbage collection (formerly cacheTime)
     },
   },
 });
@@ -24,7 +26,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
-          <AuthProvider>
+          <AuthProvider queryClient={queryClient}>
             <ThemeProvider>
               <App />
               <Toaster

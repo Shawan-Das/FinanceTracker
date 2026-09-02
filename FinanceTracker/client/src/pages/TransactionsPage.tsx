@@ -75,16 +75,19 @@ export default function TransactionsPage() {
   const { data: accounts } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountsApi.list().then((r) => r.data.data),
+    staleTime: 120_000,
   });
 
   const { data: people } = useQuery({
     queryKey: ['people'],
     queryFn: () => peopleApi.list().then((r) => r.data.data),
+    staleTime: 120_000,
   });
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: () => categoriesApi.list().then((r) => r.data.data),
+    staleTime: 120_000,
   });
 
   const createMutation = useMutation({

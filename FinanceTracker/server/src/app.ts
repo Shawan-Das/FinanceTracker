@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import helmet from 'helmet';
@@ -67,8 +67,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // =============================================================================
-// API Routes
+// API Routes — Prevent browser/proxy caching of dynamic data
 // =============================================================================
+app.use('/api', (_req: Request, res: Response, next: NextFunction) => {
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'Surrogate-Control': 'no-store',
+  });
+  next();
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/accounts', apiLimiter, accountRoutes);
 app.use('/api/people', apiLimiter, personRoutes);
