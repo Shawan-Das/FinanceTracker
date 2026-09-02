@@ -220,6 +220,47 @@ router.get('/account-statement', async (req: Request, res: Response) => {
       txParamIndex++;
     }
 
+    // Calculate opening balance for the selected period
+    // If a 'from' date is set, compute the balance as of that date by
+    // including all prior transactions + the account's original opening balance.
+    let openingBalance = parseFloat(account.opening_balance);
+    if (from) {
+      const priorResult = await db.query(
+        `SELECT
+            COALESCE(SUM(
+              CASE
+                WHEN t.transaction_type = 'INCOME'
+                  OR t.transaction_type = 'BORROW'
+                  OR t.transaction_type = 'LEND_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.to_account_id = $2)
+                  THEN t.amount
+                ELSE 0
+              END
+            ), 0) AS total_debit,
+            COALESCE(SUM(
+              CASE
+                WHEN t.transaction_type = 'EXPENSE'
+                  OR t.transaction_type = 'LEND'
+                  OR t.transaction_type = 'BORROW_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.from_account_id = $2)
+                  THEN t.amount
+                ELSE 0
+              END
+            ), 0) AS total_credit
+         FROM ${SCHEMA}.transactions t
+         LEFT JOIN ${SCHEMA}.transaction_transfers tt ON tt.transaction_id = t.id
+         WHERE t.user_id = $1
+           AND (t.account_id = $2
+                OR tt.from_account_id = $2
+                OR tt.to_account_id = $2)
+           AND t.deleted_at IS NULL
+           AND t.transaction_date < $3`,
+        [userId, accountId, from]
+      );
+      const prior = priorResult.rows[0];
+      openingBalance += parseFloat(prior.total_debit) - parseFloat(prior.total_credit);
+    }
+
     // Get all transactions for this account with debit/credit columns
     // For asset accounts: Debit = increase, Credit = decrease
     const txResult = await db.query(
@@ -253,8 +294,8 @@ router.get('/account-statement', async (req: Request, res: Response) => {
       txValues
     );
 
-    // Calculate running balance (opening + debits - credits)
-    let runningBalance = parseFloat(account.opening_balance);
+    // Calculate running balance (period opening + debits - credits)
+    let runningBalance = openingBalance;
     const transactions = txResult.rows.map((tx: any) => {
       runningBalance += parseFloat(tx.debit) - parseFloat(tx.credit);
       return { ...tx, running_balance: runningBalance };
@@ -264,7 +305,7 @@ router.get('/account-statement', async (req: Request, res: Response) => {
       success: true,
       data: {
         account,
-        openingBalance: parseFloat(account.opening_balance),
+        openingBalance,
         closingBalance: runningBalance,
         transactions,
       },
@@ -343,8 +384,25 @@ router.get('/person-statement', async (req: Request, res: Response) => {
       txValues
     );
 
+    // Calculate opening balance for the selected period
+    // Positive = they owe you (Dr), Negative = you owe them (Cr)
+    let openingBalance = 0;
+    if (from) {
+      const priorResult = await db.query(
+        `SELECT
+            COALESCE(SUM(CASE WHEN t.transaction_type IN ('LEND', 'BORROW_REPAYMENT') THEN t.amount ELSE 0 END), 0) AS total_debit,
+            COALESCE(SUM(CASE WHEN t.transaction_type IN ('BORROW', 'LEND_REPAYMENT') THEN t.amount ELSE 0 END), 0) AS total_credit
+         FROM ${SCHEMA}.transactions t
+         WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
+           AND t.transaction_date < $3`,
+        [userId, personId, from]
+      );
+      const prior = priorResult.rows[0];
+      openingBalance = parseFloat(prior.total_debit) - parseFloat(prior.total_credit);
+    }
+
     // Calculate running balance for the ledger (positive = Dr, negative = Cr)
-    let runningBalance = 0;
+    let runningBalance = openingBalance;
     const transactions = txResult.rows.map((tx: any) => {
       runningBalance += parseFloat(tx.debit) - parseFloat(tx.credit);
       return { ...tx, running_balance: runningBalance };
@@ -387,6 +445,7 @@ router.get('/person-statement', async (req: Request, res: Response) => {
       data: {
         person,
         balance,
+        openingBalance,
         transactions,
         loans: loansResult.rows,
       },

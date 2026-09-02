@@ -1140,7 +1140,7 @@ export default function ReportsPage() {
                         {accountStatement.account?.account_name || accountStatement.account?.name}
                       </h3>
                       <p className="text-[11px] text-slate-400 mt-0.5 capitalize">
-                        {accountStatement.account?.account_type} account · Opening balance: {formatCurrency(accountStatement.openingBalance)}
+                        {accountStatement.account?.account_type} account · {(dateFrom || dateTo) ? 'Period opening balance' : 'Opening balance'}: {formatCurrency(accountStatement.openingBalance)}
                       </p>
                     </div>
                     <div className="flex items-center gap-5">
@@ -1167,8 +1167,7 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Ledger Table */}
-                {accountStatement.transactions && accountStatement.transactions.length > 0 ? (
-                  <div className="card p-0 overflow-hidden">
+                <div className="card p-0 overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
@@ -1182,6 +1181,42 @@ export default function ReportsPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                          {(() => {
+                            const ob = accountStatement.openingBalance || 0;
+                            const isDr = ob >= 0;
+                            return (
+                              <tr className="bg-slate-50/80 dark:bg-slate-900/50">
+                                <td className="p-3 text-slate-500 whitespace-nowrap font-medium">
+                                  {dateFrom ? formatDateDMY(dateFrom) : formatDateDMY(accountStatement.account?.opening_balance_date || '') || '—'}
+                                </td>
+                                <td className="p-3">
+                                  <div className="font-bold text-slate-500 dark:text-slate-400 italic">
+                                    Opening Balance b/d
+                                  </div>
+                                </td>
+                                <td className="p-3"><span className="badge badge-neutral text-[10px]">OB</span></td>
+                                <td className="p-3 text-right font-bold font-mono">
+                                  {ob > 0 ? (
+                                    <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(ob)}</span>
+                                  ) : (
+                                    <span className="text-slate-300 dark:text-slate-700">—</span>
+                                  )}
+                                </td>
+                                <td className="p-3 text-right font-bold font-mono">
+                                  {ob < 0 ? (
+                                    <span className="text-rose-600 dark:text-rose-400">{formatCurrency(Math.abs(ob))}</span>
+                                  ) : (
+                                    <span className="text-slate-300 dark:text-slate-700">—</span>
+                                  )}
+                                </td>
+                                <td className="p-3 text-right font-extrabold font-mono">
+                                  <span className={isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
+                                    {formatCurrency(Math.abs(ob))} {isDr ? 'Dr' : 'Cr'}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })()}
                           {accountStatement.transactions.map((tx: any) => {
                             const debit = toNum(tx.debit);
                             const credit = toNum(tx.credit);
@@ -1259,11 +1294,6 @@ export default function ReportsPage() {
                       </table>
                     </div>
                   </div>
-                ) : (
-                  <div className="card p-10 text-center">
-                    <p className="text-sm text-slate-400">No transactions found for this account in the selected period.</p>
-                  </div>
-                )}
               </div>
             )
           )}
@@ -1306,7 +1336,7 @@ export default function ReportsPage() {
                         {personStatement.person?.name}
                       </h3>
                       <p className="text-[11px] text-slate-400 mt-0.5">
-                        All transactions involving this contact
+                        {(dateFrom || dateTo) ? `Period opening balance: ${formatCurrency(personStatement.openingBalance || 0)}` : 'All transactions involving this contact'}
                       </p>
                     </div>
                     <div className="flex items-center gap-5">
@@ -1339,8 +1369,7 @@ export default function ReportsPage() {
                 </div>
 
                 {/* Ledger Table */}
-                {personStatement.transactions && personStatement.transactions.length > 0 ? (
-                  <div className="card p-0 overflow-hidden">
+                <div className="card p-0 overflow-hidden">
                     <div className="overflow-x-auto">
                       <table className="w-full text-left border-collapse">
                         <thead>
@@ -1354,6 +1383,42 @@ export default function ReportsPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                          {(() => {
+                            const ob = personStatement.openingBalance || 0;
+                            const isDr = ob >= 0;
+                            return (
+                              <tr className="bg-slate-50/80 dark:bg-slate-900/50">
+                                <td className="p-3 text-slate-500 whitespace-nowrap font-medium">
+                                  {dateFrom ? formatDateDMY(dateFrom) : '—'}
+                                </td>
+                                <td className="p-3">
+                                  <div className="font-bold text-slate-500 dark:text-slate-400 italic">
+                                    Opening Balance b/d
+                                  </div>
+                                </td>
+                                <td className="p-3"><span className="badge badge-neutral text-[10px]">OB</span></td>
+                                <td className="p-3 text-right font-bold font-mono">
+                                  {ob > 0 ? (
+                                    <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(ob)}</span>
+                                  ) : (
+                                    <span className="text-slate-300 dark:text-slate-700">—</span>
+                                  )}
+                                </td>
+                                <td className="p-3 text-right font-bold font-mono">
+                                  {ob < 0 ? (
+                                    <span className="text-rose-600 dark:text-rose-400">{formatCurrency(Math.abs(ob))}</span>
+                                  ) : (
+                                    <span className="text-slate-300 dark:text-slate-700">—</span>
+                                  )}
+                                </td>
+                                <td className="p-3 text-right font-extrabold font-mono">
+                                  <span className={isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
+                                    {formatCurrency(Math.abs(ob))} {isDr ? 'Dr' : 'Cr'}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })()}
                           {personStatement.transactions.map((tx: any) => {
                             const debit = toNum(tx.debit);
                             const credit = toNum(tx.credit);
@@ -1433,11 +1498,6 @@ export default function ReportsPage() {
                       </table>
                     </div>
                   </div>
-                ) : (
-                  <div className="card p-10 text-center">
-                    <p className="text-sm text-slate-400">No transactions found in this person's ledger.</p>
-                  </div>
-                )}
 
                 {/* Loans with this person */}
                 {personStatement.loans && personStatement.loans.length > 0 && (
