@@ -116,35 +116,41 @@ export default function DashboardPage() {
     toast.success('Shortcut deleted');
   };
 
-  // Queries
+  // Queries — longer staleTime to reduce refetches on navigation
   const { data: summary, isLoading: summaryLoading, isError: summaryError, refetch: refetchSummary } = useQuery({
     queryKey: ['dashboard', 'summary'],
     queryFn: () => dashboardApi.summary().then((r) => r.data.data),
+    staleTime: 120_000, // 2 min — summary is relatively stable
   });
 
   const { data: recentTx, isLoading: recentLoading } = useQuery({
     queryKey: ['dashboard', 'recent'],
     queryFn: () => dashboardApi.recentTransactions().then((r) => r.data.data),
+    staleTime: 60_000, // 1 min
   });
 
   const { data: monthlyData, isError: monthlyError } = useQuery({
     queryKey: ['dashboard', 'monthly'],
     queryFn: () => dashboardApi.monthlyChart().then((r) => r.data.data),
+    staleTime: 300_000, // 5 min — historical data changes rarely
   });
 
   const { data: categoryData, isError: categoryError } = useQuery({
     queryKey: ['dashboard', 'categories'],
     queryFn: () => dashboardApi.expenseByCategory().then((r) => r.data.data),
+    staleTime: 300_000, // 5 min — category totals are historical
   });
 
   const { data: loanSummary, isError: loanError } = useQuery({
     queryKey: ['dashboard', 'loans'],
     queryFn: () => dashboardApi.loanSummary().then((r) => r.data.data),
+    staleTime: 120_000, // 2 min
   });
 
   const { data: peopleSummary, isError: peopleError } = useQuery({
     queryKey: ['dashboard', 'people'],
     queryFn: () => dashboardApi.peopleSummary().then((r) => r.data.data),
+    staleTime: 120_000, // 2 min
   });
 
   const formattedCategoryData = useMemo(() => {

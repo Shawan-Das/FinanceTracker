@@ -50,34 +50,39 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Fetch searchable resources
+  // Only fetch data when there's an actual search query (lazy loading)
+  const q = query.trim().toLowerCase();
+  const hasQuery = q.length >= 2;
+
   const { data: txData } = useQuery({
     queryKey: ['transactions', 'search'],
-    queryFn: () => transactionsApi.list({ limit: 100 }).then((r: any) => r.data),
-    enabled: isOpen,
+    queryFn: () => transactionsApi.list({ limit: 50 }).then((r: any) => r.data),
+    enabled: isOpen && hasQuery,
+    staleTime: 60_000,
   });
 
   const { data: accounts } = useQuery({
-    queryKey: ['accounts', 'search'],
+    queryKey: ['accounts'],
     queryFn: () => accountsApi.list().then((r: any) => r.data.data),
-    enabled: isOpen,
+    enabled: isOpen && hasQuery,
+    staleTime: 120_000,
   });
 
   const { data: people } = useQuery({
-    queryKey: ['people', 'search'],
+    queryKey: ['people'],
     queryFn: () => peopleApi.list().then((r: any) => r.data.data),
-    enabled: isOpen,
+    enabled: isOpen && hasQuery,
+    staleTime: 120_000,
   });
 
   const { data: categories } = useQuery({
-    queryKey: ['categories', 'search'],
+    queryKey: ['categories'],
     queryFn: () => categoriesApi.list().then((r: any) => r.data.data),
-    enabled: isOpen,
+    enabled: isOpen && hasQuery,
+    staleTime: 120_000,
   });
 
   if (!isOpen) return null;
-
-  const q = query.trim().toLowerCase();
 
   // Filter items
   const matchedAccounts = accounts?.filter((a: Account) =>

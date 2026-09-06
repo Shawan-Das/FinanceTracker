@@ -15,6 +15,15 @@ const api = axios.create({
   },
 });
 
+// Track whether a force-logout is already in progress to avoid multiple prompts
+let isLoggingOut = false;
+
+// Lazy reference to avoid circular import — set after AuthProvider mounts
+let _forceLogout: (() => void) | null = null;
+export function setForceLogoutHandler(fn: () => void) {
+  _forceLogout = fn;
+}
+
 // Response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
@@ -23,17 +32,35 @@ api.interceptors.response.use(
       const status = error.response.status;
       const message = error.response.data?.error?.message || 'An error occurred';
 
-      // Only show toast for non-401 errors
-      // 401 is handled by AuthContext (not logged in = expected)
-      if (status !== 401) {
+      if (status === 401) {
+        // Session expired or invalid — force logout if not already logging out
+        if (!isLoggingOut && _forceLogout) {
+          isLoggingOut = true;
+          _forceLogout();
+          // Reset after a tick so future 401s can trigger again
+          setTimeout(() => { isLoggingOut = false; }, 2000);
+        }
+      } else {
         toast.error(message);
       }
-    } else {
+    } else if (error.code !== 'ERR_CANCELED') {
       toast.error('Network error. Please check your connection.');
     }
     return Promise.reject(error);
   }
 );
+
+// Cancel token manager — helps cancel in-flight requests on logout/navigation
+let activeAbortController: AbortController | null = null;
+export function cancelAllRequests() {
+  activeAbortController?.abort();
+  activeAbortController = new AbortController();
+}
+api.interceptors.request.use((config) => {
+  if (!activeAbortController) activeAbortController = new AbortController();
+  config.signal = activeAbortController.signal;
+  return config;
+});
 
 // =============================================================================
 // Auth API

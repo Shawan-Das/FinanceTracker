@@ -148,25 +148,29 @@ export default function LoansPage() {
     enabled: !!detailsLoan?.id,
   });
 
-  // Data fetching
+  // Data fetching — staleTime avoids refetches when navigating back to this page
   const { data: loans, isLoading, isError: loansError, refetch: refetchLoans } = useQuery({
     queryKey: ['loans'],
     queryFn: () => loansApi.list().then((r) => r.data.data),
+    staleTime: 120_000, // 2 min — loan data is relatively stable
   });
 
   const { data: people } = useQuery({
     queryKey: ['people'],
     queryFn: () => peopleApi.list().then((r) => r.data.data),
+    staleTime: 120_000,
   });
 
   const { data: accounts } = useQuery({
     queryKey: ['accounts'],
     queryFn: () => accountsApi.list().then((r) => r.data.data),
+    staleTime: 120_000,
   });
 
   const { data: orphanedData, refetch: refetchOrphaned } = useQuery({
     queryKey: ['loans', 'orphaned'],
     queryFn: () => loansApi.orphaned().then((r) => r.data.data),
+    staleTime: 120_000,
   });
 
   // Mutations

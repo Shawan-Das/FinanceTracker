@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authApi } from '../api/client';
+import { QueryClient } from '@tanstack/react-query';
+import { authApi, setForceLogoutHandler, cancelAllRequests } from '../api/client';
 import type { User } from '../types';
 
 interface AuthContextType {
@@ -9,13 +10,30 @@ interface AuthContextType {
   register: (fullName: string, email: string, password: string, confirmPassword: string) => Promise<void>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  forceLogout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children, queryClient }: { children: React.ReactNode; queryClient: QueryClient }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Clear all cached data for the previous user
+  const clearUserCache = useCallback(() => {
+    queryClient.clear();
+    cancelAllRequests();
+  }, [queryClient]);
+
+  // Register force-logout handler for 401 auto-logout
+  const forceLogout = useCallback(() => {
+    setUser(null);
+    clearUserCache();
+  }, [clearUserCache]);
+
+  useEffect(() => {
+    setForceLogoutHandler(forceLogout);
+  }, [forceLogout]);
 
   // Check if user is logged in on mount
   useEffect(() => {
@@ -37,15 +55,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
       confirm_password: confirmPassword,
     });
-    // Don't set user here — they need to verify email first.
-    // After verification, verify-email sets the session server-side,
-    // and we fetch the real user via checkAuth().
   }, []);
 
   const logout = useCallback(async () => {
-    await authApi.logout();
+    try {
+      await authApi.logout();
+    } catch {
+      // Ignore logout errors (session may already be expired)
+    }
     setUser(null);
-  }, []);
+    clearUserCache();
+  }, [clearUserCache]);
 
   const checkAuth = useCallback(async () => {
     try {
@@ -53,11 +73,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(res.data.data);
     } catch {
       setUser(null);
+      clearUserCache();
     }
-  }, []);
+  }, [clearUserCache]);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, checkAuth, forceLogout }}>
       {children}
     </AuthContext.Provider>
   );
