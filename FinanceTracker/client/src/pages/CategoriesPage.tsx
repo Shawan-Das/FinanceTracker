@@ -17,6 +17,7 @@ export default function CategoriesPage() {
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [formName, setFormName] = useState('');
   const [formType, setFormType] = useState<'INCOME' | 'EXPENSE'>('INCOME');
+  const [sortBy, setSortBy] = useState<'usage' | 'name'>('usage');
 
   const { data: categories, isLoading, isError, refetch } = useQuery({
     queryKey: ['categories'],
@@ -70,8 +71,16 @@ export default function CategoriesPage() {
   if (isLoading) return <LoadingSpinner message="Loading financial categories..." />;
   if (isError) return <QueryError title="Failed to load categories" onRetry={() => refetch()} />;
 
-  const incomeCategories = categories?.filter((c: Category) => c.type === 'INCOME') || [];
-  const expenseCategories = categories?.filter((c: Category) => c.type === 'EXPENSE') || [];
+  const sortFn = (a: Category, b: Category) => {
+    if (sortBy === 'usage') {
+      const diff = (b.usage_count || 0) - (a.usage_count || 0);
+      if (diff !== 0) return diff;
+    }
+    return a.name.localeCompare(b.name);
+  };
+
+  const incomeCategories = categories?.filter((c: Category) => c.type === 'INCOME').sort(sortFn) || [];
+  const expenseCategories = categories?.filter((c: Category) => c.type === 'EXPENSE').sort(sortFn) || [];
 
   return (
     <div className="space-y-6">
@@ -86,13 +95,39 @@ export default function CategoriesPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="btn-primary text-xs font-semibold px-3.5 py-2 shadow-sm shadow-brand-500/20"
-        >
-          <Plus size={15} />
-          <span>New Category</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Sort By Toggle (#15) */}
+          <div className="flex rounded-xl bg-slate-200/60 dark:bg-slate-800 p-0.5 text-xs font-semibold">
+            <button
+              onClick={() => setSortBy('usage')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                sortBy === 'usage'
+                  ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Most Used
+            </button>
+            <button
+              onClick={() => setSortBy('name')}
+              className={`px-3 py-1.5 rounded-lg transition-all ${
+                sortBy === 'name'
+                  ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-xs font-bold'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              A-Z
+            </button>
+          </div>
+
+          <button
+            onClick={() => { resetForm(); setShowForm(true); }}
+            className="btn-primary text-xs font-semibold px-3.5 py-2 shadow-sm shadow-brand-500/20"
+          >
+            <Plus size={15} />
+            <span>New Category</span>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -118,8 +153,12 @@ export default function CategoriesPage() {
                     className="flex items-center justify-between py-3 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 px-2 rounded-xl transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Tag size={15} className="text-emerald-500" />
+                      <Tag size={15} className="text-emerald-500 shrink-0" />
                       <span className="font-semibold text-slate-900 dark:text-slate-100">{cat.name}</span>
+                      {/* Usage Count Badge (#15) */}
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        {cat.usage_count ? `${cat.usage_count} ${cat.usage_count === 1 ? 'entry' : 'entries'}` : 'Unused'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <button
@@ -173,8 +212,12 @@ export default function CategoriesPage() {
                     className="flex items-center justify-between py-3 hover:bg-slate-50/50 dark:hover:bg-slate-900/30 px-2 rounded-xl transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
-                      <Tag size={15} className="text-rose-500" />
+                      <Tag size={15} className="text-rose-500 shrink-0" />
                       <span className="font-semibold text-slate-900 dark:text-slate-100">{cat.name}</span>
+                      {/* Usage Count Badge (#15) */}
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        {cat.usage_count ? `${cat.usage_count} ${cat.usage_count === 1 ? 'entry' : 'entries'}` : 'Unused'}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
                       <button

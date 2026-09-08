@@ -17,9 +17,12 @@ router.get('/', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
     const result = await db.query(
-      `SELECT * FROM ${SCHEMA}.categories
-       WHERE user_id = $1 AND is_active = TRUE
-       ORDER BY type, name`,
+      `SELECT c.*, COUNT(t.id)::int AS usage_count
+       FROM ${SCHEMA}.categories c
+       LEFT JOIN ${SCHEMA}.transactions t ON t.category_id = c.id
+       WHERE c.user_id = $1 AND c.is_active = TRUE
+       GROUP BY c.id
+       ORDER BY c.type, c.name`,
       [userId]
     );
     res.json({ success: true, data: result.rows });

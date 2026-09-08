@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi, transactionsApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
+import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
 import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
 import { useTheme } from '../contexts/ThemeContext';
@@ -190,7 +191,6 @@ export default function DashboardPage() {
     setIsVoucherModalOpen(true);
   };
 
-  if (summaryLoading) return <LoadingSpinner message="Assembling financial command center..." />;
   if (summaryError) return <QueryError title="Failed to load financial dashboard" onRetry={() => refetchSummary()} />;
 
   const s = summary as DashboardSummary;
@@ -237,6 +237,54 @@ export default function DashboardPage() {
     }
     return null;
   };
+
+  // #19: Skeleton loading — progressive reveal instead of full-page block
+  if (summaryLoading) {
+    return (
+      <div className="space-y-6 animate-pulse">
+        {/* Hero skeleton */}
+        <div className="rounded-2xl sm:rounded-3xl bg-slate-800/80 dark:bg-slate-800 h-36 sm:h-40" />
+
+        {/* Stat cards skeleton */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="rounded-2xl bg-white dark:bg-[#111726] border border-slate-200/60 dark:border-slate-800 p-5 space-y-3">
+              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-1/2" />
+              <div className="h-7 bg-slate-200 dark:bg-slate-700 rounded-full w-3/4" />
+              <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full w-2/3" />
+            </div>
+          ))}
+        </div>
+
+        {/* Quick presets skeleton */}
+        <div className="rounded-2xl bg-white dark:bg-[#111726] border border-slate-200/60 dark:border-slate-800 p-5">
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-48 mb-4" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-16 rounded-xl bg-slate-100 dark:bg-slate-800" />
+            ))}
+          </div>
+        </div>
+
+        {/* Recent transactions skeleton */}
+        <div className="rounded-2xl bg-white dark:bg-[#111726] border border-slate-200/60 dark:border-slate-800 p-5 space-y-3">
+          <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-40 mb-4" />
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800/60">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700" />
+                <div className="space-y-1.5">
+                  <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full w-32" />
+                  <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full w-20" />
+                </div>
+              </div>
+              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full w-20" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
@@ -293,10 +341,11 @@ export default function DashboardPage() {
 
       {/* 2. ⚡ Smart Fast Transactions & Custom Shortcuts */}
       {(() => {
+        const hasLearnedSuggestions = smartSuggestions.length > 0;
         const activePresets =
           presetTab === 'custom'
             ? customPresets
-            : smartSuggestions.length > 0
+            : hasLearnedSuggestions
             ? smartSuggestions
             : QUICK_PRESETS;
 
@@ -313,7 +362,9 @@ export default function DashboardPage() {
                   </h2>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400">
                     {presetTab === 'smart'
-                      ? 'Smart patterns learned from your recent transactions'
+                      ? hasLearnedSuggestions
+                        ? 'Smart patterns learned from your recent transactions'
+                        : 'Starter templates to quickly log standard transactions'
                       : 'Your personalized quick transaction shortcuts'}
                   </p>
                 </div>
@@ -331,7 +382,7 @@ export default function DashboardPage() {
                     }`}
                   >
                     <Sparkles size={13} className="text-amber-500" />
-                    <span>Smart Suggestions</span>
+                    <span>{hasLearnedSuggestions ? 'Smart Suggestions' : 'Starter Presets'}</span>
                   </button>
                   <button
                     onClick={() => setPresetTab('custom')}
@@ -939,7 +990,19 @@ export default function DashboardPage() {
             </div>
           </>
         ) : (
-          <p className="text-xs text-slate-500 dark:text-slate-400 text-center py-8">No recent transactions to display.</p>
+          <EmptyState
+            title="No Recent Transactions"
+            description="Your cashflow activity, incomes, and expenses will appear here once you log your first entry."
+            action={
+              <button
+                onClick={() => setIsQuickOpen(true)}
+                className="btn-primary text-xs font-semibold px-4 py-2 mt-1 inline-flex items-center gap-1.5"
+              >
+                <PlusCircle size={14} />
+                <span>Log First Transaction</span>
+              </button>
+            }
+          />
         )}
       </div>
 

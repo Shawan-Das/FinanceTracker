@@ -7,8 +7,11 @@ import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
+import LoanDetailsModal from '../components/loans/LoanDetailsModal';
+import LoanCreateModal from '../components/loans/LoanCreateModal';
+import LoanRepayModal from '../components/loans/LoanRepayModal';
+import LoanAddFundsModal from '../components/loans/LoanAddFundsModal';
 import { useAuth } from '../contexts/AuthContext';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { useTheme } from '../contexts/ThemeContext';
 import toast from 'react-hot-toast';
 import {
@@ -20,7 +23,6 @@ import {
   Calendar,
   ArrowUpRight,
   ArrowDownRight,
-  Mail,
   Trash2,
   Zap,
   PenLine,
@@ -106,47 +108,16 @@ export default function LoansPage() {
   // Modals state
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showRepayForm, setShowRepayForm] = useState(false);
+  const [showAddFundsForm, setShowAddFundsForm] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
   const [detailsLoan, setDetailsLoan] = useState<Loan | null>(null);
   const [deletingLoanId, setDeletingLoanId] = useState<string | null>(null);
   const [voucherReportData, setVoucherReportData] = useState<VoucherReportData | null>(null);
   const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
-  // Create loan form
-  const [direction, setDirection] = useState<'BORROWED' | 'LENT'>('LENT');
-  const [personId, setPersonId] = useState('');
-  const [accountId, setAccountId] = useState('');
-  const [principal, setPrincipal] = useState('');
-  const [interest, setInterest] = useState('0');
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [dueDate, setDueDate] = useState('');
-  const [description, setDescription] = useState('');
-  const [loanSendReceipt, setLoanSendReceipt] = useState(false);
-
-  // Add funds form
-  const [showAddFundsForm, setShowAddFundsForm] = useState(false);
-  const [addFundsAmount, setAddFundsAmount] = useState('');
-  const [addFundsAccountId, setAddFundsAccountId] = useState('');
-  const [addFundsDate, setAddFundsDate] = useState(new Date().toISOString().split('T')[0]);
-  const [addFundsDescription, setAddFundsDescription] = useState('');
-
-  // Repay form
-  const [repayAmount, setRepayAmount] = useState('');
-  const [repayDate, setRepayDate] = useState(new Date().toISOString().split('T')[0]);
-  const [repayAccountId, setRepayAccountId] = useState('');
-  const [repayNotes, setRepayNotes] = useState('');
-  const [repaySendReceipt, setRepaySendReceipt] = useState(false);
-
   // Fix orphaned loans
   const [showFixForm, setShowFixForm] = useState(false);
   const [fixAccountId, setFixAccountId] = useState('');
-
-  // Details Modal query
-  const { data: detailsData, isLoading: detailsLoading } = useQuery({
-    queryKey: ['loans', detailsLoan?.id],
-    queryFn: () => loansApi.get(detailsLoan!.id).then((r) => r.data.data),
-    enabled: !!detailsLoan?.id,
-  });
 
   // Data fetching — staleTime avoids refetches when navigating back to this page
   const { data: loans, isLoading, isError: loansError, refetch: refetchLoans } = useQuery({
@@ -198,69 +169,6 @@ export default function LoansPage() {
     },
   });
 
-  const addFundsMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => loansApi.addFunds(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      toast.success('Funds added to loan successfully!');
-      setShowAddFundsForm(false);
-      resetAddFundsForm();
-    },
-  });
-
-  const createMutation = useMutation({
-    mutationFn: (data: any) => loansApi.create(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      toast.success('Loan position recorded!');
-      setShowCreateForm(false);
-      resetCreateForm();
-    },
-  });
-
-  const repayMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: any }) => loansApi.createRepayment(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['loans'] });
-      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      toast.success('Repayment transaction logged!');
-      setShowRepayForm(false);
-      resetRepayForm();
-    },
-  });
-
-  // Form Reset Handlers
-  const resetCreateForm = () => {
-    setDirection('LENT');
-    setPersonId('');
-    setAccountId('');
-    setPrincipal('');
-    setInterest('0');
-    setStartDate(new Date().toISOString().split('T')[0]);
-    setDueDate('');
-    setDescription('');
-    setLoanSendReceipt(false);
-  };
-
-  const resetAddFundsForm = () => {
-    setAddFundsAmount('');
-    setAddFundsAccountId('');
-    setAddFundsDate(new Date().toISOString().split('T')[0]);
-    setAddFundsDescription('');
-    setSelectedLoan(null);
-  };
-
-  const resetRepayForm = () => {
-    setRepayAmount('');
-    setRepayDate(new Date().toISOString().split('T')[0]);
-    setRepayAccountId('');
-    setRepayNotes('');
-    setRepaySendReceipt(false);
-    setSelectedLoan(null);
-  };
-
   const handleOpenVoucher = (loan: Loan) => {
     setVoucherReportData({
       id: loan.id,
@@ -282,65 +190,13 @@ export default function LoansPage() {
     setIsVoucherModalOpen(true);
   };
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    createMutation.mutate({
-      direction,
-      person_id: personId || undefined,
-      account_id: accountId || undefined,
-      principal_amount: parseFloat(principal),
-      interest_amount: parseFloat(interest) || 0,
-      start_date: startDate,
-      due_date: dueDate || undefined,
-      description: description || undefined,
-      send_receipt: loanSendReceipt,
-    });
-  };
-
-  const handleRepay = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedLoan) return;
-    repayMutation.mutate({
-      id: selectedLoan.id,
-      data: {
-        amount: parseFloat(repayAmount),
-        repayment_date: repayDate,
-        account_id: repayAccountId,
-        notes: repayNotes || undefined,
-        send_receipt: repaySendReceipt,
-      },
-    });
-  };
-
   const openAddFunds = (loan: Loan) => {
     setSelectedLoan(loan);
-    setAddFundsAmount('');
-    setAddFundsAccountId('');
-    setAddFundsDate(new Date().toISOString().split('T')[0]);
-    setAddFundsDescription('');
     setShowAddFundsForm(true);
-  };
-
-  const handleAddFunds = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedLoan) return;
-    addFundsMutation.mutate({
-      id: selectedLoan.id,
-      data: {
-        amount: parseFloat(addFundsAmount),
-        account_id: addFundsAccountId,
-        date: addFundsDate || undefined,
-        description: addFundsDescription || undefined,
-      },
-    });
   };
 
   const openRepay = (loan: Loan) => {
     setSelectedLoan(loan);
-    setRepayAmount(String(toNum(loan.remaining_amount)));
-    setRepayDate(new Date().toISOString().split('T')[0]);
-    setRepayAccountId('');
-    setRepayNotes('');
     setShowRepayForm(true);
   };
 
@@ -492,10 +348,7 @@ export default function LoansPage() {
         </div>
 
         <button
-          onClick={() => {
-            resetCreateForm();
-            setShowCreateForm(true);
-          }}
+          onClick={() => setShowCreateForm(true)}
           className="btn-primary text-xs font-semibold px-4 py-2.5 shadow-md shadow-brand-500/20 flex items-center gap-2"
         >
           <Plus size={16} />
@@ -962,10 +815,7 @@ export default function LoansPage() {
               }
               action={
                 <button
-                  onClick={() => {
-                    resetCreateForm();
-                    setShowCreateForm(true);
-                  }}
+                  onClick={() => setShowCreateForm(true)}
                   className="btn-primary text-xs font-semibold px-4 py-2"
                 >
                   <Plus size={15} /> Create Loan Agreement
@@ -1089,754 +939,43 @@ export default function LoansPage() {
       )}
 
       {/* ─── POPUP MODAL: Full Loan Details & Amortization Statement ─── */}
-      <Modal
+      <LoanDetailsModal
         isOpen={!!detailsLoan}
         onClose={() => setDetailsLoan(null)}
-        title="Loan Agreement Details & Statement"
-        maxWidth="max-w-2xl"
-      >
-        {detailsLoan && (
-          <div className="space-y-5">
-            {/* Header with Counterparty, Direction, and Badges */}
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-sm shadow-sm ${
-                    detailsLoan.direction === 'LENT'
-                      ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300'
-                  }`}
-                >
-                  {getInitials(detailsLoan.person_name)}
-                </div>
-                <div>
-                  <h3 className="font-extrabold text-base text-slate-900 dark:text-slate-100">
-                    {detailsLoan.person_name || 'Unknown Contact'}
-                  </h3>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <span
-                      className={`badge text-[10px] ${
-                        detailsLoan.direction === 'LENT' ? 'badge-success' : 'badge-danger'
-                      }`}
-                    >
-                      {detailsLoan.direction === 'LENT' ? 'Lent (Receivable)' : 'Borrowed (Payable)'}
-                    </span>
-                    <span className="badge badge-neutral text-[10px]">{detailsLoan.status}</span>
-                    {detailsLoan.source === 'AUTO' && (
-                      <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 dark:bg-brand-950 dark:text-brand-300 flex items-center gap-0.5">
-                        <Zap size={9} /> Auto
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons inside Details Modal */}
-              <div className="flex items-center gap-2">
-                {detailsLoan.status !== 'PAID' && (
-                  <button
-                    onClick={() => {
-                      const l = detailsLoan;
-                      setDetailsLoan(null);
-                      openRepay(l);
-                    }}
-                    className="btn-primary text-xs px-3 py-1.5 font-semibold flex items-center gap-1"
-                  >
-                    <Wallet size={13} />
-                    <span>Record Payment</span>
-                  </button>
-                )}
-                <button
-                  onClick={() => handleOpenVoucher(detailsLoan)}
-                  className="btn-secondary text-xs px-3 py-1.5 font-semibold flex items-center gap-1"
-                >
-                  <FileText size={13} />
-                  <span>Voucher</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Financial Overview 4 Grid */}
-            {(() => {
-              const p = toNum(detailsLoan.principal_amount);
-              const i = toNum(detailsLoan.interest_amount);
-              const r = toNum(detailsLoan.total_repaid);
-              const rem = toNum(detailsLoan.remaining_amount);
-              const tot = p + i;
-              const pct = tot > 0 ? (r / tot) * 100 : 0;
-
-              return (
-                <div className="space-y-3">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                    <div className="p-3 rounded-xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Principal</p>
-                      <p className="text-sm font-extrabold font-mono text-slate-900 dark:text-slate-100 mt-0.5">
-                        {formatCurrency(p)}
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Interest</p>
-                      <p className="text-sm font-extrabold font-mono text-amber-600 dark:text-amber-400 mt-0.5">
-                        {formatCurrency(i)}
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Total Repaid</p>
-                      <p className="text-sm font-extrabold font-mono text-emerald-600 dark:text-emerald-400 mt-0.5">
-                        {formatCurrency(r)}
-                      </p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Remaining</p>
-                      <p
-                        className={`text-sm font-extrabold font-mono mt-0.5 ${
-                          detailsLoan.direction === 'LENT'
-                            ? 'text-emerald-600 dark:text-emerald-400'
-                            : 'text-rose-600 dark:text-rose-400'
-                        }`}
-                      >
-                        {formatCurrency(rem)}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div>
-                    <div className="flex items-center justify-between text-xs text-slate-400 font-semibold mb-1">
-                      <span>Repayment Settlement Progress</span>
-                      <span className="font-mono text-slate-700 dark:text-slate-300">{pct.toFixed(1)}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
-                      <div
-                        className="bg-brand-500 h-2 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(pct, 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-
-            {/* Dates & Notes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800">
-              <div>
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Agreement Start Date</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">
-                  {formatDateDMY(detailsLoan.start_date)}
-                </span>
-              </div>
-              <div>
-                <span className="text-slate-400 block text-[10px] uppercase font-bold">Due Date</span>
-                <span className="font-semibold text-slate-800 dark:text-slate-200 mt-0.5 block">
-                  {detailsLoan.due_date ? formatDateDMY(detailsLoan.due_date) : 'No due date set'}
-                </span>
-              </div>
-              {detailsLoan.description && (
-                <div className="sm:col-span-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Notes / Purpose</span>
-                  <p className="text-slate-600 dark:text-slate-300 mt-0.5">{detailsLoan.description}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Running Balance Trend Chart */}
-            {detailsLoading ? (
-              <div className="py-6 text-center text-xs text-slate-400">Loading ledger data...</div>
-            ) : detailsData?.transactions?.length > 1 ? (
-              <div>
-                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-2">
-                  Outstanding Balance Trajectory
-                </h4>
-                <div className="h-32 w-full p-2 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/60 dark:border-slate-800">
-                  {(() => {
-                    let r = 0;
-                    const chartData = detailsData.transactions.map((tx: any) => {
-                      const isA = tx.transaction_type === 'LEND' || tx.transaction_type === 'BORROW';
-                      r += isA ? toNum(tx.amount) : -toNum(tx.amount);
-                      return {
-                        date: tx.transaction_date,
-                        balance: Math.max(r, 0),
-                      };
-                    });
-                    return (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={chartData} margin={{ top: 4, right: 4, bottom: 0, left: 4 }}>
-                          <defs>
-                            <linearGradient id="detailsGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.4} />
-                              <stop offset="100%" stopColor="#f59e0b" stopOpacity={0.02} />
-                            </linearGradient>
-                          </defs>
-                          <XAxis
-                            dataKey="date"
-                            tick={{ fontSize: 9, fill: isDark ? '#64748b' : '#94a3b8' }}
-                            axisLine={false}
-                            tickLine={false}
-                          />
-                          <YAxis hide domain={[0, 'auto']} />
-                          <Tooltip
-                            formatter={(v: number) => [formatCurrency(v), 'Balance']}
-                            labelFormatter={(l: string) => formatDateDMY(l)}
-                            contentStyle={{
-                              fontSize: 11,
-                              borderRadius: 8,
-                              border: 'none',
-                              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                              padding: '6px 10px',
-                            }}
-                          />
-                          <Area
-                            type="stepAfter"
-                            dataKey="balance"
-                            stroke="#f59e0b"
-                            strokeWidth={2}
-                            fill="url(#detailsGrad)"
-                            dot={{ r: 3, fill: '#f59e0b', stroke: '#fff', strokeWidth: 1 }}
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
-                    );
-                  })()}
-                </div>
-              </div>
-            ) : null}
-
-            {/* Transaction Timeline Table */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 mb-2">
-                Transaction History &amp; Running Balance
-              </h4>
-              {detailsData?.transactions?.length > 0 ? (
-                <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden max-h-56 overflow-y-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead className="bg-slate-50 dark:bg-slate-900 text-[10px] font-bold text-slate-400 uppercase tracking-wider sticky top-0">
-                      <tr>
-                        <th className="p-2.5">Date</th>
-                        <th className="p-2.5">Particulars</th>
-                        <th className="p-2.5 text-right">Amount</th>
-                        <th className="p-2.5 text-right">Balance</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-                      {(() => {
-                        let running = 0;
-                        return detailsData.transactions.map((tx: any) => {
-                          const isAdd = tx.transaction_type === 'LEND' || tx.transaction_type === 'BORROW';
-                          running += isAdd ? toNum(tx.amount) : -toNum(tx.amount);
-                          return (
-                            <tr
-                              key={tx.id}
-                              className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-colors"
-                            >
-                              <td className="p-2.5 text-slate-500 whitespace-nowrap font-medium">
-                                {formatDateDMY(tx.transaction_date)}
-                              </td>
-                              <td className="p-2.5">
-                                <span className="font-semibold text-slate-800 dark:text-slate-200 block truncate max-w-[200px]">
-                                  {tx.description || tx.transaction_type.replace(/_/g, ' ').toLowerCase()}
-                                </span>
-                                {tx.account_name && (
-                                  <span className="text-[10px] text-slate-400">via {tx.account_name}</span>
-                                )}
-                              </td>
-                              <td className="p-2.5 text-right font-bold font-mono">
-                                <span
-                                  className={
-                                    isAdd
-                                      ? 'text-emerald-600 dark:text-emerald-400'
-                                      : 'text-rose-600 dark:text-rose-400'
-                                  }
-                                >
-                                  {isAdd ? '+' : '-'}
-                                  {formatCurrency(toNum(tx.amount))}
-                                </span>
-                              </td>
-                              <td className="p-2.5 text-right font-extrabold font-mono text-slate-700 dark:text-slate-300">
-                                {formatCurrency(running)}
-                              </td>
-                            </tr>
-                          );
-                        });
-                      })()}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-xs text-slate-400 py-3 text-center">No transaction records logged.</p>
-              )}
-            </div>
-          </div>
-        )}
-      </Modal>
+        loan={detailsLoan}
+        onRecordPayment={(loan) => openRepay(loan)}
+        onOpenVoucher={(loan) => handleOpenVoucher(loan)}
+      />
 
       {/* ─── Modal: New Loan Agreement ─── */}
-      <Modal
+      <LoanCreateModal
         isOpen={showCreateForm}
-        onClose={() => {
-          setShowCreateForm(false);
-          resetCreateForm();
-        }}
-        title="Record New Loan Agreement"
-        maxWidth="max-w-xl"
-      >
-        <form onSubmit={handleCreate} className="space-y-4">
-          {/* Direction Tabs */}
-          <div>
-            <label className="label">Loan Direction</label>
-            <div className="grid grid-cols-2 gap-2 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
-              <button
-                type="button"
-                onClick={() => setDirection('LENT')}
-                className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  direction === 'LENT'
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                }`}
-              >
-                <ArrowUpRight size={14} />
-                <span>I Lent Money (Receivable)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setDirection('BORROWED')}
-                className={`py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  direction === 'BORROWED'
-                    ? 'bg-rose-600 text-white shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                }`}
-              >
-                <ArrowDownRight size={14} />
-                <span>I Borrowed Money (Payable)</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="label">Counterparty / Person</label>
-              <select
-                className="input text-xs font-medium"
-                value={personId}
-                onChange={(e) => setPersonId(e.target.value)}
-                required
-              >
-                <option value="">Select contact from directory...</option>
-                {people?.map((p: Person) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} {p.phone ? `(${p.phone})` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="label">Funding / Settlement Account</label>
-              <select
-                className="input text-xs font-medium"
-                value={accountId}
-                onChange={(e) => setAccountId(e.target.value)}
-                required
-              >
-                <option value="">Select account...</option>
-                {accounts?.map((a: Account) => (
-                  <option key={a.account_id} value={a.account_id}>
-                    {a.account_name} ({formatCurrency(a.current_balance)})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="label">Principal Amount (৳)</label>
-              <input
-                type="number"
-                className="input font-mono font-bold text-xs"
-                step="0.01"
-                min="0.01"
-                placeholder="0.00"
-                value={principal}
-                onChange={(e) => setPrincipal(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="label">Interest / Markup (Optional ৳)</label>
-              <input
-                type="number"
-                className="input font-mono text-xs"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                value={interest}
-                onChange={(e) => setInterest(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="label">Agreement Start Date</label>
-              <input
-                type="date"
-                className="input text-xs"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="label">Expected Due Date (Optional)</label>
-              <input
-                type="date"
-                className="input text-xs"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="label">Description / Agreement Purpose (Optional)</label>
-            <input
-              type="text"
-              className="input text-xs"
-              placeholder="e.g. Business equipment purchase, Emergency loan..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          {personId && (
-            <div className="p-3.5 rounded-xl bg-brand-50/60 dark:bg-brand-950/40 border border-brand-200/70 dark:border-brand-900/60">
-              <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={loanSendReceipt}
-                  onChange={(e) => setLoanSendReceipt(e.target.checked)}
-                  className="mt-0.5 rounded text-brand-600 focus:ring-brand-500 w-4 h-4"
-                />
-                <div>
-                  <p className="text-xs font-bold text-brand-900 dark:text-brand-200 flex items-center gap-1.5">
-                    <Mail size={13} className="text-brand-600 dark:text-brand-400" />
-                    <span>Email Agreement PDF to Contact</span>
-                  </p>
-                  <p className="text-[11px] text-brand-700 dark:text-brand-300 mt-0.5">
-                    Automatically send an official statement of loan terms to their registered email address.
-                  </p>
-                </div>
-              </label>
-            </div>
-          )}
-
-          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-            <button
-              type="button"
-              className="btn-secondary flex-1 text-xs"
-              onClick={() => {
-                setShowCreateForm(false);
-                resetCreateForm();
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
-              disabled={createMutation.isPending}
-            >
-              {createMutation.isPending ? 'Creating...' : 'Create Loan Agreement'}
-            </button>
-          </div>
-        </form>
-      </Modal>
+        onClose={() => setShowCreateForm(false)}
+        people={people}
+        accounts={accounts}
+      />
 
       {/* ─── Modal: Record Repayment ─── */}
-      <Modal
+      <LoanRepayModal
         isOpen={showRepayForm}
         onClose={() => {
           setShowRepayForm(false);
-          resetRepayForm();
+          setSelectedLoan(null);
         }}
-        title="Record Loan Repayment"
-        maxWidth="max-w-md"
-      >
-        {selectedLoan && (
-          <form onSubmit={handleRepay} className="space-y-4">
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 text-xs space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Counterparty:</span>
-                <span className="font-bold text-slate-900 dark:text-slate-100">
-                  {selectedLoan.person_name || 'Unknown Contact'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Direction:</span>
-                <span
-                  className={`font-bold ${
-                    selectedLoan.direction === 'LENT'
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-rose-600 dark:text-rose-400'
-                  }`}
-                >
-                  {selectedLoan.direction === 'LENT' ? 'Collecting from them' : 'Paying them back'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between pt-1 border-t border-slate-200/50 dark:border-slate-800">
-                <span className="text-slate-500 font-semibold">Remaining Balance:</span>
-                <span className="font-extrabold font-mono text-sm text-amber-600 dark:text-amber-400">
-                  {formatCurrency(toNum(selectedLoan.remaining_amount))}
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <label className="label">Repayment Amount (৳)</label>
-              <input
-                type="number"
-                className="input font-mono font-bold text-base"
-                step="0.01"
-                min="0.01"
-                max={toNum(selectedLoan.remaining_amount)}
-                value={repayAmount}
-                onChange={(e) => setRepayAmount(e.target.value)}
-                required
-              />
-
-              {/* Quick Amount Percentage Shortcuts */}
-              <div className="flex gap-1.5 mt-2">
-                {[
-                  { label: '25%', fraction: 0.25 },
-                  { label: '50%', fraction: 0.5 },
-                  { label: '75%', fraction: 0.75 },
-                  { label: '100% Full', fraction: 1 },
-                ].map(({ label, fraction }) => {
-                  const amt = Math.round(toNum(selectedLoan.remaining_amount) * fraction * 100) / 100;
-                  const isActive = parseFloat(repayAmount) === amt;
-                  return (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => setRepayAmount(String(amt))}
-                      className={`flex-1 text-[10px] font-bold py-1.5 rounded-lg border transition-all cursor-pointer ${
-                        isActive
-                          ? 'bg-brand-600 dark:bg-brand-500 text-white border-brand-600 dark:border-brand-500'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-brand-400'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Balance Preview */}
-              {repayAmount && (
-                <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900/50">
-                  <span>Balance after payment:</span>
-                  <span className="font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
-                    {formatCurrency(
-                      Math.max(0, toNum(selectedLoan.remaining_amount) - (parseFloat(repayAmount) || 0))
-                    )}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="label">Settlement Account</label>
-              <select
-                className="input text-xs font-medium"
-                value={repayAccountId}
-                onChange={(e) => setRepayAccountId(e.target.value)}
-                required
-              >
-                <option value="">Select funding account...</option>
-                {accounts?.map((a: Account) => (
-                  <option key={a.account_id} value={a.account_id}>
-                    {a.account_name} ({formatCurrency(a.current_balance)})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="label">Payment Date</label>
-              <input
-                type="date"
-                className="input text-xs"
-                value={repayDate}
-                onChange={(e) => setRepayDate(e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="label">Notes / Remarks (Optional)</label>
-              <input
-                type="text"
-                className="input text-xs"
-                placeholder="e.g. Month 1 installment, Bank transfer ref..."
-                value={repayNotes}
-                onChange={(e) => setRepayNotes(e.target.value)}
-              />
-            </div>
-
-            <div className="p-3.5 rounded-xl bg-brand-50/60 dark:bg-brand-950/40 border border-brand-200/70 dark:border-brand-900/60">
-              <label className="flex items-start gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={repaySendReceipt}
-                  onChange={(e) => setRepaySendReceipt(e.target.checked)}
-                  className="mt-0.5 rounded text-brand-600 focus:ring-brand-500 w-4 h-4"
-                />
-                <div>
-                  <p className="text-xs font-bold text-brand-900 dark:text-brand-200 flex items-center gap-1.5">
-                    <Mail size={13} className="text-brand-600 dark:text-brand-400" />
-                    <span>Send PDF Repayment Receipt to Contact</span>
-                  </p>
-                  <p className="text-[11px] text-brand-700 dark:text-brand-300 mt-0.5">
-                    Email an official transaction receipt confirming payment to the contact.
-                  </p>
-                </div>
-              </label>
-            </div>
-
-            <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-              <button
-                type="button"
-                className="btn-secondary flex-1 text-xs"
-                onClick={() => {
-                  setShowRepayForm(false);
-                  resetRepayForm();
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
-                disabled={repayMutation.isPending}
-              >
-                {repayMutation.isPending ? 'Logging Repayment...' : 'Confirm Repayment'}
-              </button>
-            </div>
-          </form>
-        )}
-      </Modal>
+        loan={selectedLoan}
+        accounts={accounts}
+      />
 
       {/* ─── Modal: Add More Funds ─── */}
-      <Modal
+      <LoanAddFundsModal
         isOpen={showAddFundsForm}
         onClose={() => {
           setShowAddFundsForm(false);
-          resetAddFundsForm();
+          setSelectedLoan(null);
         }}
-        title="Add More Capital / Funds to Loan"
-        maxWidth="max-w-md"
-      >
-        {selectedLoan && (
-          <form onSubmit={handleAddFunds} className="space-y-4">
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 text-xs space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Target Contact:</span>
-                <span className="font-bold text-slate-900 dark:text-slate-100">
-                  {selectedLoan.person_name || 'Unknown Contact'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Current Principal:</span>
-                <span className="font-bold text-slate-700 dark:text-slate-300 font-mono">
-                  {formatCurrency(toNum(selectedLoan.principal_amount))}
-                </span>
-              </div>
-              <div className="flex items-center justify-between pt-1 border-t border-slate-200/50 dark:border-slate-800">
-                <span className="text-slate-400">Current Remaining:</span>
-                <span className="font-extrabold font-mono text-amber-600 dark:text-amber-400">
-                  {formatCurrency(toNum(selectedLoan.remaining_amount))}
-                </span>
-              </div>
-            </div>
-
-            <div>
-              <label className="label">Additional Amount (৳)</label>
-              <input
-                type="number"
-                className="input font-mono font-bold text-base"
-                step="0.01"
-                min="0.01"
-                placeholder="0.00"
-                value={addFundsAmount}
-                onChange={(e) => setAddFundsAmount(e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="label">Funding Account</label>
-              <select
-                className="input text-xs font-medium"
-                value={addFundsAccountId}
-                onChange={(e) => setAddFundsAccountId(e.target.value)}
-                required
-              >
-                <option value="">Select account...</option>
-                {accounts?.map((a: Account) => (
-                  <option key={a.account_id} value={a.account_id}>
-                    {a.account_name} ({formatCurrency(a.current_balance)})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="label">Transaction Date</label>
-              <input
-                type="date"
-                className="input text-xs"
-                value={addFundsDate}
-                onChange={(e) => setAddFundsDate(e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="label">Description / Memo (Optional)</label>
-              <input
-                type="text"
-                className="input text-xs"
-                placeholder="e.g. Additional top-up emergency funds"
-                value={addFundsDescription}
-                onChange={(e) => setAddFundsDescription(e.target.value)}
-              />
-            </div>
-
-            <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-900/60 text-xs text-emerald-700 dark:text-emerald-300">
-              This will increase the loan principal and automatically adjust the chosen account ledger.
-            </div>
-
-            <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-              <button
-                type="button"
-                className="btn-secondary flex-1 text-xs"
-                onClick={() => {
-                  setShowAddFundsForm(false);
-                  resetAddFundsForm();
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 text-xs py-2.5 font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-all"
-                disabled={addFundsMutation.isPending}
-              >
-                {addFundsMutation.isPending ? 'Adding Funds...' : 'Add Funds'}
-              </button>
-            </div>
-          </form>
-        )}
-      </Modal>
+        loan={selectedLoan}
+        accounts={accounts}
+      />
 
       {/* ─── Modal: Fix Orphaned Loans ─── */}
       <Modal

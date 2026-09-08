@@ -48,6 +48,7 @@ export interface Category {
   icon: string | null;
   color: string | null;
   is_active: boolean;
+  usage_count?: number;
 }
 
 export interface Transaction {

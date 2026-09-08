@@ -2,6 +2,25 @@
  * Common formatting helpers for Balqen client
  */
 
+// =============================================================================
+// Transaction Type — Human-readable labels (#11)
+// =============================================================================
+export const TX_TYPE_LABELS: Record<string, string> = {
+  INCOME: 'Income',
+  EXPENSE: 'Expense',
+  TRANSFER: 'Transfer',
+  LEND: 'Lent Out',
+  LEND_REPAYMENT: 'Loan Received',
+  BORROW: 'Borrowed',
+  BORROW_REPAYMENT: 'Repayment Made',
+  ADJUSTMENT: 'Adjustment',
+};
+
+/** Returns a human-readable label for a transaction type enum value */
+export function formatTxType(type: string): string {
+  return TX_TYPE_LABELS[type] ?? type.replace(/_/g, ' ');
+}
+
 export function formatDateDMY(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return '-';
   const d = typeof dateInput === 'string' && dateInput.includes('T')

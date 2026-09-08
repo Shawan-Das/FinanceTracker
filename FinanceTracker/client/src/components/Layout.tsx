@@ -16,13 +16,18 @@ import {
   TrendingUp,
   Search,
   PlusCircle,
-  Bell,
+  AlertCircle,
   ChevronRight,
   ShieldCheck,
-  Command
+  MoreHorizontal,
+  Keyboard,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { dashboardApi } from '../api/client';
 import GlobalSearchModal from './GlobalSearchModal';
+import QuickTransactionModal from './QuickTransactionModal';
+import KeyboardShortcutsModal from './KeyboardShortcutsModal';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -35,28 +40,79 @@ const navItems = [
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
+// Bottom nav primary items (visible without "More")
+const bottomNavPrimary = [
+  { to: '/', icon: LayoutDashboard, label: 'Home', end: true },
+  { to: '/transactions', icon: ArrowLeftRight, label: 'Ledger', end: false },
+  // center slot is the Quick Add FAB
+  { to: '/reports', icon: BarChart3, label: 'Reports', end: false },
+  { to: '/loans', icon: CreditCard, label: 'Loans', end: false },
+];
+
+// "More" sheet items
+const bottomNavMore = [
+  { to: '/accounts', icon: Wallet, label: 'Accounts' },
+  { to: '/people', icon: Users, label: 'People' },
+  { to: '/categories', icon: Tag, label: 'Categories' },
+  { to: '/settings', icon: Settings, label: 'Settings' },
+];
+
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [quickAddOpen, setQuickAddOpen] = useState(false); // #2: global quick add
+  const [moreSheetOpen, setMoreSheetOpen] = useState(false); // #9: more sheet
+  const [shortcutsOpen, setShortcutsOpen] = useState(false); // #21: keyboard shortcuts guide
 
-  // Global Ctrl+K / Cmd+K listener
+  // #10: Fetch overdue loans count for notification dot
+  const { data: loanSummary } = useQuery({
+    queryKey: ['dashboard', 'loans'],
+    queryFn: () => dashboardApi.loanSummary().then((r) => r.data.data),
+    staleTime: 120_000,
+  });
+
+  const overdueCount = (loanSummary as any[])?.filter((loan: any) => {
+    if (!loan.due_date) return false;
+    const due = new Date(loan.due_date);
+    due.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return due < today && loan.status !== 'SETTLED';
+  }).length ?? 0;
+
+  // Global keyboard shortcuts: Ctrl+K search, ? for guide, N for quick add
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't fire single-char shortcuts if focus is in an input / textarea
+      const target = e.target as HTMLElement;
+      const inInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
         e.preventDefault();
         setSearchOpen((prev) => !prev);
+        return;
+      }
+      if (!inInput && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        if (e.key === '?') {
+          e.preventDefault();
+          setShortcutsOpen((prev) => !prev);
+        } else if (e.key === 'n' || e.key === 'N') {
+          e.preventDefault();
+          setQuickAddOpen((prev) => !prev);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Close sidebar on route change in mobile/tablet
+  // Close sidebar & more sheet on route change
   useEffect(() => {
     setSidebarOpen(false);
+    setMoreSheetOpen(false);
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -81,6 +137,14 @@ export default function Layout() {
         />
       )}
 
+      {/* #9: Mobile "More" Sheet Backdrop */}
+      {moreSheetOpen && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setMoreSheetOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 bg-[#dee5ee] dark:bg-[#111726] border-r border-[#cbd5e1] dark:border-slate-800/80
@@ -99,7 +163,7 @@ export default function Layout() {
                   BALQEN
                 </h1>
                 <p className="text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-500 tracking-wider">
-                  Finance & Ledger
+                  Finance &amp; Ledger
                 </p>
               </div>
             </div>
@@ -225,23 +289,37 @@ export default function Layout() {
               <Search size={18} />
             </button>
 
-            {/* Quick Add Button */}
+            {/* #2: Quick Add Button — opens modal in-context, not navigate away */}
             <button
-              onClick={() => navigate('/transactions')}
+              onClick={() => setQuickAddOpen(true)}
               className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 rounded-xl shadow-sm shadow-brand-500/20 transition-all cursor-pointer"
+              title="Record a quick transaction (stays on current page)"
             >
               <PlusCircle size={15} />
               <span>New Entry</span>
             </button>
 
-            {/* Notifications Button */}
+            {/* #1 + #10: Loans alert button — semantic icon, dynamic overdue dot */}
             <button
               onClick={() => navigate('/loans')}
               className="p-2.5 rounded-xl text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-[#d0dbe7] dark:hover:bg-slate-800/80 transition-colors relative"
-              title="Loan Tracker & Notifications"
+              title={overdueCount > 0 ? `${overdueCount} overdue loan${overdueCount > 1 ? 's' : ''}` : 'Loans & Agreements'}
             >
-              <Bell size={18} />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-[#dee5ee] dark:ring-slate-900" />
+              <AlertCircle size={18} />
+              {/* Only show dot when there are overdue loans (#10) */}
+              {overdueCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#dee5ee] dark:ring-slate-900 animate-pulse" />
+              )}
+            </button>
+
+            {/* #21: Keyboard Shortcuts help button */}
+            <button
+              onClick={() => setShortcutsOpen(true)}
+              className="hidden sm:flex p-2 rounded-xl text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-[#d0dbe7] dark:hover:bg-slate-800/80 transition-colors"
+              title="Keyboard Shortcuts (?)"
+              aria-label="Open keyboard shortcuts guide"
+            >
+              <Keyboard size={17} />
             </button>
 
             {/* Theme Toggle Dropdown */}
@@ -255,8 +333,9 @@ export default function Layout() {
         </main>
       </div>
 
-      {/* Mobile Bottom Navigation Bar */}
+      {/* #9: Mobile Bottom Navigation Bar — rearranged with Reports, More sheet */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#dee5ee]/95 dark:bg-[#111726]/95 backdrop-blur-md border-t border-[#cbd5e1] dark:border-slate-800/80 px-2 py-1 flex items-center justify-around shadow-lg">
+        {/* Home */}
         <NavLink
           to="/"
           end
@@ -271,6 +350,7 @@ export default function Layout() {
           <span className="mt-0.5">Home</span>
         </NavLink>
 
+        {/* Ledger */}
         <NavLink
           to="/transactions"
           className={({ isActive }) =>
@@ -284,17 +364,18 @@ export default function Layout() {
           <span className="mt-0.5">Ledger</span>
         </NavLink>
 
-        {/* Center Quick Add Action */}
+        {/* #2: Center Quick Add FAB — opens modal */}
         <button
-          onClick={() => navigate('/transactions')}
+          onClick={() => setQuickAddOpen(true)}
           className="w-11 h-11 -mt-4 rounded-full bg-gradient-to-tr from-brand-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-brand-500/35 active:scale-95 transition-transform"
-          title="New Entry"
+          title="Quick Add Transaction"
         >
           <PlusCircle size={22} />
         </button>
 
+        {/* #9: Reports (replaces Accounts — more commonly visited) */}
         <NavLink
-          to="/accounts"
+          to="/reports"
           className={({ isActive }) =>
             `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${isActive
               ? 'text-brand-600 dark:text-brand-400 font-bold'
@@ -302,28 +383,81 @@ export default function Layout() {
             }`
           }
         >
-          <Wallet size={19} />
-          <span className="mt-0.5">Accounts</span>
+          <BarChart3 size={19} />
+          <span className="mt-0.5">Reports</span>
         </NavLink>
 
-        <NavLink
-          to="/loans"
-          className={({ isActive }) =>
-            `flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all ${isActive
+        {/* #9: "More" button opens bottom sheet */}
+        <button
+          onClick={() => setMoreSheetOpen(true)}
+          className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl text-[10px] font-semibold transition-all relative ${
+            ['/accounts', '/people', '/loans', '/categories', '/settings'].some((p) =>
+              location.pathname.startsWith(p)
+            )
               ? 'text-brand-600 dark:text-brand-400 font-bold'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-            }`
-          }
+              : 'text-slate-600 dark:text-slate-400'
+          }`}
         >
-          <CreditCard size={19} />
-          <span className="mt-0.5">Loans</span>
-        </NavLink>
+          <MoreHorizontal size={19} />
+          <span className="mt-0.5">More</span>
+          {/* Show overdue dot on More button too if on a "more" page */}
+          {overdueCount > 0 && (
+            <span className="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-rose-500" />
+          )}
+        </button>
       </nav>
+
+      {/* #9: "More" Bottom Sheet */}
+      {moreSheetOpen && (
+        <div className="lg:hidden fixed bottom-16 left-0 right-0 z-50 bg-[#dee5ee] dark:bg-[#111726] border-t border-[#cbd5e1] dark:border-slate-800/80 rounded-t-2xl shadow-2xl p-4 animate-in slide-in-from-bottom duration-200">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">More Pages</p>
+            <button
+              onClick={() => setMoreSheetOpen(false)}
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="grid grid-cols-4 gap-2">
+            {bottomNavMore.map(({ to, icon: Icon, label }) => (
+              <NavLink
+                key={to}
+                to={to}
+                onClick={() => setMoreSheetOpen(false)}
+                className={({ isActive }) =>
+                  `flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-[10px] font-semibold transition-all ${
+                    isActive
+                      ? 'bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400'
+                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                  }`
+                }
+              >
+                <Icon size={20} />
+                <span>{label}</span>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Global Command & Search Palette */}
       <GlobalSearchModal
         isOpen={searchOpen}
         onClose={() => setSearchOpen(false)}
+      />
+
+      {/* #2: Global Quick Add Modal — stays on current page */}
+      <QuickTransactionModal
+        isOpen={quickAddOpen}
+        onClose={() => setQuickAddOpen(false)}
+        preset={null}
+      />
+
+      {/* #21: Keyboard Shortcuts Guide Modal */}
+      <KeyboardShortcutsModal
+        isOpen={shortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
       />
     </div>
   );

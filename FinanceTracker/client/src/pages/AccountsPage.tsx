@@ -7,7 +7,7 @@ import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import toast from 'react-hot-toast';
-import { Plus, Wallet, Edit, Trash2, Building2, Banknote, Smartphone, ShieldCheck, ArrowUpRight } from 'lucide-react';
+import { Plus, Wallet, Edit, Trash2, Building2, Banknote, Smartphone, ShieldCheck, ArrowUpRight, AlertTriangle } from 'lucide-react';
 import type { Account } from '../types';
 import { formatDateDMY } from '../utils/format';
 
@@ -282,6 +282,16 @@ export default function AccountsPage() {
               />
             </div>
           </div>
+
+          {/* Warning banner when modifying opening balance of existing account (#17) */}
+          {editingAccount && (
+            <div className="p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/50 flex items-start gap-2.5 text-amber-800 dark:text-amber-300 text-xs">
+              <AlertTriangle size={16} className="shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+              <p className="text-[11px] leading-relaxed">
+                <strong className="font-semibold">Important ledger impact:</strong> Modifying the opening balance of an existing account shifts all calculated historical running balances across statement reports.
+              </p>
+            </div>
+          )}
 
           <div>
             <label className="label">Notes / Description</label>

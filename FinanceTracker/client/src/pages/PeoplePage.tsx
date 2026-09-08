@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { peopleApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -7,13 +8,14 @@ import QueryError from '../components/QueryError';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import toast from 'react-hot-toast';
-import { Plus, Edit, Trash2, User, Phone, Mail, ArrowUpRight, ArrowDownRight, CheckCircle2 } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Phone, Mail, ArrowUpRight, ArrowDownRight, CheckCircle2, FileText } from 'lucide-react';
 import type { Person } from '../types';
 
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
 
 export default function PeoplePage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingPerson, setEditingPerson] = useState<Person | null>(null);
@@ -200,6 +202,18 @@ export default function PeoplePage() {
                     {p.notes}
                   </p>
                 )}
+
+                {/* View History Drilldown Button (#16) */}
+                <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                  <button
+                    onClick={() => navigate(`/transactions?person_id=${p.id}`)}
+                    className="text-[11px] font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1.5 transition-colors cursor-pointer group"
+                  >
+                    <FileText size={13} className="text-brand-500" />
+                    <span>View Transaction History</span>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                  </button>
+                </div>
               </div>
             );
           })}

@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme, Theme } from '../contexts/ThemeContext';
 import { authApi } from '../api/client';
 import toast from 'react-hot-toast';
-import { User, Lock, Save, Sun, Moon, Monitor, ShieldCheck, KeyRound, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, Save, Sun, Moon, Monitor, ShieldCheck, KeyRound, Eye, EyeOff, Info } from 'lucide-react';
 import { formatDateDMY } from '../utils/format';
 
 export default function SettingsPage() {
@@ -65,31 +65,28 @@ export default function SettingsPage() {
       <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 max-w-md">
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'profile'
-              ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === 'profile'
+            ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+            }`}
         >
           <User size={14} /> Profile
         </button>
         <button
           onClick={() => setActiveTab('theme')}
-          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'theme'
-              ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === 'theme'
+            ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+            }`}
         >
           <Sun size={14} /> Theme
         </button>
         <button
           onClick={() => setActiveTab('password')}
-          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === 'password'
-              ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
-          }`}
+          className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all ${activeTab === 'password'
+            ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+            }`}
         >
           <Lock size={14} /> Password
         </button>
@@ -108,6 +105,17 @@ export default function SettingsPage() {
               <span className="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
                 <ShieldCheck size={12} /> Verified Account
               </span>
+            </div>
+          </div>
+
+          {/* Explanation banner for read-only profile fields (#5) */}
+          <div className="p-3.5 rounded-2xl bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/80 dark:border-blue-900/50 flex items-start gap-3">
+            <Info size={17} className="text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+            <div className="space-y-0.5 text-xs text-blue-900 dark:text-blue-200">
+              <p className="font-bold text-[12px]">Profile details are read-only</p>
+              <p className="text-[11px] text-blue-700 dark:text-blue-300 leading-relaxed">
+                Your legal name, account email, and base currency are fixed to preserve financial ledger consistency. To request changes to your profile or currency, please contact support.
+              </p>
             </div>
           </div>
 
@@ -167,17 +175,15 @@ export default function SettingsPage() {
               <div
                 key={value}
                 onClick={() => setTheme(value)}
-                className={`flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${
-                  theme === value
-                    ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/40 ring-2 ring-brand-500/20'
-                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/40'
-                }`}
+                className={`flex items-start gap-4 p-4 rounded-2xl border cursor-pointer transition-all ${theme === value
+                  ? 'border-brand-500 bg-brand-50/50 dark:bg-brand-950/40 ring-2 ring-brand-500/20'
+                  : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/40'
+                  }`}
               >
-                <div className={`p-2.5 rounded-xl ${
-                  theme === value
-                    ? 'bg-brand-600 text-white shadow-sm'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                }`}>
+                <div className={`p-2.5 rounded-xl ${theme === value
+                  ? 'bg-brand-600 text-white shadow-sm'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+                  }`}>
                   <Icon size={18} />
                 </div>
                 <div className="flex-1">

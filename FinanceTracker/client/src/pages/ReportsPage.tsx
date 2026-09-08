@@ -2,7 +2,9 @@ import { useState, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { reportsApi, accountsApi, peopleApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
+import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
+import PrintPreviewModal from '../components/PrintPreviewModal';
 import { useTheme } from '../contexts/ThemeContext';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -35,6 +37,7 @@ export default function ReportsPage() {
   const [dateTo, setDateTo] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState('');
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
   const dateParams = { ...(dateFrom && { from: dateFrom }), ...(dateTo && { to: dateTo }) };
@@ -136,13 +139,22 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-          Financial Intelligence &amp; Reports
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-          Executive financial statements, category breakdowns, and account ledgers.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+            Financial Intelligence &amp; Reports
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Executive financial statements, category breakdowns, and account ledgers.
+          </p>
+        </div>
+        <button
+          onClick={() => setShowPrintPreview(true)}
+          className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400 transition-all shadow-xs cursor-pointer"
+        >
+          <Printer size={15} className="text-brand-500" />
+          <span>Print / PDF Preview</span>
+        </button>
       </div>
 
       {/* Pill Navigation Bar */}
@@ -237,12 +249,12 @@ export default function ReportsPage() {
 
           {/* Print / Export Button */}
           <button
-            onClick={() => window.print()}
+            onClick={() => setShowPrintPreview(true)}
             className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500 transition-all cursor-pointer"
-            title="Print report or export as PDF"
+            title="Open Print & PDF Export Preview"
           >
             <Printer size={12} />
-            <span>Print / PDF</span>
+            <span>Print Preview</span>
           </button>
         </div>
       )}
@@ -1124,179 +1136,153 @@ export default function ReportsPage() {
             </select>
           </div>
 
-          {accountLoading ? (
+          {!selectedAccountId ? (
+            <EmptyState
+              icon={<CreditCard size={28} className="text-brand-500" />}
+              title="Select an Account to Generate Statement"
+              description="Choose any account from the dropdown above to view its debit/credit ledger, running balance progression, and statement history."
+            />
+          ) : accountLoading ? (
             <LoadingSpinner message="Generating account ledger statement..." />
           ) : accountError ? (
             <QueryError title="Failed to load statement" onRetry={() => refetchAccount()} />
-          ) : (
-            accountStatement && (
-              <div className="space-y-4">
-                {/* Statement Header Card */}
-                <div className="card p-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Ledger Statement</p>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
-                        {accountStatement.account?.account_name || accountStatement.account?.name}
-                      </h3>
-                      <p className="text-[11px] text-slate-400 mt-0.5 capitalize">
-                        {accountStatement.account?.account_type} account · {(dateFrom || dateTo) ? 'Period opening balance' : 'Opening balance'}: {formatCurrency(accountStatement.openingBalance)}
-                      </p>
+          ) : accountStatement ? (
+            <div className="space-y-4">
+              {/* Statement Header Card */}
+              <div className="card p-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Ledger Statement</p>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+                      {accountStatement.account?.account_name || accountStatement.account?.name}
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5 capitalize">
+                      {accountStatement.account?.account_type} account · {(dateFrom || dateTo) ? 'Period opening balance' : 'Opening balance'}: {formatCurrency(accountStatement.openingBalance)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-5">
+                    <div className="text-center">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
+                      <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                        {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-5">
-                      <div className="text-center">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
-                        <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                          {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
-                        </span>
-                      </div>
-                      <div className="text-center">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
-                        <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
-                          {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
-                        </span>
-                      </div>
-                      <div className="text-center pl-4 border-l border-slate-200 dark:border-slate-700">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Closing Balance</span>
-                        <span className={`text-sm font-extrabold font-mono ${accountStatement.closingBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                          {formatCurrency(Math.abs(accountStatement.closingBalance))} {accountStatement.closingBalance >= 0 ? 'Dr' : 'Cr'}
-                        </span>
-                      </div>
+                    <div className="text-center">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
+                      <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
+                        {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
+                      </span>
+                    </div>
+                    <div className="text-center border-l border-slate-200 dark:border-slate-800 pl-5">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Closing Balance</span>
+                      <span className={`text-base font-black font-mono ${accountStatement.closingBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                        {formatCurrency(Math.abs(accountStatement.closingBalance))} {accountStatement.closingBalance >= 0 ? 'Dr' : 'Cr'}
+                      </span>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Ledger Table */}
-                <div className="card p-0 overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
-                        <thead>
-                          <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
-                            <th className="p-3 w-[100px]">Date</th>
-                            <th className="p-3">Particulars</th>
-                            <th className="p-3 w-[130px]">Type</th>
-                            <th className="p-3 w-[120px] text-right">Debit (৳)</th>
-                            <th className="p-3 w-[120px] text-right">Credit (৳)</th>
-                            <th className="p-3 w-[140px] text-right">Balance</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
-                          {(() => {
-                            const ob = accountStatement.openingBalance || 0;
-                            const isDr = ob >= 0;
-                            return (
-                              <tr className="bg-slate-50/80 dark:bg-slate-900/50">
-                                <td className="p-3 text-slate-500 whitespace-nowrap font-medium">
-                                  {dateFrom ? formatDateDMY(dateFrom) : formatDateDMY(accountStatement.account?.opening_balance_date || '') || '—'}
-                                </td>
-                                <td className="p-3">
-                                  <div className="font-bold text-slate-500 dark:text-slate-400 italic">
-                                    Opening Balance b/d
-                                  </div>
-                                </td>
-                                <td className="p-3"><span className="badge badge-neutral text-[10px]">OB</span></td>
-                                <td className="p-3 text-right font-bold font-mono">
-                                  {ob > 0 ? (
-                                    <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(ob)}</span>
-                                  ) : (
-                                    <span className="text-slate-300 dark:text-slate-700">—</span>
-                                  )}
-                                </td>
-                                <td className="p-3 text-right font-bold font-mono">
-                                  {ob < 0 ? (
-                                    <span className="text-rose-600 dark:text-rose-400">{formatCurrency(Math.abs(ob))}</span>
-                                  ) : (
-                                    <span className="text-slate-300 dark:text-slate-700">—</span>
-                                  )}
-                                </td>
-                                <td className="p-3 text-right font-extrabold font-mono">
-                                  <span className={isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
-                                    {formatCurrency(Math.abs(ob))} {isDr ? 'Dr' : 'Cr'}
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })()}
-                          {accountStatement.transactions.map((tx: any) => {
-                            const debit = toNum(tx.debit);
-                            const credit = toNum(tx.credit);
-                            const bal = toNum(tx.running_balance);
-                            const isDr = bal >= 0;
-                            return (
-                              <tr key={tx.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors">
-                                <td className="p-3 text-slate-500 whitespace-nowrap font-medium">
-                                  {formatDateDMY(tx.transaction_date)}
-                                </td>
-                                <td className="p-3">
-                                  <div className="font-bold text-slate-900 dark:text-slate-100 max-w-[240px] truncate">
-                                    {tx.description || tx.transaction_type.replace(/_/g, ' ').toLowerCase()}
-                                  </div>
-                                  <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-                                    {tx.person_name && <span>with {tx.person_name}</span>}
-                                    {tx.category_name && <span>· {tx.category_name}</span>}
-                                  </div>
-                                </td>
-                                <td className="p-3">
-                                  <span className={`badge text-[10px] ${
-                                    tx.transaction_type === 'INCOME' ? 'badge-success' :
-                                    tx.transaction_type === 'EXPENSE' ? 'badge-danger' :
-                                    tx.transaction_type === 'TRANSFER' ? 'badge-brand' :
-                                    tx.transaction_type === 'LEND' ? 'badge-warning' :
-                                    tx.transaction_type === 'BORROW' ? 'badge-brand' :
-                                    tx.transaction_type === 'LEND_REPAYMENT' ? 'badge-success' :
-                                    tx.transaction_type === 'BORROW_REPAYMENT' ? 'badge-danger' :
-                                    'badge-neutral'
-                                  }`}>
-                                    {tx.transaction_type.replace(/_/g, ' ')}
-                                  </span>
-                                </td>
-                                <td className="p-3 text-right font-bold font-mono">
-                                  {debit > 0 ? (
-                                    <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(debit)}</span>
-                                  ) : (
-                                    <span className="text-slate-300 dark:text-slate-700">—</span>
-                                  )}
-                                </td>
-                                <td className="p-3 text-right font-bold font-mono">
-                                  {credit > 0 ? (
-                                    <span className="text-rose-600 dark:text-rose-400">{formatCurrency(credit)}</span>
-                                  ) : (
-                                    <span className="text-slate-300 dark:text-slate-700">—</span>
-                                  )}
-                                </td>
-                                <td className="p-3 text-right font-extrabold font-mono">
-                                  <span className={isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
-                                    {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
-                                  </span>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                        <tfoot>
-                          <tr className="bg-slate-50/80 dark:bg-slate-900/60 border-t-2 border-slate-200 dark:border-slate-700">
-                            <td className="p-3" colSpan={3}>
-                              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Totals</span>
+              {/* Transactions Ledger Table */}
+              <div className="card p-0 overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
+                      Account Transactions ({accountStatement.transactions?.length || 0})
+                    </h3>
+                    <p className="text-[11px] text-slate-400">Detailed debits and credits ledger for the selected period</p>
+                  </div>
+                  <span className="badge badge-brand text-[10px] font-mono">
+                    {accountStatement.transactions?.length || 0} entries
+                  </span>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-900/40">
+                        <th className="p-3">Date</th>
+                        <th className="p-3">Particulars / Description</th>
+                        <th className="p-3">Type</th>
+                        <th className="p-3 text-right">Debit (+)</th>
+                        <th className="p-3 text-right">Credit (-)</th>
+                        <th className="p-3 text-right">Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                      {/* Period Opening Balance Row */}
+                      <tr className="bg-slate-50/30 dark:bg-slate-900/20 italic text-slate-400 font-medium">
+                        <td className="p-3">—</td>
+                        <td className="p-3 font-semibold text-slate-600 dark:text-slate-300" colSpan={4}>
+                          Opening Balance B/F
+                        </td>
+                        <td className="p-3 text-right font-bold font-mono text-slate-600 dark:text-slate-300">
+                          {formatCurrency(Math.abs(accountStatement.openingBalance))} {accountStatement.openingBalance >= 0 ? 'Dr' : 'Cr'}
+                        </td>
+                      </tr>
+
+                      {accountStatement.transactions?.map((tx: any, idx: number) => {
+                        const debit = toNum(tx.debit);
+                        const credit = toNum(tx.credit);
+                        const bal = toNum(tx.balance);
+                        return (
+                          <tr key={tx.id || idx} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors">
+                            <td className="p-3 text-slate-400 whitespace-nowrap font-mono text-[11px]">
+                              {formatDateDMY(tx.transaction_date)}
                             </td>
-                            <td className="p-3 text-right font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
-                              {formatCurrency(accountStatement.transactions.reduce((s: number, t: any) => s + toNum(t.debit), 0))}
+                            <td className="p-3">
+                              <p className="font-semibold text-slate-900 dark:text-slate-100">{tx.description || tx.transaction_type?.replace(/_/g, ' ')}</p>
+                              {tx.reference && (
+                                <p className="text-[10px] text-slate-400 font-mono">Ref: {tx.reference}</p>
+                              )}
                             </td>
-                            <td className="p-3 text-right font-extrabold font-mono text-rose-600 dark:text-rose-400">
-                              {formatCurrency(accountStatement.transactions.reduce((s: number, t: any) => s + toNum(t.credit), 0))}
-                            </td>
-                            <td className="p-3 text-right">
-                              <span className={`font-extrabold font-mono text-sm ${accountStatement.closingBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                                {formatCurrency(Math.abs(accountStatement.closingBalance))} {accountStatement.closingBalance >= 0 ? 'Dr' : 'Cr'}
+                            <td className="p-3">
+                              <span className="badge badge-neutral text-[10px]">
+                                {tx.transaction_type?.replace(/_/g, ' ')}
                               </span>
                             </td>
+                            <td className="p-3 text-right font-bold font-mono">
+                              {debit > 0 ? (
+                                <span className="text-emerald-600 dark:text-emerald-400">{formatCurrency(debit)}</span>
+                              ) : (
+                                <span className="text-slate-300 dark:text-slate-700">—</span>
+                              )}
+                            </td>
+                            <td className="p-3 text-right font-bold font-mono">
+                              {credit > 0 ? (
+                                <span className="text-rose-600 dark:text-rose-400">{formatCurrency(credit)}</span>
+                              ) : (
+                                <span className="text-slate-300 dark:text-slate-700">—</span>
+                              )}
+                            </td>
+                            <td className="p-3 text-right font-extrabold font-mono text-slate-900 dark:text-slate-100">
+                              {formatCurrency(Math.abs(bal))} {bal >= 0 ? 'Dr' : 'Cr'}
+                            </td>
                           </tr>
-                        </tfoot>
-                      </table>
-                    </div>
-                  </div>
+                        );
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="bg-slate-50/80 dark:bg-slate-900/60 border-t-2 border-slate-200 dark:border-slate-700 font-bold">
+                        <td className="p-3" colSpan={3}>
+                          <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Closing Balance</span>
+                        </td>
+                        <td className="p-3 text-right font-mono text-emerald-600 dark:text-emerald-400">
+                          {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
+                        </td>
+                        <td className="p-3 text-right font-mono text-rose-600 dark:text-rose-400">
+                          {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
+                        </td>
+                        <td className="p-3 text-right font-mono text-slate-900 dark:text-white">
+                          {formatCurrency(accountStatement.account?.current_balance || 0)}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
               </div>
-            )
-          )}
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -1320,7 +1306,13 @@ export default function ReportsPage() {
             </select>
           </div>
 
-          {personLoading ? (
+          {!selectedPersonId ? (
+            <EmptyState
+              icon={<Users size={28} className="text-brand-500" />}
+              title="Select a Contact to Generate Ledger"
+              description="Choose a counterparty or contact above to review their complete borrowing, lending, receivables, payables, and settlement history."
+            />
+          ) : personLoading ? (
             <LoadingSpinner message="Retrieving contact ledger..." />
           ) : personError ? (
             <QueryError title="Failed to load person ledger" onRetry={() => refetchPerson()} />
@@ -1615,6 +1607,222 @@ export default function ReportsPage() {
         </div>
       )}
       </div>
+
+      {/* #14: Print Preview Modal */}
+      <PrintPreviewModal
+        isOpen={showPrintPreview}
+        onClose={() => setShowPrintPreview(false)}
+        reportTitle={tabs.find((t) => t.key === activeTab)?.label || 'Financial Report'}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onDateFromChange={(val) => setDateFrom(val)}
+        onDateToChange={(val) => setDateTo(val)}
+        showDateControls={['income', 'expense', 'comparison', 'person', 'account'].includes(activeTab)}
+      >
+        {activeTab === 'position' && position && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div>
+                <p className="text-slate-500 font-medium">Liquid Cash</p>
+                <p className="text-base font-bold text-slate-900 font-mono mt-0.5">{formatCurrency(position.totalCash)}</p>
+              </div>
+              <div>
+                <p className="text-emerald-700 font-medium">Receivables</p>
+                <p className="text-base font-bold text-emerald-700 font-mono mt-0.5">+{formatCurrency(position.totalReceivable)}</p>
+              </div>
+              <div>
+                <p className="text-rose-700 font-medium">Payables</p>
+                <p className="text-base font-bold text-rose-700 font-mono mt-0.5">-{formatCurrency(position.totalPayable)}</p>
+              </div>
+              <div>
+                <p className="text-brand-700 font-medium">Net Position</p>
+                <p className="text-base font-bold text-brand-700 font-mono mt-0.5">{formatCurrency(position.netPosition)}</p>
+              </div>
+            </div>
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Account Balances</h4>
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500">
+                    <th className="py-2">Account Name</th>
+                    <th className="py-2">Type</th>
+                    <th className="py-2 text-right">Current Balance</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {accounts?.map((acc: Account) => (
+                    <tr key={acc.account_id}>
+                      <td className="py-2 font-medium text-slate-900">{acc.account_name}</td>
+                      <td className="py-2 text-slate-500 capitalize">{acc.account_type.toLowerCase()}</td>
+                      <td className="py-2 text-right font-mono font-bold text-slate-900">{formatCurrency(acc.current_balance)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'income' && incomeReport && (
+          <div className="space-y-6">
+            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-emerald-700 font-medium">Total Income In Period</p>
+                <p className="text-2xl font-black text-emerald-700 font-mono mt-0.5">{formatCurrency(toNum(incomeReport.total))}</p>
+              </div>
+              <span className="text-xs text-emerald-700 font-semibold bg-emerald-100/80 px-2.5 py-1 rounded-md">
+                {incomeReport.categories?.length || 0} Categories
+              </span>
+            </div>
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Category Breakdown</h4>
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500">
+                    <th className="py-2">Category</th>
+                    <th className="py-2 text-right">Amount</th>
+                    <th className="py-2 text-right">Percentage</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {incomeReport.categories?.map((cat: any) => (
+                    <tr key={cat.category_id || cat.name}>
+                      <td className="py-2 font-medium text-slate-900">{cat.name}</td>
+                      <td className="py-2 text-right font-mono font-bold text-slate-900">{formatCurrency(toNum(cat.total))}</td>
+                      <td className="py-2 text-right text-slate-500">{cat.percentage}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'expense' && expenseReport && (
+          <div className="space-y-6">
+            <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 flex justify-between items-center">
+              <div>
+                <p className="text-xs text-rose-700 font-medium">Total Expenses In Period</p>
+                <p className="text-2xl font-black text-rose-700 font-mono mt-0.5">{formatCurrency(toNum(expenseReport.total))}</p>
+              </div>
+              <span className="text-xs text-rose-700 font-semibold bg-rose-100/80 px-2.5 py-1 rounded-md">
+                {expenseReport.categories?.length || 0} Categories
+              </span>
+            </div>
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Category Breakdown</h4>
+              <table className="w-full text-xs text-left">
+                <thead>
+                  <tr className="border-b border-slate-200 text-slate-500">
+                    <th className="py-2">Category</th>
+                    <th className="py-2 text-right">Amount</th>
+                    <th className="py-2 text-right">Percentage</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {expenseReport.categories?.map((cat: any) => (
+                    <tr key={cat.category_id || cat.name}>
+                      <td className="py-2 font-medium text-slate-900">{cat.name}</td>
+                      <td className="py-2 text-right font-mono font-bold text-slate-900">{formatCurrency(toNum(cat.total))}</td>
+                      <td className="py-2 text-right text-slate-500">{cat.percentage}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'comparison' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div>
+                <p className="text-emerald-700 font-medium">Total Inflows</p>
+                <p className="text-base font-bold text-emerald-700 font-mono mt-0.5">{formatCurrency(toNum(compIncome?.total))}</p>
+              </div>
+              <div>
+                <p className="text-rose-700 font-medium">Total Outflows</p>
+                <p className="text-base font-bold text-rose-700 font-mono mt-0.5">{formatCurrency(toNum(compExpense?.total))}</p>
+              </div>
+              <div>
+                <p className="text-slate-700 font-medium">Net Savings</p>
+                <p className="text-base font-bold text-brand-700 font-mono mt-0.5">
+                  {formatCurrency(toNum(compIncome?.total) - toNum(compExpense?.total))}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'account' && (
+          <div>
+            {!selectedAccountId || !accountStatement ? (
+              <p className="text-xs text-slate-500 italic py-6 text-center">
+                Select an account from the filters above to generate its official statement preview.
+              </p>
+            ) : (
+              <div className="space-y-6">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center text-xs">
+                  <div>
+                    <p className="text-slate-500">Account Name</p>
+                    <p className="text-base font-bold text-slate-900 mt-0.5">{accountStatement.account?.account_name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-slate-500">Ending Balance</p>
+                    <p className="text-base font-bold text-brand-600 font-mono mt-0.5">
+                      {formatCurrency(toNum(accountStatement.account?.current_balance))}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'person' && (
+          <div>
+            {!selectedPersonId || !personStatement ? (
+              <p className="text-xs text-slate-500 italic py-6 text-center">
+                Select a contact from the filters above to generate their personal ledger statement preview.
+              </p>
+            ) : (
+              <div className="space-y-6">
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex justify-between items-center text-xs">
+                  <div>
+                    <p className="text-slate-500">Counterparty Name</p>
+                    <p className="text-base font-bold text-slate-900 mt-0.5">{personStatement.person?.name}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-slate-500">Net Position</p>
+                    <p className="text-base font-bold text-brand-600 font-mono mt-0.5">
+                      {formatCurrency(toNum(personStatement.summary?.net_position))}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'loan' && loanReport && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-3 gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div>
+                <p className="text-emerald-700 font-medium">Total Lent Out</p>
+                <p className="text-base font-bold text-emerald-700 font-mono mt-0.5">{formatCurrency(loanReport.summary?.total_lent || 0)}</p>
+              </div>
+              <div>
+                <p className="text-rose-700 font-medium">Total Borrowed</p>
+                <p className="text-base font-bold text-rose-700 font-mono mt-0.5">{formatCurrency(loanReport.summary?.total_borrowed || 0)}</p>
+              </div>
+              <div>
+                <p className="text-amber-700 font-medium">Overdue Agreements</p>
+                <p className="text-base font-bold text-amber-700 font-mono mt-0.5">{loanReport.summary?.overdue_count || 0}</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </PrintPreviewModal>
     </div>
   );
 }

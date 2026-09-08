@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { transactionsApi, accountsApi, peopleApi, categoriesApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -9,6 +10,7 @@ import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
 import { useAuth } from '../contexts/AuthContext';
+import { formatTxType } from '../utils/format';
 import toast from 'react-hot-toast';
 import { Plus, Filter, Trash2, Edit, Download, FileText, Search, X, Check, ArrowLeftRight, Mail } from 'lucide-react';
 import type { Transaction, TransactionType, Account, Person, Category } from '../types';
@@ -29,24 +31,27 @@ const TRANSACTION_TYPES: TransactionType[] = [
 ];
 
 export default function TransactionsPage() {
+  const [searchParams] = useSearchParams();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [page, setPage] = useState(1);
   const [showForm, setShowForm] = useState(false);
   const [editingTx, setEditingTx] = useState<Transaction | null>(null);
   const [deletingTxId, setDeletingTxId] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(
+    Boolean(searchParams.get('person_id') || searchParams.get('account_id') || searchParams.get('type'))
+  );
   const [voucherReportData, setVoucherReportData] = useState<VoucherReportData | null>(null);
   const [isVoucherModalOpen, setIsVoucherModalOpen] = useState(false);
 
-  // Filters
+  // Filters (pre-populated from URL query params if present, e.g. from PeoplePage #16)
   const [filters, setFilters] = useState({
-    from: '',
-    to: '',
-    account_id: '',
-    person_id: '',
-    type: '',
-    search: '',
+    from: searchParams.get('from') || '',
+    to: searchParams.get('to') || '',
+    account_id: searchParams.get('account_id') || '',
+    person_id: searchParams.get('person_id') || '',
+    type: searchParams.get('type') || '',
+    search: searchParams.get('search') || '',
   });
 
   // Form state
@@ -60,6 +65,7 @@ export default function TransactionsPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formReference, setFormReference] = useState('');
   const [formSendReceipt, setFormSendReceipt] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Queries
   const queryParams: Record<string, any> = { page, limit: 30, ...filters };
@@ -142,6 +148,7 @@ export default function TransactionsPage() {
     setFormReference('');
     setFormSendReceipt(false);
     setEditingTx(null);
+    setFormErrors({});
   };
 
   const openEdit = (tx: Transaction) => {
@@ -155,11 +162,46 @@ export default function TransactionsPage() {
     setFormCategoryId(tx.category_id ? String(tx.category_id) : '');
     setFormDescription(tx.description || '');
     setFormReference(tx.reference || '');
+    setFormErrors({});
     setShowForm(true);
+  };
+
+  const validateForm = (): boolean => {
+    const errs: Record<string, string> = {};
+    const amt = parseFloat(formAmount);
+    if (!formAmount || isNaN(amt) || amt <= 0) {
+      errs.amount = 'Amount must be greater than ৳0.00';
+    }
+    if (!formDate) {
+      errs.date = 'Transaction date is required';
+    }
+    if (showFromAccount && !formAccountId) {
+      errs.accountId = 'Please select an account';
+    }
+    if (showToAccount) {
+      if (!formToAccountId) {
+        errs.toAccountId = 'Please select destination account';
+      } else if (formToAccountId === formAccountId) {
+        errs.toAccountId = 'Destination account cannot be the same as source account';
+      }
+    }
+    if (showPerson && !formPersonId) {
+      errs.personId = 'Please select a contact person';
+    }
+    if (showCategory && !formCategoryId) {
+      errs.categoryId = 'Please choose a classification category';
+    }
+    setFormErrors(errs);
+    return Object.keys(errs).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) {
+      toast.error('Please resolve the highlighted form errors');
+      return;
+    }
+
     const payload: any = {
       transaction_type: formType,
       transaction_date: formDate,
@@ -191,9 +233,10 @@ export default function TransactionsPage() {
     }
   };
 
-  const applyFilters = () => {
+  // Reactive filter updater (#13)
+  const updateFilter = (key: string, val: string) => {
+    setFilters((prev) => ({ ...prev, [key]: val }));
     setPage(1);
-    setShowFilters(false);
   };
 
   const clearFilters = () => {
@@ -329,7 +372,7 @@ export default function TransactionsPage() {
                 type="date"
                 className="input text-xs"
                 value={filters.from}
-                onChange={(e) => setFilters({ ...filters, from: e.target.value })}
+                onChange={(e) => updateFilter('from', e.target.value)}
               />
             </div>
             <div>
@@ -338,7 +381,7 @@ export default function TransactionsPage() {
                 type="date"
                 className="input text-xs"
                 value={filters.to}
-                onChange={(e) => setFilters({ ...filters, to: e.target.value })}
+                onChange={(e) => updateFilter('to', e.target.value)}
               />
             </div>
             <div>
@@ -346,7 +389,7 @@ export default function TransactionsPage() {
               <select
                 className="input text-xs"
                 value={filters.account_id}
-                onChange={(e) => setFilters({ ...filters, account_id: e.target.value })}
+                onChange={(e) => updateFilter('account_id', e.target.value)}
               >
                 <option value="">All Accounts</option>
                 {accounts?.map((a: Account) => (
@@ -359,7 +402,7 @@ export default function TransactionsPage() {
               <select
                 className="input text-xs"
                 value={filters.person_id}
-                onChange={(e) => setFilters({ ...filters, person_id: e.target.value })}
+                onChange={(e) => updateFilter('person_id', e.target.value)}
               >
                 <option value="">All People</option>
                 {people?.map((p: Person) => (
@@ -372,11 +415,11 @@ export default function TransactionsPage() {
               <select
                 className="input text-xs"
                 value={filters.type}
-                onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+                onChange={(e) => updateFilter('type', e.target.value)}
               >
                 <option value="">All Types</option>
                 {TRANSACTION_TYPES.map((t) => (
-                  <option key={t} value={t}>{t.replace('_', ' ')}</option>
+                  <option key={t} value={t}>{formatTxType(t)}</option>
                 ))}
               </select>
             </div>
@@ -387,18 +430,27 @@ export default function TransactionsPage() {
                 className="input text-xs"
                 placeholder="Search notes..."
                 value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                onChange={(e) => updateFilter('search', e.target.value)}
               />
             </div>
           </div>
 
-          <div className="flex gap-2 justify-end mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-            <button onClick={clearFilters} className="btn-secondary text-xs px-3 py-1.5">
-              Reset Filters
-            </button>
-            <button onClick={applyFilters} className="btn-primary text-xs px-4 py-1.5">
-              Apply Filters
-            </button>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            <span className="text-xs text-slate-500 font-medium">
+              {hasActiveFilters
+                ? '⚡ Filters update table in real-time'
+                : 'Select any filters to narrow ledger records'}
+            </span>
+            <div className="flex gap-2">
+              {hasActiveFilters && (
+                <button onClick={clearFilters} className="btn-secondary text-xs px-3 py-1.5">
+                  Reset All
+                </button>
+              )}
+              <button onClick={() => setShowFilters(false)} className="btn-primary text-xs px-4 py-1.5">
+                Close Panel
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -433,11 +485,11 @@ export default function TransactionsPage() {
                         {new Date(tx.transaction_date).toLocaleDateString('en-BD', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </td>
                       <td className="p-4 font-bold text-slate-900 dark:text-slate-100 max-w-[220px] truncate">
-                        {tx.description || tx.transaction_type.replace('_', ' ')}
+                        {tx.description || formatTxType(tx.transaction_type)}
                       </td>
                       <td className="p-4 whitespace-nowrap">
                         <span className="badge badge-neutral text-[10px]">
-                          {tx.transaction_type.replace('_', ' ')}
+                          {formatTxType(tx.transaction_type)}
                         </span>
                       </td>
                       <td className="p-4 text-slate-500 dark:text-slate-400 font-medium">
@@ -499,7 +551,7 @@ export default function TransactionsPage() {
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                        {tx.description || tx.transaction_type.replace('_', ' ')}
+                        {tx.description || formatTxType(tx.transaction_type)}
                       </p>
                       <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
                         <span>{new Date(tx.transaction_date).toLocaleDateString('en-BD', { month: 'short', day: 'numeric' })}</span>
@@ -530,7 +582,7 @@ export default function TransactionsPage() {
                   {/* Mobile Actions Ribbon */}
                   <div className="flex items-center justify-between pt-1 border-t border-slate-100/60 dark:border-slate-800/40 text-xs">
                     <span className="badge badge-neutral text-[9px] uppercase">
-                      {tx.transaction_type.replace('_', ' ')}
+                      {formatTxType(tx.transaction_type)}
                     </span>
                     <div className="flex items-center gap-2">
                       <button
@@ -548,11 +600,7 @@ export default function TransactionsPage() {
                         <span>Voucher</span>
                       </button>
                       <button
-                        onClick={() => {
-                          if (confirm('Are you sure you want to delete this transaction?')) {
-                            deleteMutation.mutate(tx.id);
-                          }
-                        }}
+                        onClick={() => setDeletingTxId(tx.id)}
                         className="p-1 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
                         title="Delete"
                       >
@@ -600,48 +648,73 @@ export default function TransactionsPage() {
                 const next = e.target.value as TransactionType;
                 setFormType(next);
                 setFormCategoryId('');
+                setFormErrors({});
               }}
             >
               {TRANSACTION_TYPES.map((t) => (
-                <option key={t} value={t}>{t.replace('_', ' ')}</option>
+                <option key={t} value={t}>{formatTxType(t)}</option>
               ))}
             </select>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="label">Amount (৳)</label>
+              <label className="label">
+                Amount (৳) <span className="text-rose-500">*</span>
+              </label>
               <input
                 type="number"
-                className="input font-mono font-bold"
+                className={`input font-mono font-bold ${
+                  formErrors.amount ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20 dark:bg-rose-950/20' : ''
+                }`}
                 placeholder="0.00"
                 step="0.01"
                 min="0.01"
                 value={formAmount}
-                onChange={(e) => setFormAmount(e.target.value)}
-                required
+                onChange={(e) => {
+                  setFormAmount(e.target.value);
+                  if (formErrors.amount) setFormErrors((prev) => ({ ...prev, amount: '' }));
+                }}
               />
+              {formErrors.amount && (
+                <p className="text-[11px] text-rose-500 mt-1 font-medium">{formErrors.amount}</p>
+              )}
             </div>
             <div>
-              <label className="label">Date</label>
+              <label className="label">
+                Date <span className="text-rose-500">*</span>
+              </label>
               <input
                 type="date"
-                className="input text-xs"
+                className={`input text-xs ${
+                  formErrors.date ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20 dark:bg-rose-950/20' : ''
+                }`}
                 value={formDate}
-                onChange={(e) => setFormDate(e.target.value)}
-                required
+                onChange={(e) => {
+                  setFormDate(e.target.value);
+                  if (formErrors.date) setFormErrors((prev) => ({ ...prev, date: '' }));
+                }}
               />
+              {formErrors.date && (
+                <p className="text-[11px] text-rose-500 mt-1 font-medium">{formErrors.date}</p>
+              )}
             </div>
           </div>
 
           {showFromAccount && (
             <div>
-              <label className="label">{showToAccount ? 'Source Account' : 'Account'}</label>
+              <label className="label">
+                {showToAccount ? 'Source Account' : 'Account'} <span className="text-rose-500">*</span>
+              </label>
               <select
-                className="input text-xs font-medium"
+                className={`input text-xs font-medium ${
+                  formErrors.accountId ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20 dark:bg-rose-950/20' : ''
+                }`}
                 value={formAccountId}
-                onChange={(e) => setFormAccountId(e.target.value)}
-                required
+                onChange={(e) => {
+                  setFormAccountId(e.target.value);
+                  if (formErrors.accountId) setFormErrors((prev) => ({ ...prev, accountId: '' }));
+                }}
               >
                 <option value="">Select account...</option>
                 {accounts?.map((a: Account) => (
@@ -650,17 +723,26 @@ export default function TransactionsPage() {
                   </option>
                 ))}
               </select>
+              {formErrors.accountId && (
+                <p className="text-[11px] text-rose-500 mt-1 font-medium">{formErrors.accountId}</p>
+              )}
             </div>
           )}
 
           {showToAccount && (
             <div>
-              <label className="label">Destination Account</label>
+              <label className="label">
+                Destination Account <span className="text-rose-500">*</span>
+              </label>
               <select
-                className="input text-xs font-medium"
+                className={`input text-xs font-medium ${
+                  formErrors.toAccountId ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20 dark:bg-rose-950/20' : ''
+                }`}
                 value={formToAccountId}
-                onChange={(e) => setFormToAccountId(e.target.value)}
-                required
+                onChange={(e) => {
+                  setFormToAccountId(e.target.value);
+                  if (formErrors.toAccountId) setFormErrors((prev) => ({ ...prev, toAccountId: '' }));
+                }}
               >
                 <option value="">Select destination account...</option>
                 {accounts
@@ -671,17 +753,26 @@ export default function TransactionsPage() {
                     </option>
                   ))}
               </select>
+              {formErrors.toAccountId && (
+                <p className="text-[11px] text-rose-500 mt-1 font-medium">{formErrors.toAccountId}</p>
+              )}
             </div>
           )}
 
           {showPerson && (
             <div>
-              <label className="label">Person / Contact</label>
+              <label className="label">
+                Person / Contact <span className="text-rose-500">*</span>
+              </label>
               <select
-                className="input text-xs font-medium"
+                className={`input text-xs font-medium ${
+                  formErrors.personId ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20 dark:bg-rose-950/20' : ''
+                }`}
                 value={formPersonId}
-                onChange={(e) => setFormPersonId(e.target.value)}
-                required
+                onChange={(e) => {
+                  setFormPersonId(e.target.value);
+                  if (formErrors.personId) setFormErrors((prev) => ({ ...prev, personId: '' }));
+                }}
               >
                 <option value="">Select contact...</option>
                 {people?.map((p: Person) => (
@@ -690,17 +781,26 @@ export default function TransactionsPage() {
                   </option>
                 ))}
               </select>
+              {formErrors.personId && (
+                <p className="text-[11px] text-rose-500 mt-1 font-medium">{formErrors.personId}</p>
+              )}
             </div>
           )}
 
           {showCategory && (
             <div>
-              <label className="label">Classification Category</label>
+              <label className="label">
+                Classification Category <span className="text-rose-500">*</span>
+              </label>
               <select
-                className="input text-xs font-medium"
+                className={`input text-xs font-medium ${
+                  formErrors.categoryId ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20 bg-rose-50/20 dark:bg-rose-950/20' : ''
+                }`}
                 value={formCategoryId}
-                onChange={(e) => setFormCategoryId(e.target.value)}
-                required
+                onChange={(e) => {
+                  setFormCategoryId(e.target.value);
+                  if (formErrors.categoryId) setFormErrors((prev) => ({ ...prev, categoryId: '' }));
+                }}
               >
                 <option value="">Choose category...</option>
                 {filteredCategories?.map((c: Category) => (
@@ -709,6 +809,9 @@ export default function TransactionsPage() {
                   </option>
                 ))}
               </select>
+              {formErrors.categoryId && (
+                <p className="text-[11px] text-rose-500 mt-1 font-medium">{formErrors.categoryId}</p>
+              )}
             </div>
           )}
 

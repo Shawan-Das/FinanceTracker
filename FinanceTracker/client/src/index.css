@@ -3,24 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --bg-main: #e9edf2;
-    --fg-main: #0f172a;
-    --card-bg: #f4f7fa;
-    --card-border: #cbd5e1;
-    --muted-bg: #dde4ed;
-    --muted-fg: #475569;
-  }
-
-  .dark {
-    --bg-main: #090d16;
-    --fg-main: #f8fafc;
-    --card-bg: #111827;
-    --card-border: #1f2937;
-    --muted-bg: #1e293b;
-    --muted-fg: #94a3b8;
-  }
-
   body {
     @apply bg-[#e9edf2] text-slate-900 dark:bg-[#0b0f19] dark:text-slate-100 antialiased font-sans transition-colors duration-200 selection:bg-brand-500 selection:text-white min-h-screen;
   }

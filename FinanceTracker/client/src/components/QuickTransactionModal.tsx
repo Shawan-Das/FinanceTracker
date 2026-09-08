@@ -3,9 +3,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { transactionsApi, accountsApi, categoriesApi } from '../api/client';
 import Modal from './Modal';
 import toast from 'react-hot-toast';
-import { Zap, Check, ArrowRight, Wallet, Tag, Calendar, DollarSign, Sparkles } from 'lucide-react';
-import { formatCurrency } from '../utils/format';
+import { Zap, Wallet, Sparkles, PlusCircle } from 'lucide-react';
+import { formatCurrency, formatTxType } from '../utils/format';
 import type { Account, Category } from '../types';
+
+const QUICK_TYPES = ['EXPENSE', 'INCOME', 'TRANSFER'] as const;
 
 export interface QuickPreset {
   id: string;
@@ -90,6 +92,10 @@ interface QuickTransactionModalProps {
 export default function QuickTransactionModal({ isOpen, onClose, preset }: QuickTransactionModalProps) {
   const queryClient = useQueryClient();
 
+  // When preset is null (blank mode), allow user to choose type
+  const [blankType, setBlankType] = useState<'EXPENSE' | 'INCOME' | 'TRANSFER'>('EXPENSE');
+  const effectiveType = preset?.type ?? blankType;
+
   const [amount, setAmount] = useState('');
   const [accountId, setAccountId] = useState('');
   const [toAccountId, setToAccountId] = useState('');
@@ -110,9 +116,19 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
     enabled: isOpen,
   });
 
-  // Pre-fill form when preset opens
+  // Pre-fill form when preset opens; reset when modal closes
   useEffect(() => {
-    if (preset && isOpen) {
+    if (!isOpen) {
+      setAmount('');
+      setAccountId('');
+      setToAccountId('');
+      setCategoryId('');
+      setDescription('');
+      setBlankType('EXPENSE');
+      setTxDate(new Date().toISOString().split('T')[0]);
+      return;
+    }
+    if (preset) {
       setAmount(String(preset.defaultAmount || ''));
       setDescription(preset.description || preset.title);
       setTxDate(new Date().toISOString().split('T')[0]);
@@ -137,10 +153,15 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
         if (matched) {
           setCategoryId(matched.id);
         } else {
-          // Fallback to first category matching type
           const fallback = categories.find((c: Category) => c.type === preset.type);
           if (fallback) setCategoryId(fallback.id);
         }
+      }
+    } else {
+      // Blank mode: auto-select first account
+      if (accounts && accounts.length > 0) {
+        const positiveAcc = accounts.find((a: Account) => a.current_balance > 0) || accounts[0];
+        setAccountId(positiveAcc.account_id);
       }
     }
   }, [preset, isOpen, accounts, categories]);
@@ -173,15 +194,15 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
     }
 
     const payload: any = {
-      transaction_type: preset?.type || 'EXPENSE',
+      transaction_type: effectiveType,
       amount: parseFloat(amount),
       transaction_date: txDate,
-      description,
+      description: description || effectiveType,
       account_id: accountId,
       category_id: categoryId || null,
     };
 
-    if (preset?.type === 'TRANSFER') {
+    if (effectiveType === 'TRANSFER') {
       payload.from_account_id = accountId;
       payload.to_account_id = toAccountId;
     }
@@ -189,33 +210,54 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
     mutation.mutate(payload);
   };
 
-  if (!preset) return null;
-
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="⚡ 1-Click Fast Transaction"
+      title={preset ? '⚡ Quick Transaction' : '➕ New Transaction'}
       maxWidth="max-w-md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Preset Badge Header */}
-        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-50 to-brand-50/40 dark:from-slate-900/60 dark:to-brand-950/30 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="text-2xl w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
-              {preset.icon}
+        {/* Preset Badge Header OR blank type selector */}
+        {preset ? (
+          <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-50 to-brand-50/40 dark:from-slate-900/60 dark:to-brand-950/30 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-2xl w-10 h-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shadow-sm">
+                {preset.icon}
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{preset.title}</h3>
+                <p className="text-[11px] text-slate-400 capitalize">
+                  {preset.type.toLowerCase()} • {preset.categoryName || 'General'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{preset.title}</h3>
-              <p className="text-[11px] text-slate-400 capitalize">
-                {preset.type.toLowerCase()} • {preset.categoryName || 'General'}
-              </p>
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300">
+              <Sparkles size={11} /> Pre-filled
+            </span>
+          </div>
+        ) : (
+          /* Blank mode: type selector */
+          <div>
+            <label className="label">Transaction Type</label>
+            <div className="grid grid-cols-3 gap-2">
+              {QUICK_TYPES.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => { setBlankType(t); setCategoryId(''); }}
+                  className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                    blankType === t
+                      ? 'bg-brand-600 text-white border-brand-600 shadow-sm'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-brand-400'
+                  }`}
+                >
+                  {formatTxType(t)}
+                </button>
+              ))}
             </div>
           </div>
-          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300">
-            <Sparkles size={11} /> Pre-filled
-          </span>
-        </div>
+        )}
 
         {/* Amount Input */}
         <div>
@@ -257,7 +299,7 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
         </div>
 
         {/* Transfer Destination if Transfer */}
-        {preset.type === 'TRANSFER' && (
+        {effectiveType === 'TRANSFER' && (
           <div>
             <label className="label">Destination Account</label>
             <select
@@ -279,7 +321,7 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
         )}
 
         {/* Category Selection */}
-        {preset.type !== 'TRANSFER' && (
+        {effectiveType !== 'TRANSFER' && (
           <div>
             <label className="label">Category</label>
             <select
@@ -289,7 +331,7 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
             >
               <option value="">None / Uncategorized</option>
               {categories
-                ?.filter((c: Category) => c.type === preset.type)
+                ?.filter((c: Category) => c.type === effectiveType)
                 .map((cat: Category) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}

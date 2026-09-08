@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { transactionsApi, accountsApi, peopleApi, categoriesApi } from '../api/client';
@@ -17,7 +17,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from 'lucide-react';
-import { formatDateDMY, formatCurrency } from '../utils/format';
+import { formatDateDMY, formatCurrency, formatTxType } from '../utils/format';
 import type { Transaction, Account, Person, Category } from '../types';
 
 interface GlobalSearchModalProps {
@@ -28,27 +28,8 @@ interface GlobalSearchModalProps {
 export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
+  const [focusedIndex, setFocusedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Focus input when opened
-  useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      setQuery('');
-    }
-  }, [isOpen]);
-
-  // Handle escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
 
   // Only fetch data when there's an actual search query (lazy loading)
   const q = query.trim().toLowerCase();
@@ -81,8 +62,6 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
     enabled: isOpen && hasQuery,
     staleTime: 120_000,
   });
-
-  if (!isOpen) return null;
 
   // Filter items
   const matchedAccounts = accounts?.filter((a: Account) =>
@@ -120,13 +99,88 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
     onClose();
   };
 
+  // Compile flat actionable list for arrow key navigation
+  const displayedNavs = quickNavs.slice(0, q ? 5 : 4);
+  const displayedAccounts = matchedAccounts.slice(0, 3);
+  const displayedPeople = matchedPeople.slice(0, 3);
+  const displayedTransactions = matchedTransactions.slice(0, 5);
+
+  const flatActions: { id: string; action: () => void }[] = [
+    ...displayedNavs.map((n) => ({ id: `nav-${n.path}`, action: () => handleSelect(n.path) })),
+    ...displayedAccounts.map((a: Account) => ({ id: `acc-${a.account_id}`, action: () => handleSelect('/accounts') })),
+    ...displayedPeople.map((p: Person) => ({ id: `p-${p.id}`, action: () => handleSelect('/people') })),
+    ...displayedTransactions.map((tx: Transaction) => ({ id: `tx-${tx.id}`, action: () => handleSelect('/transactions') })),
+  ];
+
+  // Focus input when opened
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 50);
+      setFocusedIndex(-1);
+    } else {
+      setQuery('');
+      setFocusedIndex(-1);
+    }
+  }, [isOpen]);
+
+  // Reset focus when query changes
+  useEffect(() => {
+    setFocusedIndex(-1);
+  }, [query]);
+
+  // Handle keyboard events (Escape, ArrowUp, ArrowDown, Enter)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (flatActions.length === 0) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setFocusedIndex((prev) => {
+          const next = prev < flatActions.length - 1 ? prev + 1 : 0;
+          return next;
+        });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setFocusedIndex((prev) => {
+          const next = prev > 0 ? prev - 1 : flatActions.length - 1;
+          return next;
+        });
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (focusedIndex >= 0 && focusedIndex < flatActions.length) {
+          flatActions[focusedIndex].action();
+        } else if (flatActions.length > 0) {
+          flatActions[0].action();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose, flatActions, focusedIndex]);
+
+  // Auto-scroll focused item into view
+  useEffect(() => {
+    if (focusedIndex >= 0) {
+      const el = document.querySelector(`[data-search-idx="${focusedIndex}"]`);
+      el?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [focusedIndex]);
+
   const hasResults =
     q === '' ||
-    matchedAccounts.length > 0 ||
-    matchedPeople.length > 0 ||
-    matchedTransactions.length > 0 ||
-    matchedCategories.length > 0 ||
-    quickNavs.length > 0;
+    displayedNavs.length > 0 ||
+    displayedAccounts.length > 0 ||
+    displayedPeople.length > 0 ||
+    displayedTransactions.length > 0;
+
+  if (!isOpen) return null;
+
+  let itemIndexCounter = 0;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
@@ -161,19 +215,27 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
         {/* Results List */}
         <div className="overflow-y-auto p-3 space-y-4 flex-1">
           {/* Quick Actions / Commands */}
-          {quickNavs.length > 0 && (
+          {displayedNavs.length > 0 && (
             <div>
               <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Navigation & Actions
               </p>
               <div className="space-y-1 mt-1">
-                {quickNavs.slice(0, q ? 5 : 4).map((nav, i) => {
+                {displayedNavs.map((nav) => {
                   const Icon = nav.icon;
+                  const idx = itemIndexCounter++;
+                  const isFocused = focusedIndex === idx;
                   return (
                     <button
-                      key={i}
+                      key={nav.path}
+                      data-search-idx={idx}
                       onClick={() => handleSelect(nav.path)}
-                      className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors text-left group"
+                      onMouseEnter={() => setFocusedIndex(idx)}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left group ${
+                        isFocused
+                          ? 'bg-brand-500/15 dark:bg-brand-500/25 ring-2 ring-brand-500 text-brand-900 dark:text-brand-100'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-900/60'
+                      }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400 flex items-center justify-center">
@@ -193,111 +255,160 @@ export default function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModal
           )}
 
           {/* Matched Accounts */}
-          {matchedAccounts.length > 0 && (
+          {displayedAccounts.length > 0 && (
             <div>
               <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 Accounts ({matchedAccounts.length})
               </p>
               <div className="space-y-1 mt-1">
-                {matchedAccounts.slice(0, 3).map((acc: Account) => (
-                  <button
-                    key={acc.account_id}
-                    onClick={() => handleSelect('/accounts')}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors text-left group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                        <Wallet size={16} />
+                {displayedAccounts.map((acc: Account) => {
+                  const idx = itemIndexCounter++;
+                  const isFocused = focusedIndex === idx;
+                  return (
+                    <button
+                      key={acc.account_id}
+                      data-search-idx={idx}
+                      onClick={() => handleSelect('/accounts')}
+                      onMouseEnter={() => setFocusedIndex(idx)}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left group ${
+                        isFocused
+                          ? 'bg-brand-500/15 dark:bg-brand-500/25 ring-2 ring-brand-500 text-brand-900 dark:text-brand-100'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-900/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                          <Wallet size={16} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{acc.account_name}</p>
+                          <p className="text-[10px] text-slate-400 capitalize">{acc.account_type.replace('_', ' ')}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{acc.account_name}</p>
-                        <p className="text-[10px] text-slate-400 capitalize">{acc.account_type.replace('_', ' ')}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
-                      {formatCurrency(acc.current_balance)}
-                    </span>
-                  </button>
-                ))}
+                      <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
+                        {formatCurrency(acc.current_balance)}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* Matched Contacts / People */}
-          {matchedPeople.length > 0 && (
+          {displayedPeople.length > 0 && (
             <div>
               <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                 People & Contacts ({matchedPeople.length})
               </p>
               <div className="space-y-1 mt-1">
-                {matchedPeople.slice(0, 3).map((p: Person) => (
-                  <button
-                    key={p.id}
-                    onClick={() => handleSelect('/people')}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors text-left group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                        <Users size={16} />
+                {displayedPeople.map((p: Person) => {
+                  const idx = itemIndexCounter++;
+                  const isFocused = focusedIndex === idx;
+                  return (
+                    <button
+                      key={p.id}
+                      data-search-idx={idx}
+                      onClick={() => handleSelect('/people')}
+                      onMouseEnter={() => setFocusedIndex(idx)}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left group ${
+                        isFocused
+                          ? 'bg-brand-500/15 dark:bg-brand-500/25 ring-2 ring-brand-500 text-brand-900 dark:text-brand-100'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-900/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                          <Users size={16} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{p.name}</p>
+                          <p className="text-[10px] text-slate-400">{p.phone || p.email || 'Contact'}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{p.name}</p>
-                        <p className="text-[10px] text-slate-400">{p.phone || p.email || 'Contact'}</p>
+                      <div className="text-right">
+                        {parseFloat(String(p.amount_they_owe_you || 0)) > 0 && (
+                          <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block">
+                            +{formatCurrency(p.amount_they_owe_you)}
+                          </span>
+                        )}
+                        {parseFloat(String(p.amount_you_owe_them || 0)) > 0 && (
+                          <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 block">
+                            -{formatCurrency(p.amount_you_owe_them)}
+                          </span>
+                        )}
                       </div>
-                    </div>
-                    <div className="text-right">
-                      {parseFloat(String(p.amount_they_owe_you || 0)) > 0 && (
-                        <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block">
-                          +{formatCurrency(p.amount_they_owe_you)}
-                        </span>
-                      )}
-                      {parseFloat(String(p.amount_you_owe_them || 0)) > 0 && (
-                        <span className="text-[11px] font-bold text-rose-600 dark:text-rose-400 block">
-                          -{formatCurrency(p.amount_you_owe_them)}
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* Matched Transactions */}
-          {matchedTransactions.length > 0 && (
+          {displayedTransactions.length > 0 && (
             <div>
-              <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                Transactions ({matchedTransactions.length})
-              </p>
+              <div className="flex items-center justify-between px-3 py-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                  Transactions ({matchedTransactions.length})
+                </p>
+                {/* 50-limit indicator (#4) */}
+                <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                  Latest 50 sample
+                </span>
+              </div>
               <div className="space-y-1 mt-1">
-                {matchedTransactions.slice(0, 5).map((tx: Transaction) => (
-                  <button
-                    key={tx.id}
-                    onClick={() => handleSelect('/transactions')}
-                    className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors text-left group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
-                        {['INCOME', 'LEND_REPAYMENT'].includes(tx.transaction_type) ? (
-                          <ArrowUpRight size={16} className="text-emerald-500" />
-                        ) : (
-                          <ArrowDownRight size={16} className="text-rose-500" />
-                        )}
+                {displayedTransactions.map((tx: Transaction) => {
+                  const idx = itemIndexCounter++;
+                  const isFocused = focusedIndex === idx;
+                  return (
+                    <button
+                      key={tx.id}
+                      data-search-idx={idx}
+                      onClick={() => handleSelect('/transactions')}
+                      onMouseEnter={() => setFocusedIndex(idx)}
+                      className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-all text-left group ${
+                        isFocused
+                          ? 'bg-brand-500/15 dark:bg-brand-500/25 ring-2 ring-brand-500 text-brand-900 dark:text-brand-100'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-900/60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 flex items-center justify-center">
+                          {['INCOME', 'LEND_REPAYMENT'].includes(tx.transaction_type) ? (
+                            <ArrowUpRight size={16} className="text-emerald-500" />
+                          ) : (
+                            <ArrowDownRight size={16} className="text-rose-500" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-slate-900 dark:text-slate-100 max-w-sm truncate">
+                            {tx.description || formatTxType(tx.transaction_type)}
+                          </p>
+                          <p className="text-[10px] text-slate-400">
+                            {formatDateDMY(tx.transaction_date)} • {tx.account_name || 'Account'} •{' '}
+                            <span className="capitalize">{formatTxType(tx.transaction_type)}</span>
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-slate-100 max-w-sm truncate">
-                          {tx.description || tx.transaction_type.replace('_', ' ')}
-                        </p>
-                        <p className="text-[10px] text-slate-400">
-                          {formatDateDMY(tx.transaction_date)} • {tx.account_name || 'Account'}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
-                      {formatCurrency(tx.amount)}
-                    </span>
-                  </button>
-                ))}
+                      <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100">
+                        {formatCurrency(tx.amount)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* 50-record limit warning note (#4) */}
+              <div className="mt-2 p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-[11px] flex items-center justify-between">
+                <span>⚡ Showing results from latest 50 transactions</span>
+                <button
+                  type="button"
+                  onClick={() => handleSelect('/transactions')}
+                  className="font-bold underline hover:text-amber-900 dark:hover:text-amber-200"
+                >
+                  Full search in Ledger →
+                </button>
               </div>
             </div>
           )}
