@@ -1,4 +1,4 @@
--- Migration: Fix person balance and dashboard summary views
+/* -- Migration: Fix person balance and dashboard summary views
 -- Prevents negative receivable/payable values that caused -500 display bugs
 
 -- View: Person balances (receivable and payable)
@@ -56,4 +56,4 @@ SELECT
         AS total_payable
 FROM finance_tracker.transactions
 WHERE deleted_at IS NULL
-GROUP BY user_id;
+GROUP BY user_id; */
