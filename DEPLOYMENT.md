@@ -6,13 +6,13 @@ The Personal Finance Tracker is deployed as **one application** on a single serv
 The Express server serves both the React frontend and the REST API from the same URL.
 
 ```
-┌──────────────┐         ┌──────────────────────────┐         ┌──────────────┐
-│   Browser    │ ──────▶ │  Single Server            │ ──────▶ │  PostgreSQL  │
-│              │         │  (Node.js + Express)      │         │  (Neon /     │
-│              │         │                            │         │   Supabase / │
-│              │         │  /          → React SPA    │         │   Railway)   │
-│              │         │  /api/*     → REST API     │         └──────────────┘
-│              │         │  /dashboard → React SPA    │
+┌──────────────┐         ┌──────────────────────────┐          ┌──────────────┐
+│   Browser    │ ──────▶ │  Single Server           │ ──────▶ │   PostgreSQL │
+│              │         │  (Node.js + Express)     │          │  (Neon /     │
+│              │         │                          │          │   Supabase / │
+│              │         │  /          → React SPA  │          │   Railway)   │
+│              │         │  /api/*     → REST API   │          └──────────────┘
+│              │         │  /dashboard → React SPA  │
 └──────────────┘         └──────────────────────────┘
 ```
 
@@ -68,11 +68,11 @@ That's it. The server serves the React frontend AND handles API requests from th
 Vercel is the easiest way to deploy. Everything runs from **one URL** — the React frontend is served as static files, and the Express API runs as a serverless function.
 
 ```
-┌──────────────┐         ┌──────────────────────────────────────┐         ┌──────────────┐
+┌──────────────┐         ┌──────────────────────────────────────┐          ┌──────────────┐
 │   Browser    │ ──────▶ │  Vercel                              │ ──────▶ │  PostgreSQL  │
-│              │         │                                      │         │  (Neon /     │
-│              │         │  /          → React SPA (static)     │         │   Supabase)  │
-│              │         │  /api/*     → Express (serverless)   │         └──────────────┘
+│              │         │                                      │          │  (Neon /     │
+│              │         │  /          → React SPA (static)     │          │   Supabase)  │
+│              │         │  /api/*     → Express (serverless)   │          └──────────────┘
 │              │         │  /dashboard → React SPA              │
 └──────────────┘         └──────────────────────────────────────┘
 ```
