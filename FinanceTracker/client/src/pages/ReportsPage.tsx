@@ -139,31 +139,36 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-            Financial Intelligence &amp; Reports
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight truncate">
+            <span className="sm:hidden">Financial Reports</span>
+            <span className="hidden sm:inline">Financial Intelligence &amp; Reports</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block truncate">
             Executive financial statements, category breakdowns, and account ledgers.
+          </p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 sm:hidden truncate">
+            Statements, breakdowns &amp; ledgers
           </p>
         </div>
         <button
           onClick={() => setShowPrintPreview(true)}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400 transition-all shadow-xs cursor-pointer"
+          className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400 transition-all shadow-xs cursor-pointer flex-shrink-0"
         >
-          <Printer size={15} className="text-brand-500" />
-          <span>Print / PDF Preview</span>
+          <Printer size={14} className="text-brand-500" />
+          <span className="sm:hidden">Print / PDF</span>
+          <span className="hidden sm:inline">Print / PDF Preview</span>
         </button>
       </div>
 
-      {/* Pill Navigation Bar */}
-      <div className="flex flex-wrap items-center gap-1.5 p-1.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+      {/* Pill Navigation Bar (Single swipeable row on mobile, wrap on sm+) */}
+      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-slate-200/60 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar scrollbar-none sm:flex-wrap">
         {tabs.map(({ key, label, icon: Icon }) => (
           <button
             key={key}
             onClick={() => setActiveTab(key)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex-shrink-0 cursor-pointer ${
               activeTab === key
                 ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
@@ -177,14 +182,26 @@ export default function ReportsPage() {
 
       {/* Date Filter Bar */}
       {['income', 'expense', 'comparison', 'person', 'account'].includes(activeTab) && (
-        <div className="card p-4 flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-            <Calendar size={15} />
-            <span>Date Range:</span>
+        <div className="card p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="flex items-center justify-between sm:justify-start gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <Calendar size={14} />
+              <span>Date Range:</span>
+            </span>
+
+            {/* Print / Export Button on mobile header */}
+            <button
+              onClick={() => setShowPrintPreview(true)}
+              className="sm:hidden flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-brand-400 transition-all cursor-pointer"
+              title="Open Print & PDF Export Preview"
+            >
+              <Printer size={11} />
+              <span>Preview</span>
+            </button>
           </div>
 
           {/* Quick Date Presets */}
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar scrollbar-none flex-nowrap sm:flex-wrap pb-0.5 sm:pb-0">
             {([
               { label: 'This Month', getRange: () => {
                 const now = new Date(); return { from: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`, to: `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(new Date(now.getFullYear(), now.getMonth()+1, 0).getDate()).padStart(2,'0')}` };
@@ -205,7 +222,7 @@ export default function ReportsPage() {
                 <button
                   key={label}
                   onClick={() => { setDateFrom(range.from); setDateTo(range.to); }}
-                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border whitespace-nowrap flex-shrink-0 cursor-pointer ${
                     isActive
                       ? 'bg-brand-600 dark:bg-brand-500 text-white border-brand-600 dark:border-brand-500'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500'
@@ -219,38 +236,41 @@ export default function ReportsPage() {
 
           <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block" />
 
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-slate-500">From:</label>
-            <input
-              type="date"
-              className="input py-1 px-3 text-xs"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="text-xs font-medium text-slate-500">To:</label>
-            <input
-              type="date"
-              className="input py-1 px-3 text-xs"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-            />
+          {/* Date Range Inputs */}
+          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs font-medium text-slate-500">From:</label>
+              <input
+                type="date"
+                className="input py-1 px-2.5 text-xs w-full sm:w-auto"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center gap-1.5">
+              <label className="text-xs font-medium text-slate-500">To:</label>
+              <input
+                type="date"
+                className="input py-1 px-2.5 text-xs w-full sm:w-auto"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+              />
+            </div>
           </div>
 
           {(dateFrom || dateTo) && (
             <button
               onClick={() => { setDateFrom(''); setDateTo(''); }}
-              className="text-xs text-rose-500 hover:text-rose-700 font-semibold transition-colors"
+              className="text-xs text-rose-500 hover:text-rose-700 font-semibold transition-colors cursor-pointer"
             >
               Clear Filter
             </button>
           )}
 
-          {/* Print / Export Button */}
+          {/* Desktop Print / Export Button */}
           <button
             onClick={() => setShowPrintPreview(true)}
-            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500 transition-all cursor-pointer"
+            className="hidden sm:flex ml-auto items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:border-brand-400 dark:hover:border-brand-500 transition-all cursor-pointer"
             title="Open Print & PDF Export Preview"
           >
             <Printer size={12} />
@@ -315,82 +335,90 @@ export default function ReportsPage() {
             ) : (
               position && (
                 <div className="space-y-5">
-                  {/* 4 Overview Stat Cards */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="stat-card">
-                    <div className="flex items-center gap-2.5 mb-2">
-                      <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
-                        <Wallet size={16} className="text-slate-600 dark:text-slate-400" />
+                  {/* 4 Overview Stat Cards (2x2 on Mobile, 4 Cols on Desktop) */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+                  <div className="stat-card p-3 sm:p-5 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 sm:gap-2.5 mb-1.5 sm:mb-2">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center flex-shrink-0">
+                          <Wallet size={15} className="text-slate-600 dark:text-slate-400" />
+                        </div>
+                        <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate">Cash in Accounts</span>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cash in Accounts</span>
+                      <p className="text-base sm:text-2xl font-extrabold text-slate-900 dark:text-white truncate">{formatCurrency(position.totalCash)}</p>
                     </div>
-                    <p className="text-2xl font-extrabold text-slate-900 dark:text-white">{formatCurrency(position.totalCash)}</p>
-                    <span className="text-[10px] text-slate-400 mt-1">Liquid balances across accounts</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 mt-1 truncate">Liquid balances across accounts</span>
                   </div>
 
-                  <div className="stat-card">
-                    <div className="flex items-center gap-2.5 mb-2">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-100/60 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
-                        <ArrowUpRight size={16} className="text-emerald-600 dark:text-emerald-400" />
+                  <div className="stat-card p-3 sm:p-5 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 sm:gap-2.5 mb-1.5 sm:mb-2">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-100/60 dark:bg-emerald-950/40 flex items-center justify-center flex-shrink-0">
+                          <ArrowUpRight size={15} className="text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider truncate">Receivables</span>
                       </div>
-                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Receivables</span>
+                      <p className="text-base sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 truncate">+{formatCurrency(position.totalReceivable)}</p>
                     </div>
-                    <p className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">+{formatCurrency(position.totalReceivable)}</p>
-                    <span className="text-[10px] text-slate-400 mt-1">Owed to you by counterparties</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 mt-1 truncate">Owed to you by others</span>
                   </div>
 
-                  <div className="stat-card">
-                    <div className="flex items-center gap-2.5 mb-2">
-                      <div className="w-8 h-8 rounded-xl bg-rose-100/60 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
-                        <ArrowDownRight size={16} className="text-rose-600 dark:text-rose-400" />
+                  <div className="stat-card p-3 sm:p-5 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 sm:gap-2.5 mb-1.5 sm:mb-2">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-rose-100/60 dark:bg-rose-950/40 flex items-center justify-center flex-shrink-0">
+                          <ArrowDownRight size={15} className="text-rose-600 dark:text-rose-400" />
+                        </div>
+                        <span className="text-[9px] sm:text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider truncate">Payables</span>
                       </div>
-                      <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Payables</span>
+                      <p className="text-base sm:text-2xl font-extrabold text-rose-600 dark:text-rose-400 truncate">-{formatCurrency(position.totalPayable)}</p>
                     </div>
-                    <p className="text-2xl font-extrabold text-rose-600 dark:text-rose-400">-{formatCurrency(position.totalPayable)}</p>
-                    <span className="text-[10px] text-slate-400 mt-1">Owed by you to others</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 mt-1 truncate">Owed by you to others</span>
                   </div>
 
-                  <div className="stat-card border-brand-300/50 dark:border-brand-800/50">
-                    <div className="flex items-center gap-2.5 mb-2">
-                      <div className="w-8 h-8 rounded-xl bg-brand-100/60 dark:bg-brand-950/40 flex items-center justify-center flex-shrink-0">
-                        <TrendingUp size={16} className="text-brand-600 dark:text-brand-400" />
+                  <div className="stat-card p-3 sm:p-5 flex flex-col justify-between border-brand-300/50 dark:border-brand-800/50">
+                    <div>
+                      <div className="flex items-center gap-2 sm:gap-2.5 mb-1.5 sm:mb-2">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-brand-100/60 dark:bg-brand-950/40 flex items-center justify-center flex-shrink-0">
+                          <TrendingUp size={15} className="text-brand-600 dark:text-brand-400" />
+                        </div>
+                        <span className="text-[9px] sm:text-[10px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider truncate">Net Wealth</span>
                       </div>
-                      <span className="text-[10px] font-bold text-brand-600 dark:text-brand-400 uppercase tracking-wider">Net Wealth</span>
+                      <p className={`text-base sm:text-2xl font-extrabold truncate ${position.netPosition >= 0 ? 'text-slate-900 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
+                        {formatCurrency(position.netPosition)}
+                      </p>
                     </div>
-                    <p className={`text-2xl font-extrabold ${position.netPosition >= 0 ? 'text-slate-900 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
-                      {formatCurrency(position.netPosition)}
-                    </p>
-                    <span className="text-[10px] text-slate-400 mt-1">Cash + Receivables - Payables</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 mt-1 truncate">Cash + Rec − Pay</span>
                   </div>
                 </div>
 
                 {/* Loan Commitments Block */}
-                <div className="card p-5">
-                  <div className="pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
+                <div className="card p-3.5 sm:p-5">
+                  <div className="pb-2.5 sm:pb-3 border-b border-slate-100 dark:border-slate-800 mb-3 sm:mb-4">
+                    <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
                       Active Loan Commitments
                     </h3>
-                    <p className="text-[11px] text-slate-400 mt-0.5">
+                    <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5">
                       Overview of funds currently tied up in formal loan agreements.
                     </p>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-4 p-4 rounded-xl bg-brand-50/40 dark:bg-brand-950/20 border border-brand-200/50 dark:border-brand-900/40">
-                      <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-950/60 flex items-center justify-center flex-shrink-0">
-                        <ArrowUpRight size={18} className="text-brand-600 dark:text-brand-400" />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-4">
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-brand-50/40 dark:bg-brand-950/20 border border-brand-200/50 dark:border-brand-900/40">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-100 dark:bg-brand-950/60 flex items-center justify-center flex-shrink-0">
+                        <ArrowUpRight size={17} className="text-brand-600 dark:text-brand-400" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Active Lent</p>
-                        <p className="text-lg font-extrabold text-brand-600 dark:text-brand-400">{formatCurrency(position.loanSummary.totalLent)}</p>
+                        <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Active Lent</p>
+                        <p className="text-base sm:text-lg font-extrabold text-brand-600 dark:text-brand-400">{formatCurrency(position.loanSummary.totalLent)}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 p-4 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/40">
-                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center flex-shrink-0">
-                        <ArrowDownRight size={18} className="text-amber-600 dark:text-amber-400" />
+                    <div className="flex items-center gap-3 p-3 sm:p-4 rounded-xl bg-amber-50/40 dark:bg-amber-950/20 border border-amber-200/50 dark:border-amber-900/40">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 flex items-center justify-center flex-shrink-0">
+                        <ArrowDownRight size={17} className="text-amber-600 dark:text-amber-400" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Active Borrowed</p>
-                        <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400">{formatCurrency(position.loanSummary.totalBorrowed)}</p>
+                        <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Active Borrowed</p>
+                        <p className="text-base sm:text-lg font-extrabold text-amber-600 dark:text-amber-400">{formatCurrency(position.loanSummary.totalBorrowed)}</p>
                       </div>
                     </div>
                   </div>
@@ -1149,36 +1177,34 @@ export default function ReportsPage() {
           ) : accountStatement ? (
             <div className="space-y-4">
               {/* Statement Header Card */}
-              <div className="card p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Ledger Statement</p>
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
-                      {accountStatement.account?.account_name || accountStatement.account?.name}
-                    </h3>
-                    <p className="text-[11px] text-slate-400 mt-0.5 capitalize">
-                      {accountStatement.account?.account_type} account · {(dateFrom || dateTo) ? 'Period opening balance' : 'Opening balance'}: {formatCurrency(accountStatement.openingBalance)}
-                    </p>
+              <div className="card p-4 sm:p-5">
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Ledger Statement</p>
+                  <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+                    {accountStatement.account?.account_name || accountStatement.account?.name}
+                  </h3>
+                  <p className="text-[11px] text-slate-400 mt-0.5 capitalize">
+                    {accountStatement.account?.account_type} account · {(dateFrom || dateTo) ? 'Period opening balance' : 'Opening balance'}: {formatCurrency(accountStatement.openingBalance)}
+                  </p>
+                </div>
+                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  <div className="text-center p-2 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                      {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-5">
-                    <div className="text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
-                      <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                        {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
-                      </span>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
-                      <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
-                        {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
-                      </span>
-                    </div>
-                    <div className="text-center border-l border-slate-200 dark:border-slate-800 pl-5">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Closing Balance</span>
-                      <span className={`text-base font-black font-mono ${accountStatement.closingBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                        {formatCurrency(Math.abs(accountStatement.closingBalance))} {accountStatement.closingBalance >= 0 ? 'Dr' : 'Cr'}
-                      </span>
-                    </div>
+                  <div className="text-center p-2 rounded-lg bg-rose-50/60 dark:bg-rose-950/20">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
+                    <span className="text-xs sm:text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
+                      {formatCurrency(accountStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
+                    </span>
+                  </div>
+                  <div className="text-center p-2 rounded-lg bg-slate-100/60 dark:bg-slate-800/40">
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Closing Bal.</span>
+                    <span className={`text-xs sm:text-sm font-black font-mono ${accountStatement.closingBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                      {formatCurrency(Math.abs(accountStatement.closingBalance))} {accountStatement.closingBalance >= 0 ? 'Dr' : 'Cr'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1197,8 +1223,8 @@ export default function ReportsPage() {
                   </span>
                 </div>
 
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
+                <div className="overflow-x-auto -mx-0">
+                  <table className="w-full min-w-[560px] text-left text-xs border-collapse">
                     <thead>
                       <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50 dark:bg-slate-900/40">
                         <th className="p-3">Date</th>
@@ -1320,42 +1346,40 @@ export default function ReportsPage() {
             personStatement && (
               <div className="space-y-4">
                 {/* Header Summary */}
-                <div className="card p-5">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Counterparty Ledger</p>
-                      <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
-                        {personStatement.person?.name}
-                      </h3>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        {(dateFrom || dateTo) ? `Period opening balance: ${formatCurrency(personStatement.openingBalance || 0)}` : 'All transactions involving this contact'}
-                      </p>
+                <div className="card p-4 sm:p-5">
+                  <div className="mb-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Counterparty Ledger</p>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-slate-100">
+                      {personStatement.person?.name}
+                    </h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      {(dateFrom || dateTo) ? `Period opening balance: ${formatCurrency(personStatement.openingBalance || 0)}` : 'All transactions involving this contact'}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div className="text-center p-2 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
+                      <span className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                        {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-5">
-                      <div className="text-center">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
-                        <span className="text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
-                          {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
-                        </span>
-                      </div>
-                      <div className="text-center">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
-                        <span className="text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
-                          {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
-                        </span>
-                      </div>
-                      <div className="text-center pl-4 border-l border-slate-200 dark:border-slate-700">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Net Balance</span>
-                        {(() => {
-                          const bal = toNum(personStatement.balance?.amount_they_owe_you) - toNum(personStatement.balance?.amount_you_owe_them);
-                          const isDr = bal >= 0;
-                          return (
-                            <span className={`text-sm font-extrabold font-mono ${isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                              {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
-                            </span>
-                          );
-                        })()}
-                      </div>
+                    <div className="text-center p-2 rounded-lg bg-rose-50/60 dark:bg-rose-950/20">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
+                      <span className="text-xs sm:text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
+                        {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
+                      </span>
+                    </div>
+                    <div className="text-center p-2 rounded-lg bg-slate-100/60 dark:bg-slate-800/40">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Net Balance</span>
+                      {(() => {
+                        const bal = toNum(personStatement.balance?.amount_they_owe_you) - toNum(personStatement.balance?.amount_you_owe_them);
+                        const isDr = bal >= 0;
+                        return (
+                          <span className={`text-xs sm:text-sm font-extrabold font-mono ${isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                            {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -1363,7 +1387,7 @@ export default function ReportsPage() {
                 {/* Ledger Table */}
                 <div className="card p-0 overflow-hidden">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
+                      <table className="w-full min-w-[560px] text-left border-collapse">
                         <thead>
                           <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
                             <th className="p-3 w-[100px]">Date</th>
@@ -1500,7 +1524,7 @@ export default function ReportsPage() {
                       </h3>
                     </div>
                     <div className="overflow-x-auto">
-                      <table className="w-full text-left border-collapse">
+                      <table className="w-full min-w-[520px] text-left border-collapse">
                         <thead>
                           <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
                             <th className="p-3">Direction</th>

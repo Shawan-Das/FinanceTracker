@@ -379,10 +379,10 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
         </div>
 
         {/* Action Buttons */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex gap-2.5">
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2.5">
           <button
             type="button"
-            className="btn-secondary flex-1 text-xs py-2.5"
+            className="btn-secondary flex-1 text-xs h-10 font-semibold cursor-pointer"
             onClick={onClose}
           >
             Cancel
@@ -390,10 +390,10 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
           <button
             type="submit"
             disabled={mutation.isPending}
-            className="btn-primary flex-[2] text-xs py-2.5 font-bold shadow-md shadow-brand-500/25 flex items-center justify-center gap-1.5"
+            className="btn-primary flex-[2] text-xs h-10 font-bold shadow-md shadow-brand-500/25 flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <Zap size={15} className="fill-current" />
-            <span>{mutation.isPending ? 'Logging...' : 'Confirm & Log (1-Click)'}</span>
+            <Zap size={14} className="fill-current flex-shrink-0" />
+            <span className="truncate">{mutation.isPending ? 'Logging...' : 'Confirm & Log'}</span>
           </button>
         </div>
       </form>

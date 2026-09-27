@@ -161,20 +161,22 @@ export default function LoanAddFundsModal({
           This will increase the loan principal and automatically adjust the chosen account ledger.
         </div>
 
-        <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+        <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
           <button
             type="button"
-            className="btn-secondary flex-1 text-xs"
+            className="btn-secondary flex-1 text-xs h-10 font-semibold cursor-pointer"
             onClick={handleClose}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="flex-1 text-xs py-2.5 font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-all"
+            className="btn-primary flex-[2] text-xs h-10 font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             disabled={addFundsMutation.isPending}
           >
-            {addFundsMutation.isPending ? 'Adding Funds...' : 'Add Funds'}
+            <span className="truncate">
+              {addFundsMutation.isPending ? 'Adding Funds...' : 'Add Funds'}
+            </span>
           </button>
         </div>
       </form>

@@ -337,178 +337,207 @@ export default function LoansPage() {
   return (
     <div className="space-y-6">
       {/* ─── Header & Actions ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-            Loan Portfolio &amp; Debt Tracking
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight truncate">
+            <span className="sm:hidden">Loans &amp; Debts</span>
+            <span className="hidden sm:inline">Loan Portfolio &amp; Debt Tracking</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
             Track money lent out, borrowed liabilities, running balances, and repayment schedules.
+          </p>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate sm:hidden">
+            Track receivables, debts &amp; repayments
           </p>
         </div>
 
         <button
           onClick={() => setShowCreateForm(true)}
-          className="btn-primary text-xs font-semibold px-4 py-2.5 shadow-md shadow-brand-500/20 flex items-center gap-2"
+          className="btn-primary text-xs font-semibold px-3 sm:px-4 py-2 sm:py-2.5 shadow-md shadow-brand-500/20 flex items-center gap-1.5 flex-shrink-0 cursor-pointer"
         >
-          <Plus size={16} />
-          <span>New Loan Agreement</span>
+          <Plus size={15} />
+          <span className="sm:hidden">New Loan</span>
+          <span className="hidden sm:inline">New Loan Agreement</span>
         </button>
       </div>
 
-      {/* ─── Executive KPI Stat Cards (4 Cards) ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* ─── Executive KPI Stat Cards (2x2 on Mobile, 4 Cols on Desktop) ─── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Total Receivables (Lent Out) */}
-        <div className="stat-card relative overflow-hidden group">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-100/70 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
-                <ArrowUpRight size={18} />
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Money Lent (Receivables)
-                </span>
-                <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                  {metrics.lentRecoveryRate.toFixed(0)}% recovered
-                </span>
+        <div className="stat-card p-3 sm:p-5 relative overflow-hidden group flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-emerald-100/70 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold flex-shrink-0">
+                  <ArrowUpRight size={15} className="sm:hidden" />
+                  <ArrowUpRight size={18} className="hidden sm:block" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">
+                    <span className="sm:hidden">Money Lent</span>
+                    <span className="hidden sm:inline">Money Lent (Receivables)</span>
+                  </span>
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 block truncate">
+                    {metrics.lentRecoveryRate.toFixed(0)}% recovered
+                  </span>
+                </div>
               </div>
             </div>
+            <p className="text-base sm:text-2xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight truncate">
+              {formatCurrency(metrics.outstandingLent)}
+            </p>
           </div>
-          <p className="text-2xl font-extrabold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
-            {formatCurrency(metrics.outstandingLent)}
-          </p>
-          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-            <span>Given: {formatCurrency(metrics.totalLentPrincipal)}</span>
-            <span>Repaid: {formatCurrency(metrics.totalLentRepaid)}</span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800/80 gap-0.5 sm:gap-1">
+            <span className="truncate">Given: {formatCurrency(metrics.totalLentPrincipal)}</span>
+            <span className="truncate text-emerald-600 dark:text-emerald-400 font-medium">Repaid: {formatCurrency(metrics.totalLentRepaid)}</span>
           </div>
         </div>
 
         {/* Total Payables (Borrowed In) */}
-        <div className="stat-card relative overflow-hidden group">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-rose-100/70 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
-                <ArrowDownRight size={18} />
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Money Borrowed (Payables)
-                </span>
-                <span className="text-[10px] font-semibold text-rose-600 dark:text-rose-400">
-                  {metrics.borrowedPayRate.toFixed(0)}% settled
-                </span>
+        <div className="stat-card p-3 sm:p-5 relative overflow-hidden group flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-rose-100/70 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold flex-shrink-0">
+                  <ArrowDownRight size={15} className="sm:hidden" />
+                  <ArrowDownRight size={18} className="hidden sm:block" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">
+                    <span className="sm:hidden">Borrowed</span>
+                    <span className="hidden sm:inline">Money Borrowed (Payables)</span>
+                  </span>
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-rose-600 dark:text-rose-400 block truncate">
+                    {metrics.borrowedPayRate.toFixed(0)}% settled
+                  </span>
+                </div>
               </div>
             </div>
+            <p className="text-base sm:text-2xl font-extrabold font-mono text-rose-600 dark:text-rose-400 tracking-tight truncate">
+              {formatCurrency(metrics.outstandingBorrowed)}
+            </p>
           </div>
-          <p className="text-2xl font-extrabold font-mono text-rose-600 dark:text-rose-400 tracking-tight">
-            {formatCurrency(metrics.outstandingBorrowed)}
-          </p>
-          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-            <span>Taken: {formatCurrency(metrics.totalBorrowedPrincipal)}</span>
-            <span>Repaid: {formatCurrency(metrics.totalBorrowedRepaid)}</span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800/80 gap-0.5 sm:gap-1">
+            <span className="truncate">Taken: {formatCurrency(metrics.totalBorrowedPrincipal)}</span>
+            <span className="truncate text-rose-600 dark:text-rose-400 font-medium">Repaid: {formatCurrency(metrics.totalBorrowedRepaid)}</span>
           </div>
         </div>
 
         {/* Net Credit Position */}
-        <div className="stat-card relative overflow-hidden group">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold ${
-                  metrics.netPosition >= 0
-                    ? 'bg-brand-100/70 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400'
-                    : 'bg-amber-100/70 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
-                }`}
-              >
-                <Scale size={18} />
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Net Lending Position
-                </span>
-                <span
-                  className={`text-[10px] font-semibold ${
+        <div className="stat-card p-3 sm:p-5 relative overflow-hidden group flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <div
+                  className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-bold flex-shrink-0 ${
                     metrics.netPosition >= 0
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-rose-600 dark:text-rose-400'
+                      ? 'bg-brand-100/70 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400'
+                      : 'bg-amber-100/70 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
                   }`}
                 >
-                  {metrics.netPosition >= 0 ? 'Net Creditor (Surplus)' : 'Net Debtor (Deficit)'}
-                </span>
+                  <Scale size={15} className="sm:hidden" />
+                  <Scale size={18} className="hidden sm:block" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">
+                    <span className="sm:hidden">Net Position</span>
+                    <span className="hidden sm:inline">Net Lending Position</span>
+                  </span>
+                  <span
+                    className={`text-[9px] sm:text-[10px] font-semibold block truncate ${
+                      metrics.netPosition >= 0
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-rose-600 dark:text-rose-400'
+                    }`}
+                  >
+                    {metrics.netPosition >= 0 ? 'Surplus (Creditor)' : 'Deficit (Debtor)'}
+                  </span>
+                </div>
               </div>
             </div>
+            <p
+              className={`text-base sm:text-2xl font-extrabold font-mono tracking-tight truncate ${
+                metrics.netPosition >= 0
+                  ? 'text-emerald-600 dark:text-emerald-400'
+                  : 'text-rose-600 dark:text-rose-400'
+              }`}
+            >
+              {metrics.netPosition >= 0 ? '+' : ''}
+              {formatCurrency(metrics.netPosition)}
+            </p>
           </div>
-          <p
-            className={`text-2xl font-extrabold font-mono tracking-tight ${
-              metrics.netPosition >= 0
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-rose-600 dark:text-rose-400'
-            }`}
-          >
-            {metrics.netPosition >= 0 ? '+' : ''}
-            {formatCurrency(metrics.netPosition)}
-          </p>
-          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
-            <span>Receivables − Payables</span>
-            <span className="font-semibold text-slate-700 dark:text-slate-300">
-              {metrics.netPosition >= 0 ? 'Surplus' : 'Deficit'}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800/80 gap-0.5 sm:gap-1">
+            <span className="truncate">Lent − Borrowed</span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300 truncate">
+              {metrics.netPosition >= 0 ? 'Net Creditor' : 'Net Debtor'}
             </span>
           </div>
         </div>
 
         {/* Portfolio Status & Health */}
-        <div className="stat-card relative overflow-hidden group">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold ${
-                  metrics.overdueCount > 0
-                    ? 'bg-rose-100/80 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 animate-pulse'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
-                }`}
-              >
-                {metrics.overdueCount > 0 ? <AlertTriangle size={18} /> : <CheckCircle2 size={18} />}
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                  Agreements Health
-                </span>
-                <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
-                  {metrics.activeCount} Ongoing · {metrics.settledCount} Settled
-                </span>
+        <div className="stat-card p-3 sm:p-5 relative overflow-hidden group flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <div
+                  className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-bold flex-shrink-0 ${
+                    metrics.overdueCount > 0
+                      ? 'bg-rose-100/80 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 animate-pulse'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                  }`}
+                >
+                  {metrics.overdueCount > 0 ? (
+                    <>
+                      <AlertTriangle size={15} className="sm:hidden" />
+                      <AlertTriangle size={18} className="hidden sm:block" />
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 size={15} className="sm:hidden" />
+                      <CheckCircle2 size={18} className="hidden sm:block" />
+                    </>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">
+                    Portfolio Health
+                  </span>
+                  <span className="text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400 block truncate">
+                    {metrics.activeCount} Ongoing · {metrics.settledCount} Paid
+                  </span>
+                </div>
               </div>
             </div>
+            <div className="flex items-baseline gap-1.5 sm:gap-2">
+              <p className="text-base sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+                {metrics.activeCount}
+              </p>
+              <span className="text-[11px] sm:text-xs text-slate-400 font-medium">active</span>
+            </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <p className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
-              {metrics.activeCount}
-            </p>
-            <span className="text-xs text-slate-400 font-medium">active agreements</span>
-          </div>
-          <div className="flex items-center justify-between text-[11px] mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-[10px] sm:text-[11px] mt-1.5 sm:mt-2 pt-1.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800/80 gap-0.5 sm:gap-1">
             {metrics.overdueCount > 0 ? (
-              <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1">
-                <AlertTriangle size={12} /> {metrics.overdueCount} Overdue Attention
+              <span className="font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1 truncate">
+                <AlertTriangle size={11} /> {metrics.overdueCount} Overdue
               </span>
             ) : (
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 size={12} /> All payments on schedule
+              <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 truncate">
+                <CheckCircle2 size={11} /> On schedule
               </span>
             )}
-            <span className="text-slate-400 font-mono text-[10px]">{metrics.settledCount} paid</span>
+            <span className="text-slate-400 font-mono text-[10px] truncate">{metrics.settledCount} paid</span>
           </div>
         </div>
       </div>
 
       {/* ─── Legacy Loan Synchronization Notice ─── */}
       {orphanedData && orphanedData.count > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 shadow-sm animate-in fade-in">
-          <div className="flex items-start gap-3.5">
-            <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
-              <Wrench size={18} />
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 shadow-sm animate-in fade-in">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-amber-100 dark:bg-amber-950/80 text-amber-600 dark:text-amber-400 flex items-center justify-center flex-shrink-0">
+              <Wrench size={16} />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <h3 className="text-xs font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider">
                 {orphanedData.count} Legacy Loan Agreement(s) Require Ledger Sync
               </h3>
@@ -521,7 +550,7 @@ export default function LoansPage() {
                   setFixAccountId('');
                   setShowFixForm(true);
                 }}
-                className="mt-3 px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="mt-3 px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <Wrench size={13} />
                 <span>Sync {orphanedData.count} Loan Record(s)</span>
@@ -532,13 +561,13 @@ export default function LoansPage() {
       )}
 
       {/* ─── Interactive Tab Bar, Search, and Sort Controls ─── */}
-      <div className="card p-3.5 space-y-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          {/* Tab Navigation Pills */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800">
+      <div className="card p-2.5 sm:p-3.5 space-y-2.5 sm:space-y-3">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3">
+          {/* Tab Navigation Pills (Horizontal scroll on mobile, wrap on sm+) */}
+          <div className="flex items-center gap-1 sm:gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 overflow-x-auto no-scrollbar scrollbar-none sm:flex-wrap">
             <button
               onClick={() => setActiveTab('active')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
                 activeTab === 'active'
                   ? 'bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
@@ -552,31 +581,31 @@ export default function LoansPage() {
 
             <button
               onClick={() => setActiveTab('lent')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
                 activeTab === 'lent'
                   ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400'
               }`}
             >
               <ArrowUpRight size={13} className="text-emerald-500" />
-              <span>Money Lent</span>
+              <span><span className="sm:hidden">Lent</span><span className="hidden sm:inline">Money Lent</span></span>
             </button>
 
             <button
               onClick={() => setActiveTab('borrowed')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
                 activeTab === 'borrowed'
                   ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400'
               }`}
             >
               <ArrowDownRight size={13} className="text-rose-500" />
-              <span>Money Borrowed</span>
+              <span><span className="sm:hidden">Borrowed</span><span className="hidden sm:inline">Money Borrowed</span></span>
             </button>
 
             <button
               onClick={() => setActiveTab('overdue')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
                 activeTab === 'overdue'
                   ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400'
@@ -593,22 +622,22 @@ export default function LoansPage() {
 
             <button
               onClick={() => setActiveTab('settled')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap flex-shrink-0 ${
                 activeTab === 'settled'
                   ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm'
                   : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <CheckCircle2 size={13} className="text-emerald-500" />
-              <span>Settled / Paid</span>
+              <span><span className="sm:hidden">Settled</span><span className="hidden sm:inline">Settled / Paid</span></span>
               <span className="text-[10px] font-extrabold px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700">
                 {metrics.settledCount}
               </span>
             </button>
           </div>
 
-          {/* Search Bar & Sorting */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          {/* Search Bar & Sorting (Inline & tidy on mobile) */}
+          <div className="flex items-center gap-2 w-full lg:w-auto">
             <div className="relative flex-1 sm:w-64">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -618,19 +647,27 @@ export default function LoansPage() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="input pl-8.5 py-1.5 text-xs w-full"
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
 
             <div className="flex items-center gap-1.5 flex-shrink-0">
-              <SlidersHorizontal size={14} className="text-slate-400" />
+              <SlidersHorizontal size={14} className="text-slate-400 hidden sm:block" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="input py-1.5 px-2.5 text-xs font-semibold"
+                className="input py-1.5 px-2 text-xs font-semibold max-w-[125px] sm:max-w-none"
               >
-                <option value="remaining">Highest Balance First</option>
-                <option value="due_date">Due Date (Urgent First)</option>
-                <option value="start_date">Newest Agreement</option>
-                <option value="progress">Highest Progress %</option>
+                <option value="remaining">Balance</option>
+                <option value="due_date">Due Date</option>
+                <option value="start_date">Newest</option>
+                <option value="progress">Progress %</option>
               </select>
             </div>
           </div>
@@ -765,13 +802,19 @@ export default function LoansPage() {
                           </span>
                         )}
                       </div>
+
+                      {loan.description && (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1 italic pt-0.5">
+                          "{loan.description}"
+                        </p>
+                      )}
                     </div>
 
                     {/* Compact Action Toolbar */}
                     <div className="flex items-center gap-1.5 pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80">
                       <button
                         onClick={() => openRepay(loan)}
-                        className="btn-primary flex-1 text-xs py-1.5 font-bold shadow-sm shadow-brand-500/20 flex items-center justify-center gap-1"
+                        className="btn-primary flex-1 text-xs py-2 sm:py-1.5 font-bold shadow-sm shadow-brand-500/20 flex items-center justify-center gap-1 cursor-pointer"
                       >
                         <Wallet size={12} />
                         <span>Pay</span>
@@ -779,7 +822,7 @@ export default function LoansPage() {
 
                       <button
                         onClick={() => openAddFunds(loan)}
-                        className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/70 border border-emerald-200/60 dark:border-emerald-900/60 transition-colors flex-shrink-0"
+                        className="p-2 sm:p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/70 border border-emerald-200/60 dark:border-emerald-900/60 transition-colors flex-shrink-0 cursor-pointer"
                         title="Add more funds / capital to this loan"
                       >
                         <CircleDollarSign size={14} />
@@ -787,7 +830,7 @@ export default function LoansPage() {
 
                       <button
                         onClick={() => handleOpenVoucher(loan)}
-                        className="p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0"
+                        className="p-2 sm:p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex-shrink-0 cursor-pointer"
                         title="View Statement & Voucher"
                       >
                         <FileText size={14} />
@@ -795,7 +838,7 @@ export default function LoansPage() {
 
                       <button
                         onClick={() => setDeletingLoanId(loan.id)}
-                        className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/70 border border-rose-200/60 dark:border-rose-900/60 transition-colors flex-shrink-0"
+                        className="p-2 sm:p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-950/70 border border-rose-200/60 dark:border-rose-900/60 transition-colors flex-shrink-0 cursor-pointer"
                         title="Delete Loan Record"
                       >
                         <Trash2 size={14} />
@@ -826,109 +869,185 @@ export default function LoansPage() {
         </div>
       )}
 
-      {/* ─── Settled / Completed Loans Table View ─── */}
+      {/* ─── Settled / Completed Loans View (Cards on Mobile, Table on Tablet/Desktop) ─── */}
       {activeTab === 'settled' && (
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <CheckCircle2 size={18} className="text-emerald-500" />
-            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+            <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100">
               Completed &amp; Settled Agreements ({filteredLoans.length})
             </h2>
           </div>
 
           {filteredLoans.length > 0 ? (
-            <div className="card p-0 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
-                      <th className="p-4">Counterparty</th>
-                      <th className="p-4">Direction</th>
-                      <th className="p-4 text-right">Settled Principal</th>
-                      <th className="p-4 text-right">Total Repaid</th>
-                      <th className="p-4">Agreement Date</th>
-                      <th className="p-4 text-center">Status</th>
-                      <th className="p-4 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
-                    {filteredLoans.map((loan: Loan) => {
-                      const isLent = loan.direction === 'LENT';
-                      return (
-                        <tr
-                          key={loan.id}
-                          className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors"
-                        >
-                          <td className="p-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-700 dark:text-slate-300">
-                                {getInitials(loan.person_name)}
-                              </div>
-                              <div>
-                                <p className="font-bold text-slate-900 dark:text-slate-100">
-                                  {loan.person_name || 'Unknown Contact'}
-                                </p>
-                                {loan.description && (
-                                  <p className="text-[10px] text-slate-400 truncate max-w-[200px]">
-                                    {loan.description}
-                                  </p>
-                                )}
-                              </div>
+            <>
+              {/* Mobile Card List View (< sm) */}
+              <div className="sm:hidden space-y-2.5">
+                {filteredLoans.map((loan: Loan) => {
+                  const isLent = loan.direction === 'LENT';
+                  return (
+                    <div key={loan.id} className="card p-3 space-y-2 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-700 dark:text-slate-300 flex-shrink-0">
+                            {getInitials(loan.person_name)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-xs text-slate-900 dark:text-slate-100 truncate">
+                              {loan.person_name || 'Unknown Contact'}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className={`badge text-[9px] ${isLent ? 'badge-success' : 'badge-brand'}`}>
+                                {isLent ? 'Lent' : 'Borrowed'}
+                              </span>
+                              <span className="badge badge-success text-[9px] font-bold">PAID</span>
                             </div>
-                          </td>
-                          <td className="p-4">
-                            <span
-                              className={`badge text-[10px] ${
-                                isLent ? 'badge-success' : 'badge-brand'
-                              }`}
-                            >
-                              {isLent ? 'Lent (Receivable)' : 'Borrowed (Payable)'}
-                            </span>
-                          </td>
-                          <td className="p-4 text-right font-bold font-mono text-slate-900 dark:text-slate-100">
-                            {formatCurrency(toNum(loan.principal_amount))}
-                          </td>
-                          <td className="p-4 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-xs font-bold font-mono text-emerald-600 dark:text-emerald-400">
                             {formatCurrency(toNum(loan.total_repaid))}
-                          </td>
-                          <td className="p-4 text-slate-500 font-medium whitespace-nowrap">
-                            {formatDateDMY(loan.start_date)}
-                          </td>
-                          <td className="p-4 text-center">
-                            <span className="badge badge-success text-[10px] font-bold">PAID</span>
-                          </td>
-                          <td className="p-4 text-right">
-                            <div className="flex items-center justify-end gap-1.5">
-                              <button
-                                onClick={() => setDetailsLoan(loan)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                title="View Loan Statement Details"
-                              >
-                                <Eye size={14} />
-                              </button>
-                              <button
-                                onClick={() => handleOpenVoucher(loan)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                title="View Voucher Statement"
-                              >
-                                <FileText size={14} />
-                              </button>
-                              <button
-                                onClick={() => setDeletingLoanId(loan.id)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                title="Delete Loan Record"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                          </p>
+                          <p className="text-[10px] text-slate-400">
+                            Principal {formatCurrency(toNum(loan.principal_amount))}
+                          </p>
+                        </div>
+                      </div>
+
+                      {loan.description && (
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate pl-10">
+                          {loan.description}
+                        </p>
+                      )}
+
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-[10px] text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Calendar size={11} className="text-slate-400" />
+                          {formatDateDMY(loan.start_date)}
+                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => setDetailsLoan(loan)}
+                            className="px-2 py-1 rounded-lg text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 bg-slate-100 dark:bg-slate-800 flex items-center gap-1 text-[11px] font-medium"
+                          >
+                            <Eye size={12} />
+                            <span>Details</span>
+                          </button>
+                          <button
+                            onClick={() => handleOpenVoucher(loan)}
+                            className="px-2 py-1 rounded-lg text-slate-500 hover:text-brand-600 dark:hover:text-brand-400 bg-slate-100 dark:bg-slate-800 flex items-center gap-1 text-[11px] font-medium"
+                          >
+                            <FileText size={12} />
+                            <span>Voucher</span>
+                          </button>
+                          <button
+                            onClick={() => setDeletingLoanId(loan.id)}
+                            className="p-1 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
+                            title="Delete Record"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
+
+              {/* Tablet & Desktop Table View (>= sm) */}
+              <div className="hidden sm:block card p-0 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/60 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
+                        <th className="p-4">Counterparty</th>
+                        <th className="p-4">Direction</th>
+                        <th className="p-4 text-right">Settled Principal</th>
+                        <th className="p-4 text-right">Total Repaid</th>
+                        <th className="p-4">Agreement Date</th>
+                        <th className="p-4 text-center">Status</th>
+                        <th className="p-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                      {filteredLoans.map((loan: Loan) => {
+                        const isLent = loan.direction === 'LENT';
+                        return (
+                          <tr
+                            key={loan.id}
+                            className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors"
+                          >
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-bold text-xs text-slate-700 dark:text-slate-300">
+                                  {getInitials(loan.person_name)}
+                                </div>
+                                <div>
+                                  <p className="font-bold text-slate-900 dark:text-slate-100">
+                                    {loan.person_name || 'Unknown Contact'}
+                                  </p>
+                                  {loan.description && (
+                                    <p className="text-[10px] text-slate-400 truncate max-w-[200px]">
+                                      {loan.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="p-4">
+                              <span
+                                className={`badge text-[10px] ${
+                                  isLent ? 'badge-success' : 'badge-brand'
+                                }`}
+                              >
+                                {isLent ? 'Lent (Receivable)' : 'Borrowed (Payable)'}
+                              </span>
+                            </td>
+                            <td className="p-4 text-right font-bold font-mono text-slate-900 dark:text-slate-100">
+                              {formatCurrency(toNum(loan.principal_amount))}
+                            </td>
+                            <td className="p-4 text-right font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                              {formatCurrency(toNum(loan.total_repaid))}
+                            </td>
+                            <td className="p-4 text-slate-500 font-medium whitespace-nowrap">
+                              {formatDateDMY(loan.start_date)}
+                            </td>
+                            <td className="p-4 text-center">
+                              <span className="badge badge-success text-[10px] font-bold">PAID</span>
+                            </td>
+                            <td className="p-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => setDetailsLoan(loan)}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                  title="View Loan Statement Details"
+                                >
+                                  <Eye size={14} />
+                                </button>
+                                <button
+                                  onClick={() => handleOpenVoucher(loan)}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                  title="View Voucher Statement"
+                                >
+                                  <FileText size={14} />
+                                </button>
+                                <button
+                                  onClick={() => setDeletingLoanId(loan.id)}
+                                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                  title="Delete Loan Record"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
           ) : (
             <EmptyState
               title="No settled loans found"

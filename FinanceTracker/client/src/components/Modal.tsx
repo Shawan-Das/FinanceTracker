@@ -31,7 +31,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       {/* Glass Backdrop */}
       <div
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
@@ -43,11 +43,11 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
         className={`relative bg-[#f4f7fa] dark:bg-[#111726] rounded-2xl border border-[#cbd5e1] dark:border-slate-800 shadow-2xl ${maxWidth} w-full max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200 z-10`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#cbd5e1] dark:border-slate-800/80 bg-[#e4ebf4] dark:bg-slate-900/40">
-          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">{title}</h2>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-[#cbd5e1] dark:border-slate-800/80 bg-[#e4ebf4] dark:bg-slate-900/40">
+          <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 tracking-tight">{title}</h2>
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[#d0dbe7] dark:hover:bg-slate-800 rounded-xl transition-colors"
+            className="p-1.5 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-[#d0dbe7] dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
             aria-label="Close modal"
           >
             <X size={18} />
@@ -55,7 +55,7 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1 text-slate-800 dark:text-slate-200">{children}</div>
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 text-slate-800 dark:text-slate-200">{children}</div>
       </div>
     </div>
   );

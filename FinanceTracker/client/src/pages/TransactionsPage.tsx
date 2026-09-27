@@ -860,20 +860,22 @@ export default function TransactionsPage() {
             </div>
           )}
 
-          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+          <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
             <button
               type="button"
-              className="btn-secondary flex-1 text-xs"
+              className="btn-secondary flex-1 text-xs h-10 font-semibold cursor-pointer"
               onClick={() => { setShowForm(false); resetForm(); }}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
+              className="btn-primary flex-[2] text-xs h-10 font-bold shadow-md shadow-brand-500/20 flex items-center justify-center gap-1.5 cursor-pointer"
               disabled={createMutation.isPending || updateMutation.isPending}
             >
-              {editingTx ? 'Update Entry' : 'Save Transaction'}
+              <span className="truncate">
+                {editingTx ? 'Update Entry' : 'Save Transaction'}
+              </span>
             </button>
           </div>
         </form>

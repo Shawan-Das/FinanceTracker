@@ -291,16 +291,18 @@ export default function CategoriesPage() {
             )}
           </div>
 
-          <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-            <button type="button" className="btn-secondary flex-1 text-xs" onClick={resetForm}>
+          <div className="flex items-center gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            <button type="button" className="btn-secondary flex-1 text-xs h-10 font-semibold cursor-pointer" onClick={resetForm}>
               Cancel
             </button>
             <button
               type="submit"
-              className="btn-primary flex-1 text-xs shadow-md shadow-brand-500/20"
+              className="btn-primary flex-[2] text-xs h-10 font-bold shadow-md shadow-brand-500/20 flex items-center justify-center gap-1.5 cursor-pointer"
               disabled={createMutation.isPending || updateMutation.isPending}
             >
-              {editingCategory ? 'Save Category' : 'Create Category'}
+              <span className="truncate">
+                {editingCategory ? 'Save Category' : 'Create Category'}
+              </span>
             </button>
           </div>
         </form>

@@ -189,20 +189,20 @@ export default function CreatePresetModal({ isOpen, onClose, onSavePreset }: Cre
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex gap-2.5">
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-2.5">
           <button
             type="button"
-            className="btn-secondary flex-1 text-xs py-2.5"
+            className="btn-secondary flex-1 text-xs h-10 font-semibold cursor-pointer"
             onClick={onClose}
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="btn-primary flex-[2] text-xs py-2.5 font-bold shadow-md shadow-brand-500/25 flex items-center justify-center gap-1.5"
+            className="btn-primary flex-[2] text-xs h-10 font-bold shadow-md shadow-brand-500/25 flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <Plus size={15} />
-            <span>Save Quick Shortcut</span>
+            <Plus size={15} className="flex-shrink-0" />
+            <span className="truncate">Save Shortcut</span>
           </button>
         </div>
       </form>
