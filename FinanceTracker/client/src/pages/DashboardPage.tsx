@@ -154,6 +154,25 @@ export default function DashboardPage() {
     staleTime: 120_000, // 2 min
   });
 
+  const formattedMonthlyData = useMemo(() => {
+    if (!monthlyData || !Array.isArray(monthlyData)) return [];
+    return monthlyData.map((m: any) => {
+      let formattedMonth = m.month;
+      if (m.month && m.month.length === 7) {
+        const [year, month] = m.month.split('-');
+        const date = new Date(parseInt(year), parseInt(month) - 1);
+        formattedMonth = date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      }
+      return {
+        ...m,
+        month: formattedMonth,
+        rawMonth: m.month,
+        income: toNum(m.income),
+        expense: toNum(m.expense)
+      };
+    });
+  }, [monthlyData]);
+
   const formattedCategoryData = useMemo(() => {
     if (!categoryData || !Array.isArray(categoryData) || categoryData.length === 0) return [];
     return categoryData
@@ -215,9 +234,9 @@ export default function DashboardPage() {
     .reduce((sum: number, a: any) => sum + toNum(a.current_balance), 0) || 0;
 
   // Monthly stats calculations
-  const totalIncomeThisYear = monthlyData?.reduce((acc: number, curr: any) => acc + curr.income, 0) || 0;
-  const totalExpenseThisYear = monthlyData?.reduce((acc: number, curr: any) => acc + curr.expense, 0) || 0;
-  const avgMonthlyBurn = monthlyData && monthlyData.length > 0 ? totalExpenseThisYear / monthlyData.length : 0;
+  const totalIncomeThisYear = formattedMonthlyData.reduce((acc: number, curr: any) => acc + curr.income, 0);
+  const totalExpenseThisYear = formattedMonthlyData.reduce((acc: number, curr: any) => acc + curr.expense, 0);
+  const avgMonthlyBurn = formattedMonthlyData.length > 0 ? totalExpenseThisYear / formattedMonthlyData.length : 0;
   const runwayMonths = avgMonthlyBurn > 0 && s ? (s.totalAccountBalance / avgMonthlyBurn).toFixed(1) : '∞';
 
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -591,10 +610,10 @@ export default function DashboardPage() {
 
             {monthlyError ? (
               <p className="text-xs text-rose-500 py-12 text-center">Failed to load chart data</p>
-            ) : monthlyData && monthlyData.length > 0 ? (
+            ) : formattedMonthlyData && formattedMonthlyData.length > 0 ? (
               <div className="h-64 sm:h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <BarChart data={formattedMonthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <XAxis
                       dataKey="month"
                       tick={{ fontSize: 11, fill: isDark ? '#94a3b8' : '#64748b' }}
