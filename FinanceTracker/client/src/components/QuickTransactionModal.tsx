@@ -158,10 +158,15 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
         }
       }
     } else {
-      // Blank mode: auto-select first account
+      // Blank mode: auto-select first account and second account for transfers
       if (accounts && accounts.length > 0) {
         const positiveAcc = accounts.find((a: Account) => a.current_balance > 0) || accounts[0];
         setAccountId(positiveAcc.account_id);
+        // Pre-select a distinct second account so TRANSFER has a valid destination
+        if (accounts.length > 1) {
+          const secondAcc = accounts.find((a: Account) => a.account_id !== positiveAcc.account_id);
+          if (secondAcc) setToAccountId(secondAcc.account_id);
+        }
       }
     }
   }, [preset, isOpen, accounts, categories]);
@@ -192,6 +197,14 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
       toast.error('Please select an account');
       return;
     }
+    if (effectiveType === 'TRANSFER' && !toAccountId) {
+      toast.error('Please select a destination account');
+      return;
+    }
+    if (effectiveType === 'TRANSFER' && accountId === toAccountId) {
+      toast.error('Source and destination accounts cannot be the same');
+      return;
+    }
 
     const payload: any = {
       transaction_type: effectiveType,
@@ -199,11 +212,11 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
       transaction_date: txDate,
       description: description || effectiveType,
       account_id: accountId,
-      category_id: categoryId || null,
+      ...(categoryId ? { category_id: categoryId } : {}),
     };
 
     if (effectiveType === 'TRANSFER') {
-      payload.from_account_id = accountId;
+      // The server uses account_id for the source and to_account_id for the destination
       payload.to_account_id = toAccountId;
     }
 
@@ -282,7 +295,7 @@ export default function QuickTransactionModal({ isOpen, onClose, preset }: Quick
 
         {/* Account Selection */}
         <div>
-          <label className="label">Paying Account</label>
+          <label className="label">{effectiveType === 'TRANSFER' ? 'From Account' : 'Paying Account'}</label>
           <select
             className="input text-xs font-semibold"
             value={accountId}
