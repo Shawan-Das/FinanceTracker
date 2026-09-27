@@ -147,6 +147,24 @@ describe('Account statement — running balance with transfers', () => {
     const balances = calculateRunningBalance(25000, []);
     expect(balances).toEqual([]);
   });
+
+  it('maps transactions with both balance and running_balance fields', () => {
+    const openingBalance = 90000;
+    const rows = [
+      { debit: '0', credit: '39000' },
+      { debit: '43000', credit: '0' },
+    ];
+    let runningBalance = openingBalance;
+    const mapped = rows.map((tx) => {
+      runningBalance += (parseFloat(tx.debit) || 0) - (parseFloat(tx.credit) || 0);
+      return { ...tx, balance: runningBalance, running_balance: runningBalance };
+    });
+
+    expect(mapped[0].balance).toBe(51000);
+    expect(mapped[0].running_balance).toBe(51000);
+    expect(mapped[1].balance).toBe(94000);
+    expect(mapped[1].running_balance).toBe(94000);
+  });
 });
 
 // =============================================================================

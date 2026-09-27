@@ -223,7 +223,7 @@ router.get('/account-statement', async (req: Request, res: Response) => {
     // Calculate opening balance for the selected period
     // If a 'from' date is set, compute the balance as of that date by
     // including all prior transactions + the account's original opening balance.
-    let openingBalance = parseFloat(account.opening_balance);
+    let openingBalance = parseFloat(account.opening_balance || '0') || 0;
     if (from) {
       const priorResult = await db.query(
         `SELECT
@@ -258,7 +258,7 @@ router.get('/account-statement', async (req: Request, res: Response) => {
         [userId, accountId, from]
       );
       const prior = priorResult.rows[0];
-      openingBalance += parseFloat(prior.total_debit) - parseFloat(prior.total_credit);
+      openingBalance += (parseFloat(prior.total_debit) || 0) - (parseFloat(prior.total_credit) || 0);
     }
 
     // Get all transactions for this account with debit/credit columns
@@ -297,8 +297,12 @@ router.get('/account-statement', async (req: Request, res: Response) => {
     // Calculate running balance (period opening + debits - credits)
     let runningBalance = openingBalance;
     const transactions = txResult.rows.map((tx: any) => {
-      runningBalance += parseFloat(tx.debit) - parseFloat(tx.credit);
-      return { ...tx, running_balance: runningBalance };
+      runningBalance += (parseFloat(tx.debit) || 0) - (parseFloat(tx.credit) || 0);
+      return {
+        ...tx,
+        balance: runningBalance,
+        running_balance: runningBalance,
+      };
     });
 
     res.json({
@@ -404,8 +408,12 @@ router.get('/person-statement', async (req: Request, res: Response) => {
     // Calculate running balance for the ledger (positive = Dr, negative = Cr)
     let runningBalance = openingBalance;
     const transactions = txResult.rows.map((tx: any) => {
-      runningBalance += parseFloat(tx.debit) - parseFloat(tx.credit);
-      return { ...tx, running_balance: runningBalance };
+      runningBalance += (parseFloat(tx.debit) || 0) - (parseFloat(tx.credit) || 0);
+      return {
+        ...tx,
+        balance: runningBalance,
+        running_balance: runningBalance,
+      };
     });
 
     const balanceResult = await db.query(

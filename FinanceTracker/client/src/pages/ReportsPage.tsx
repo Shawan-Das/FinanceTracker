@@ -1224,7 +1224,7 @@ export default function ReportsPage() {
                       {accountStatement.transactions?.map((tx: any, idx: number) => {
                         const debit = toNum(tx.debit);
                         const credit = toNum(tx.credit);
-                        const bal = toNum(tx.balance);
+                        const bal = toNum(tx.balance ?? tx.running_balance);
                         return (
                           <tr key={tx.id || idx} className="hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors">
                             <td className="p-3 text-slate-400 whitespace-nowrap font-mono text-[11px]">
