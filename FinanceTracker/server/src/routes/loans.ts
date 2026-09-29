@@ -12,7 +12,8 @@ const SCHEMA = 'finance_tracker';
 router.use(requireAuth);
 
 // =============================================================================
-// Auto-detect overdue loans: mark ACTIVE loans past due_date as OVERDUE
+// Auto-detect overdue loans: mark ACTIVE loans past due_date as OVERDUE,
+// and revert OVERDUE loans to ACTIVE if due_date was extended to the future or cleared
 // =============================================================================
 async function markOverdueLoans(userId: string): Promise<void> {
   await db.query(
@@ -22,6 +23,117 @@ async function markOverdueLoans(userId: string): Promise<void> {
        AND due_date IS NOT NULL AND due_date < CURRENT_DATE`,
     [userId]
   );
+  await db.query(
+    `UPDATE ${SCHEMA}.loans
+     SET status = 'ACTIVE', updated_at = NOW()
+     WHERE user_id = $1 AND status = 'OVERDUE'
+       AND (due_date IS NULL OR due_date >= CURRENT_DATE)`,
+    [userId]
+  );
+}
+
+// =============================================================================
+// Auto-link unlinked repayment transactions to loans and record loan_repayments
+// =============================================================================
+export async function syncUnlinkedLoanRepayments(userId: string): Promise<void> {
+  const unlinkedTxs = await db.query(
+    `SELECT t.id, t.transaction_type, t.transaction_date, t.amount, t.person_id, t.loan_id, t.description
+     FROM ${SCHEMA}.transactions t
+     WHERE t.user_id = $1
+       AND t.transaction_type IN ('LEND_REPAYMENT', 'BORROW_REPAYMENT')
+       AND t.deleted_at IS NULL
+       AND NOT EXISTS (
+         SELECT 1 FROM ${SCHEMA}.loan_repayments lr WHERE lr.transaction_id = t.id
+       )
+     ORDER BY t.transaction_date ASC, t.created_at ASC`,
+    [userId]
+  );
+
+  for (const tx of unlinkedTxs.rows) {
+    let loanId = tx.loan_id;
+
+    // If loan_id is missing, try to find matching active/overdue loan for this person
+    if (!loanId && tx.person_id) {
+      const targetDirection = tx.transaction_type === 'LEND_REPAYMENT' ? 'LENT' : 'BORROWED';
+      const candidateLoan = await db.query(
+        `SELECT l.id
+         FROM ${SCHEMA}.loans l
+         LEFT JOIN (
+           SELECT lr.loan_id, SUM(lr.amount) as total_repaid
+           FROM ${SCHEMA}.loan_repayments lr
+           INNER JOIN ${SCHEMA}.transactions t2 ON t2.id = lr.transaction_id AND t2.deleted_at IS NULL
+           GROUP BY lr.loan_id
+         ) repaid ON repaid.loan_id = l.id
+         WHERE l.user_id = $1
+           AND l.person_id = $2
+           AND l.direction = $3
+           AND l.status IN ('ACTIVE', 'OVERDUE')
+           AND (l.principal_amount + l.interest_amount - COALESCE(repaid.total_repaid, 0)) > 0
+         ORDER BY l.start_date ASC
+         LIMIT 1`,
+        [userId, tx.person_id, targetDirection]
+      );
+
+      if (candidateLoan.rows.length > 0) {
+        loanId = candidateLoan.rows[0].id;
+        await db.query(
+          `UPDATE ${SCHEMA}.transactions SET loan_id = $1, updated_at = NOW() WHERE id = $2`,
+          [loanId, tx.id]
+        );
+      } else {
+        // Fallback to most recent loan for this person and direction
+        const fallbackLoan = await db.query(
+          `SELECT l.id
+           FROM ${SCHEMA}.loans l
+           WHERE l.user_id = $1
+             AND l.person_id = $2
+             AND l.direction = $3
+           ORDER BY l.start_date DESC
+           LIMIT 1`,
+          [userId, tx.person_id, targetDirection]
+        );
+        if (fallbackLoan.rows.length > 0) {
+          loanId = fallbackLoan.rows[0].id;
+          await db.query(
+            `UPDATE ${SCHEMA}.transactions SET loan_id = $1, updated_at = NOW() WHERE id = $2`,
+            [loanId, tx.id]
+          );
+        }
+      }
+    }
+
+    if (loanId) {
+      const lreId = generateId('loan_repayments');
+      await db.query(
+        `INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [lreId, loanId, tx.id, tx.amount, tx.transaction_date, tx.description || null]
+      );
+
+      // Check if loan is now fully repaid
+      const checkResult = await db.query(
+        `SELECT l.principal_amount, l.interest_amount, l.status,
+                COALESCE(SUM(lr.amount), 0) as total_repaid
+         FROM ${SCHEMA}.loans l
+         LEFT JOIN ${SCHEMA}.loan_repayments lr ON lr.loan_id = l.id
+         LEFT JOIN ${SCHEMA}.transactions t2 ON t2.id = lr.transaction_id AND t2.deleted_at IS NULL
+         WHERE l.id = $1
+         GROUP BY l.id`,
+        [loanId]
+      );
+      if (checkResult.rows.length > 0) {
+        const lData = checkResult.rows[0];
+        const totalDue = parseFloat(lData.principal_amount) + parseFloat(lData.interest_amount);
+        const totalRepaid = parseFloat(lData.total_repaid);
+        if (totalRepaid >= totalDue && (lData.status === 'ACTIVE' || lData.status === 'OVERDUE')) {
+          await db.query(
+            `UPDATE ${SCHEMA}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
+            [loanId]
+          );
+        }
+      }
+    }
+  }
 }
 
 // =============================================================================
@@ -30,8 +142,9 @@ async function markOverdueLoans(userId: string): Promise<void> {
 router.get('/', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
-    // Auto-detect overdue loans before listing
+    // Auto-detect overdue loans and sync any unlinked repayment transactions
     await markOverdueLoans(userId);
+    await syncUnlinkedLoanRepayments(userId);
     const result = await db.query(
       `SELECT l.*,
               p.name as person_name,
@@ -217,7 +330,7 @@ router.post('/:id/add-funds', validateBody(addFundsSchema), async (req: Request,
       return;
     }
     const loan = loanResult.rows[0];
-    if (loan.status !== 'ACTIVE') {
+    if (loan.status !== 'ACTIVE' && loan.status !== 'OVERDUE') {
       res.status(400).json({
         success: false,
         error: { code: 'LOAN_NOT_ACTIVE', message: `Cannot add funds to a loan with status '${loan.status}'` },
@@ -374,6 +487,7 @@ router.get('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
     const loanId = req.params.id;
+    await syncUnlinkedLoanRepayments(userId);
 
     const result = await db.query(
       `SELECT l.*,
@@ -786,7 +900,7 @@ router.post('/:id/repayments', validateBody(createRepaymentSchema), async (req: 
 
     const loan = loanResult.rows[0];
 
-    if (loan.status !== 'ACTIVE') {
+    if (loan.status !== 'ACTIVE' && loan.status !== 'OVERDUE') {
       res.status(400).json({
         success: false,
         error: { code: 'LOAN_NOT_ACTIVE', message: `Cannot record repayment for a loan with status '${loan.status}'` },

@@ -226,8 +226,8 @@ function queryHandler(sql: string, params: any[] = []): { rows: Row[] } {
     return { rows: repayments };
   }
 
-  // ── Check loan exists for repayment (SELECT id/SELECT * FROM loans WHERE id = $1 AND user_id = $2) ──
-  if ((sql.includes('SELECT * FROM') || sql.includes('SELECT id FROM')) && sql.includes('loans') && sql.includes('WHERE id = $1 AND user_id = $2') && !sql.includes('person_id')) {
+  // ── Check loan exists for repayment or deletion (SELECT id/SELECT * FROM loans WHERE id = $1 AND user_id = $2) ──
+  if ((sql.includes('SELECT * FROM') || sql.includes('SELECT id FROM') || sql.includes('SELECT id, direction, status FROM')) && sql.includes('loans') && sql.includes('WHERE id = $1 AND user_id = $2') && !sql.includes('person_id')) {
     const loan = store.loans.find((l) => l.id === params[0] && l.user_id === params[1]);
     return { rows: loan ? [loan] : [] };
   }
@@ -295,8 +295,15 @@ function queryHandler(sql: string, params: any[] = []): { rows: Row[] } {
     return { rows: [{ count: String(count) }] };
   }
 
+  // ── Check transactions exist for loan (for DELETE check) ──
+  if (sql.includes('SELECT COUNT(*)') && sql.includes('transactions') && sql.includes('WHERE loan_id = $1')) {
+    const loanId = params[0];
+    const count = store.transactions.filter((t) => t.loan_id === loanId && !t.deleted_at).length;
+    return { rows: [{ count: String(count) }] };
+  }
+
   // ── DELETE loan ──
-  if (sql.includes('DELETE FROM') && sql.includes('loans') && sql.includes('RETURNING id')) {
+  if (sql.includes('DELETE FROM') && sql.includes('loans')) {
     const loanId = params[0];
     const userId = params[1];
     const idx = store.loans.findIndex((l) => l.id === loanId && l.user_id === userId);
@@ -737,7 +744,7 @@ describe('Loan CRUD — end-to-end', () => {
       const res = await makeRequest(server, 'DELETE', `/api/loans/${loanId}`);
 
       expect(res.status).toBe(409);
-      expect(res.body.error.code).toBe('HAS_REPAYMENTS');
+      expect(res.body.error.code).toBe('LOAN_HAS_REPAYMENTS');
     });
 
     it('returns 404 for non-existent loan', async () => {
@@ -793,6 +800,58 @@ describe('Loan CRUD — end-to-end', () => {
       // Check loan is now PAID
       const getRes = await makeRequest(server, 'GET', `/api/loans/${loanId}`);
       expect(getRes.body.data.status).toBe('PAID');
+    });
+
+    it('records a repayment for an OVERDUE loan successfully and marks PAID when fully repaid', async () => {
+      const createRes = await makeRequest(server, 'POST', '/api/loans', {
+        person_id: 'per_rahim',
+        direction: 'LENT',
+        principal_amount: 50000,
+        start_date: '2026-08-01',
+      });
+      const loanId = createRes.body.data.id;
+
+      const loan = store.loans.find((l) => l.id === loanId);
+      if (loan) loan.status = 'OVERDUE';
+
+      const repayRes = await makeRequest(server, 'POST', `/api/loans/${loanId}/repayments`, {
+        amount: 50000,
+        repayment_date: '2026-08-20',
+        account_id: 'acc_bank1',
+        notes: 'Repaid after overdue',
+      });
+
+      expect(repayRes.status).toBe(201);
+      expect(repayRes.body.success).toBe(true);
+
+      const getRes = await makeRequest(server, 'GET', `/api/loans/${loanId}`);
+      expect(getRes.body.data.status).toBe('PAID');
+    });
+
+    it('records a partial repayment for an OVERDUE loan and keeps OVERDUE status', async () => {
+      const createRes = await makeRequest(server, 'POST', '/api/loans', {
+        person_id: 'per_rahim',
+        direction: 'LENT',
+        principal_amount: 50000,
+        start_date: '2026-08-01',
+      });
+      const loanId = createRes.body.data.id;
+
+      const loan = store.loans.find((l) => l.id === loanId);
+      if (loan) loan.status = 'OVERDUE';
+
+      const repayRes = await makeRequest(server, 'POST', `/api/loans/${loanId}/repayments`, {
+        amount: 20000,
+        repayment_date: '2026-08-20',
+        account_id: 'acc_bank1',
+      });
+
+      expect(repayRes.status).toBe(201);
+      expect(repayRes.body.success).toBe(true);
+
+      const getRes = await makeRequest(server, 'GET', `/api/loans/${loanId}`);
+      expect(getRes.body.data.status).toBe('OVERDUE');
+      expect(getRes.body.data.remaining_amount).toBe(30000);
     });
 
     it('returns 400 when repayment exceeds remaining amount', async () => {

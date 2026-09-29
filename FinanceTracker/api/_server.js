@@ -1,5 +1,10 @@
 "use strict";
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __commonJS = (cb, mod) => function __require() {
   try {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -7,6 +12,27 @@ var __commonJS = (cb, mod) => function __require() {
     throw mod = 0, e;
   }
 };
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
 // node_modules/depd/index.js
 var require_depd = __commonJS({
@@ -705,13 +731,13 @@ var require_inherits_browser = __commonJS({
 var require_inherits = __commonJS({
   "node_modules/inherits/inherits.js"(exports2, module2) {
     try {
-      util = require("util");
-      if (typeof util.inherits !== "function") throw "";
-      module2.exports = util.inherits;
+      util2 = require("util");
+      if (typeof util2.inherits !== "function") throw "";
+      module2.exports = util2.inherits;
     } catch (e) {
       module2.exports = require_inherits_browser();
     }
-    var util;
+    var util2;
   }
 });
 
@@ -998,7 +1024,7 @@ var require_ms = __commonJS({
 var require_debug = __commonJS({
   "node_modules/body-parser/node_modules/debug/src/debug.js"(exports2, module2) {
     exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
-    exports2.coerce = coerce;
+    exports2.coerce = coerce2;
     exports2.disable = disable;
     exports2.enable = enable;
     exports2.enabled = enabled;
@@ -1092,7 +1118,7 @@ var require_debug = __commonJS({
       }
       return false;
     }
-    function coerce(val) {
+    function coerce2(val) {
       if (val instanceof Error) return val.stack || val.message;
       return val;
     }
@@ -1189,7 +1215,7 @@ var require_browser = __commonJS({
 var require_node = __commonJS({
   "node_modules/body-parser/node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
-    var util = require("util");
+    var util2 = require("util");
     exports2 = module2.exports = require_debug();
     exports2.init = init;
     exports2.log = log;
@@ -1214,7 +1240,7 @@ var require_node = __commonJS({
     }, {});
     var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
     if (1 !== fd && 2 !== fd) {
-      util.deprecate(function() {
+      util2.deprecate(function() {
       }, "except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)")();
     }
     var stream = 1 === fd ? process.stdout : 2 === fd ? process.stderr : createWritableStdioStream(fd);
@@ -1223,13 +1249,13 @@ var require_node = __commonJS({
     }
     exports2.formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts).split("\n").map(function(str) {
+      return util2.inspect(v, this.inspectOpts).split("\n").map(function(str) {
         return str.trim();
       }).join(" ");
     };
     exports2.formatters.O = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts);
+      return util2.inspect(v, this.inspectOpts);
     };
     function formatArgs(args) {
       var name = this.namespace;
@@ -1244,7 +1270,7 @@ var require_node = __commonJS({
       }
     }
     function log() {
-      return stream.write(util.format.apply(util, arguments) + "\n");
+      return stream.write(util2.format.apply(util2, arguments) + "\n");
     }
     function save(namespaces) {
       if (null == namespaces) {
@@ -1585,7 +1611,7 @@ var require_safer = __commonJS({
   "node_modules/safer-buffer/safer.js"(exports2, module2) {
     "use strict";
     var buffer = require("buffer");
-    var Buffer2 = buffer.Buffer;
+    var Buffer3 = buffer.Buffer;
     var safer = {};
     var key;
     for (key in buffer) {
@@ -1594,12 +1620,12 @@ var require_safer = __commonJS({
       safer[key] = buffer[key];
     }
     var Safer = safer.Buffer = {};
-    for (key in Buffer2) {
-      if (!Buffer2.hasOwnProperty(key)) continue;
+    for (key in Buffer3) {
+      if (!Buffer3.hasOwnProperty(key)) continue;
       if (key === "allocUnsafe" || key === "allocUnsafeSlow") continue;
-      Safer[key] = Buffer2[key];
+      Safer[key] = Buffer3[key];
     }
-    safer.Buffer.prototype = Buffer2.prototype;
+    safer.Buffer.prototype = Buffer3.prototype;
     if (!Safer.from || Safer.from === Uint8Array.from) {
       Safer.from = function(value, encodingOrOffset, length) {
         if (typeof value === "number") {
@@ -1608,7 +1634,7 @@ var require_safer = __commonJS({
         if (value && typeof value.length === "undefined") {
           throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type " + typeof value);
         }
-        return Buffer2(value, encodingOrOffset, length);
+        return Buffer3(value, encodingOrOffset, length);
       };
     }
     if (!Safer.alloc) {
@@ -1619,7 +1645,7 @@ var require_safer = __commonJS({
         if (size < 0 || size >= 2 * (1 << 30)) {
           throw new RangeError('The value "' + size + '" is invalid for option "size"');
         }
-        var buf = Buffer2(size);
+        var buf = Buffer3(size);
         if (!fill || fill.length === 0) {
           buf.fill(0);
         } else if (typeof encoding === "string") {
@@ -1696,7 +1722,7 @@ var require_bom_handling = __commonJS({
 var require_internal = __commonJS({
   "node_modules/iconv-lite/encodings/internal.js"(exports2, module2) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     module2.exports = {
       // Encodings
       utf8: { type: "_internal", bomAware: true },
@@ -1718,7 +1744,7 @@ var require_internal = __commonJS({
       else if (this.enc === "cesu8") {
         this.enc = "utf8";
         this.encoder = InternalEncoderCesu8;
-        if (Buffer2.from("eda0bdedb2a9", "hex").toString() !== "\u{1F4A9}") {
+        if (Buffer3.from("eda0bdedb2a9", "hex").toString() !== "\u{1F4A9}") {
           this.decoder = InternalDecoderCesu8;
           this.defaultCharUnicode = iconv.defaultCharUnicode;
         }
@@ -1738,7 +1764,7 @@ var require_internal = __commonJS({
       this.enc = codec.enc;
     }
     InternalEncoder.prototype.write = function(str) {
-      return Buffer2.from(str, this.enc);
+      return Buffer3.from(str, this.enc);
     };
     InternalEncoder.prototype.end = function() {
     };
@@ -1750,15 +1776,15 @@ var require_internal = __commonJS({
       var completeQuads = str.length - str.length % 4;
       this.prevStr = str.slice(completeQuads);
       str = str.slice(0, completeQuads);
-      return Buffer2.from(str, "base64");
+      return Buffer3.from(str, "base64");
     };
     InternalEncoderBase64.prototype.end = function() {
-      return Buffer2.from(this.prevStr, "base64");
+      return Buffer3.from(this.prevStr, "base64");
     };
     function InternalEncoderCesu8(options, codec) {
     }
     InternalEncoderCesu8.prototype.write = function(str) {
-      var buf = Buffer2.alloc(str.length * 3), bufIdx = 0;
+      var buf = Buffer3.alloc(str.length * 3), bufIdx = 0;
       for (var i = 0; i < str.length; i++) {
         var charCode = str.charCodeAt(i);
         if (charCode < 128)
@@ -1840,7 +1866,7 @@ var require_internal = __commonJS({
 var require_utf16 = __commonJS({
   "node_modules/iconv-lite/encodings/utf16.js"(exports2) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports2.utf16be = Utf16BECodec;
     function Utf16BECodec() {
     }
@@ -1850,7 +1876,7 @@ var require_utf16 = __commonJS({
     function Utf16BEEncoder() {
     }
     Utf16BEEncoder.prototype.write = function(str) {
-      var buf = Buffer2.from(str, "ucs2");
+      var buf = Buffer3.from(str, "ucs2");
       for (var i = 0; i < buf.length; i += 2) {
         var tmp = buf[i];
         buf[i] = buf[i + 1];
@@ -1866,7 +1892,7 @@ var require_utf16 = __commonJS({
     Utf16BEDecoder.prototype.write = function(buf) {
       if (buf.length == 0)
         return "";
-      var buf2 = Buffer2.alloc(buf.length + 1), i = 0, j = 0;
+      var buf2 = Buffer3.alloc(buf.length + 1), i = 0, j = 0;
       if (this.overflowByte !== -1) {
         buf2[0] = buf[0];
         buf2[1] = this.overflowByte;
@@ -1913,7 +1939,7 @@ var require_utf16 = __commonJS({
         this.initialBytesLen += buf.length;
         if (this.initialBytesLen < 16)
           return "";
-        var buf = Buffer2.concat(this.initialBytes), encoding = detectEncoding(buf, this.options.defaultEncoding);
+        var buf = Buffer3.concat(this.initialBytes), encoding = detectEncoding(buf, this.options.defaultEncoding);
         this.decoder = this.iconv.getDecoder(encoding, this.options);
         this.initialBytes.length = this.initialBytesLen = 0;
       }
@@ -1921,7 +1947,7 @@ var require_utf16 = __commonJS({
     };
     Utf16Decoder.prototype.end = function() {
       if (!this.decoder) {
-        var buf = Buffer2.concat(this.initialBytes), encoding = detectEncoding(buf, this.options.defaultEncoding);
+        var buf = Buffer3.concat(this.initialBytes), encoding = detectEncoding(buf, this.options.defaultEncoding);
         this.decoder = this.iconv.getDecoder(encoding, this.options);
         var res = this.decoder.write(buf), trail = this.decoder.end();
         return trail ? res + trail : res;
@@ -1956,7 +1982,7 @@ var require_utf16 = __commonJS({
 var require_utf7 = __commonJS({
   "node_modules/iconv-lite/encodings/utf7.js"(exports2) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports2.utf7 = Utf7Codec;
     exports2.unicode11utf7 = "utf7";
     function Utf7Codec(codecOptions, iconv) {
@@ -1970,7 +1996,7 @@ var require_utf7 = __commonJS({
       this.iconv = codec.iconv;
     }
     Utf7Encoder.prototype.write = function(str) {
-      return Buffer2.from(str.replace(nonDirectChars, function(chunk) {
+      return Buffer3.from(str.replace(nonDirectChars, function(chunk) {
         return "+" + (chunk === "+" ? "" : this.iconv.encode(chunk, "utf16-be").toString("base64").replace(/=+$/, "")) + "-";
       }.bind(this)));
     };
@@ -1981,10 +2007,10 @@ var require_utf7 = __commonJS({
       this.inBase64 = false;
       this.base64Accum = "";
     }
-    var base64Regex = /[A-Za-z0-9\/+]/;
+    var base64Regex2 = /[A-Za-z0-9\/+]/;
     var base64Chars = [];
     for (i = 0; i < 256; i++)
-      base64Chars[i] = base64Regex.test(String.fromCharCode(i));
+      base64Chars[i] = base64Regex2.test(String.fromCharCode(i));
     var i;
     var plusChar = "+".charCodeAt(0);
     var minusChar = "-".charCodeAt(0);
@@ -2004,7 +2030,7 @@ var require_utf7 = __commonJS({
               res += "+";
             } else {
               var b64str = base64Accum + buf.slice(lastI, i2).toString();
-              res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+              res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
             }
             if (buf[i2] != minusChar)
               i2--;
@@ -2021,7 +2047,7 @@ var require_utf7 = __commonJS({
         var canBeDecoded = b64str.length - b64str.length % 8;
         base64Accum = b64str.slice(canBeDecoded);
         b64str = b64str.slice(0, canBeDecoded);
-        res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+        res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
       }
       this.inBase64 = inBase64;
       this.base64Accum = base64Accum;
@@ -2030,7 +2056,7 @@ var require_utf7 = __commonJS({
     Utf7Decoder.prototype.end = function() {
       var res = "";
       if (this.inBase64 && this.base64Accum.length > 0)
-        res = this.iconv.decode(Buffer2.from(this.base64Accum, "base64"), "utf16-be");
+        res = this.iconv.decode(Buffer3.from(this.base64Accum, "base64"), "utf16-be");
       this.inBase64 = false;
       this.base64Accum = "";
       return res;
@@ -2045,11 +2071,11 @@ var require_utf7 = __commonJS({
     function Utf7IMAPEncoder(options, codec) {
       this.iconv = codec.iconv;
       this.inBase64 = false;
-      this.base64Accum = Buffer2.alloc(6);
+      this.base64Accum = Buffer3.alloc(6);
       this.base64AccumIdx = 0;
     }
     Utf7IMAPEncoder.prototype.write = function(str) {
-      var inBase64 = this.inBase64, base64Accum = this.base64Accum, base64AccumIdx = this.base64AccumIdx, buf = Buffer2.alloc(str.length * 5 + 10), bufIdx = 0;
+      var inBase64 = this.inBase64, base64Accum = this.base64Accum, base64AccumIdx = this.base64AccumIdx, buf = Buffer3.alloc(str.length * 5 + 10), bufIdx = 0;
       for (var i2 = 0; i2 < str.length; i2++) {
         var uChar = str.charCodeAt(i2);
         if (32 <= uChar && uChar <= 126) {
@@ -2086,7 +2112,7 @@ var require_utf7 = __commonJS({
       return buf.slice(0, bufIdx);
     };
     Utf7IMAPEncoder.prototype.end = function() {
-      var buf = Buffer2.alloc(10), bufIdx = 0;
+      var buf = Buffer3.alloc(10), bufIdx = 0;
       if (this.inBase64) {
         if (this.base64AccumIdx > 0) {
           bufIdx += buf.write(this.base64Accum.slice(0, this.base64AccumIdx).toString("base64").replace(/\//g, ",").replace(/=+$/, ""), bufIdx);
@@ -2119,7 +2145,7 @@ var require_utf7 = __commonJS({
               res += "&";
             } else {
               var b64str = base64Accum + buf.slice(lastI, i2).toString().replace(/,/g, "/");
-              res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+              res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
             }
             if (buf[i2] != minusChar)
               i2--;
@@ -2136,7 +2162,7 @@ var require_utf7 = __commonJS({
         var canBeDecoded = b64str.length - b64str.length % 8;
         base64Accum = b64str.slice(canBeDecoded);
         b64str = b64str.slice(0, canBeDecoded);
-        res += this.iconv.decode(Buffer2.from(b64str, "base64"), "utf16-be");
+        res += this.iconv.decode(Buffer3.from(b64str, "base64"), "utf16-be");
       }
       this.inBase64 = inBase64;
       this.base64Accum = base64Accum;
@@ -2145,7 +2171,7 @@ var require_utf7 = __commonJS({
     Utf7IMAPDecoder.prototype.end = function() {
       var res = "";
       if (this.inBase64 && this.base64Accum.length > 0)
-        res = this.iconv.decode(Buffer2.from(this.base64Accum, "base64"), "utf16-be");
+        res = this.iconv.decode(Buffer3.from(this.base64Accum, "base64"), "utf16-be");
       this.inBase64 = false;
       this.base64Accum = "";
       return res;
@@ -2157,7 +2183,7 @@ var require_utf7 = __commonJS({
 var require_sbcs_codec = __commonJS({
   "node_modules/iconv-lite/encodings/sbcs-codec.js"(exports2) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports2._sbcs = SBCSCodec;
     function SBCSCodec(codecOptions, iconv) {
       if (!codecOptions)
@@ -2170,8 +2196,8 @@ var require_sbcs_codec = __commonJS({
           asciiString += String.fromCharCode(i);
         codecOptions.chars = asciiString + codecOptions.chars;
       }
-      this.decodeBuf = Buffer2.from(codecOptions.chars, "ucs2");
-      var encodeBuf = Buffer2.alloc(65536, iconv.defaultCharSingleByte.charCodeAt(0));
+      this.decodeBuf = Buffer3.from(codecOptions.chars, "ucs2");
+      var encodeBuf = Buffer3.alloc(65536, iconv.defaultCharSingleByte.charCodeAt(0));
       for (var i = 0; i < codecOptions.chars.length; i++)
         encodeBuf[codecOptions.chars.charCodeAt(i)] = i;
       this.encodeBuf = encodeBuf;
@@ -2182,7 +2208,7 @@ var require_sbcs_codec = __commonJS({
       this.encodeBuf = codec.encodeBuf;
     }
     SBCSEncoder.prototype.write = function(str) {
-      var buf = Buffer2.alloc(str.length);
+      var buf = Buffer3.alloc(str.length);
       for (var i = 0; i < str.length; i++)
         buf[i] = this.encodeBuf[str.charCodeAt(i)];
       return buf;
@@ -2194,7 +2220,7 @@ var require_sbcs_codec = __commonJS({
     }
     SBCSDecoder.prototype.write = function(buf) {
       var decodeBuf = this.decodeBuf;
-      var newBuf = Buffer2.alloc(buf.length * 2);
+      var newBuf = Buffer3.alloc(buf.length * 2);
       var idx1 = 0, idx2 = 0;
       for (var i = 0; i < buf.length; i++) {
         idx1 = buf[i] * 2;
@@ -2817,7 +2843,7 @@ var require_sbcs_data_generated = __commonJS({
 var require_dbcs_codec = __commonJS({
   "node_modules/iconv-lite/encodings/dbcs-codec.js"(exports2) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     exports2._dbcs = DBCSCodec;
     var UNASSIGNED = -1;
     var GB18030_CODE = -2;
@@ -3000,7 +3026,7 @@ var require_dbcs_codec = __commonJS({
       this.gb18030 = codec.gb18030;
     }
     DBCSEncoder.prototype.write = function(str) {
-      var newBuf = Buffer2.alloc(str.length * (this.gb18030 ? 4 : 3)), leadSurrogate = this.leadSurrogate, seqObj = this.seqObj, nextChar = -1, i2 = 0, j = 0;
+      var newBuf = Buffer3.alloc(str.length * (this.gb18030 ? 4 : 3)), leadSurrogate = this.leadSurrogate, seqObj = this.seqObj, nextChar = -1, i2 = 0, j = 0;
       while (true) {
         if (nextChar === -1) {
           if (i2 == str.length) break;
@@ -3091,7 +3117,7 @@ var require_dbcs_codec = __commonJS({
     DBCSEncoder.prototype.end = function() {
       if (this.leadSurrogate === -1 && this.seqObj === void 0)
         return;
-      var newBuf = Buffer2.alloc(10), j = 0;
+      var newBuf = Buffer3.alloc(10), j = 0;
       if (this.seqObj) {
         var dbcsCode = this.seqObj[DEF_CHAR];
         if (dbcsCode !== void 0) {
@@ -3114,16 +3140,16 @@ var require_dbcs_codec = __commonJS({
     DBCSEncoder.prototype.findIdx = findIdx;
     function DBCSDecoder(options, codec) {
       this.nodeIdx = 0;
-      this.prevBuf = Buffer2.alloc(0);
+      this.prevBuf = Buffer3.alloc(0);
       this.decodeTables = codec.decodeTables;
       this.decodeTableSeq = codec.decodeTableSeq;
       this.defaultCharUnicode = codec.defaultCharUnicode;
       this.gb18030 = codec.gb18030;
     }
     DBCSDecoder.prototype.write = function(buf) {
-      var newBuf = Buffer2.alloc(buf.length * 2), nodeIdx = this.nodeIdx, prevBuf = this.prevBuf, prevBufOffset = this.prevBuf.length, seqStart = -this.prevBuf.length, uCode;
+      var newBuf = Buffer3.alloc(buf.length * 2), nodeIdx = this.nodeIdx, prevBuf = this.prevBuf, prevBufOffset = this.prevBuf.length, seqStart = -this.prevBuf.length, uCode;
       if (prevBufOffset > 0)
-        prevBuf = Buffer2.concat([prevBuf, buf.slice(0, 10)]);
+        prevBuf = Buffer3.concat([prevBuf, buf.slice(0, 10)]);
       for (var i2 = 0, j = 0; i2 < buf.length; i2++) {
         var curByte = i2 >= 0 ? buf[i2] : prevBuf[i2 + prevBufOffset];
         var uCode = this.decodeTables[nodeIdx][curByte];
@@ -3170,7 +3196,7 @@ var require_dbcs_codec = __commonJS({
       while (this.prevBuf.length > 0) {
         ret += this.defaultCharUnicode;
         var buf = this.prevBuf.slice(1);
-        this.prevBuf = Buffer2.alloc(0);
+        this.prevBuf = Buffer3.alloc(0);
         this.nodeIdx = 0;
         if (buf.length > 0)
           ret += this.write(buf);
@@ -4646,7 +4672,7 @@ var require_encodings = __commonJS({
 var require_streams = __commonJS({
   "node_modules/iconv-lite/lib/streams.js"(exports2, module2) {
     "use strict";
-    var Buffer2 = require("buffer").Buffer;
+    var Buffer3 = require("buffer").Buffer;
     var Transform = require("stream").Transform;
     module2.exports = function(iconv) {
       iconv.encodeStream = function encodeStream(encoding, options) {
@@ -4696,7 +4722,7 @@ var require_streams = __commonJS({
         chunks.push(chunk);
       });
       this.on("end", function() {
-        cb(null, Buffer2.concat(chunks));
+        cb(null, Buffer3.concat(chunks));
       });
       return this;
     };
@@ -4710,7 +4736,7 @@ var require_streams = __commonJS({
       constructor: { value: IconvLiteDecoderStream }
     });
     IconvLiteDecoderStream.prototype._transform = function(chunk, encoding, done) {
-      if (!Buffer2.isBuffer(chunk))
+      if (!Buffer3.isBuffer(chunk))
         return done(new Error("Iconv decoding stream needs buffers as its input."));
       try {
         var res = this.conv.write(chunk);
@@ -4747,10 +4773,10 @@ var require_streams = __commonJS({
 var require_extend_node = __commonJS({
   "node_modules/iconv-lite/lib/extend-node.js"(exports2, module2) {
     "use strict";
-    var Buffer2 = require("buffer").Buffer;
+    var Buffer3 = require("buffer").Buffer;
     module2.exports = function(iconv) {
       var original = void 0;
-      iconv.supportsNodeEncodingsExtension = !(Buffer2.from || new Buffer2(0) instanceof Uint8Array);
+      iconv.supportsNodeEncodingsExtension = !(Buffer3.from || new Buffer3(0) instanceof Uint8Array);
       iconv.extendNodeEncodings = function extendNodeEncodings() {
         if (original) return;
         original = {};
@@ -4771,14 +4797,14 @@ var require_extend_node = __commonJS({
           "utf16le": true,
           "utf-16le": true
         };
-        Buffer2.isNativeEncoding = function(enc) {
+        Buffer3.isNativeEncoding = function(enc) {
           return enc && nodeNativeEncodings[enc.toLowerCase()];
         };
         var SlowBuffer = require("buffer").SlowBuffer;
         original.SlowBufferToString = SlowBuffer.prototype.toString;
         SlowBuffer.prototype.toString = function(encoding, start, end) {
           encoding = String(encoding || "utf8").toLowerCase();
-          if (Buffer2.isNativeEncoding(encoding))
+          if (Buffer3.isNativeEncoding(encoding))
             return original.SlowBufferToString.call(this, encoding, start, end);
           if (typeof start == "undefined") start = 0;
           if (typeof end == "undefined") end = this.length;
@@ -4808,7 +4834,7 @@ var require_extend_node = __commonJS({
             }
           }
           encoding = String(encoding || "utf8").toLowerCase();
-          if (Buffer2.isNativeEncoding(encoding))
+          if (Buffer3.isNativeEncoding(encoding))
             return original.SlowBufferWrite.call(this, string, offset, length, encoding);
           if (string.length > 0 && (length < 0 || offset < 0))
             throw new RangeError("attempt to write beyond buffer bounds");
@@ -4817,28 +4843,28 @@ var require_extend_node = __commonJS({
           buf.copy(this, offset, 0, length);
           return length;
         };
-        original.BufferIsEncoding = Buffer2.isEncoding;
-        Buffer2.isEncoding = function(encoding) {
-          return Buffer2.isNativeEncoding(encoding) || iconv.encodingExists(encoding);
+        original.BufferIsEncoding = Buffer3.isEncoding;
+        Buffer3.isEncoding = function(encoding) {
+          return Buffer3.isNativeEncoding(encoding) || iconv.encodingExists(encoding);
         };
-        original.BufferByteLength = Buffer2.byteLength;
-        Buffer2.byteLength = SlowBuffer.byteLength = function(str, encoding) {
+        original.BufferByteLength = Buffer3.byteLength;
+        Buffer3.byteLength = SlowBuffer.byteLength = function(str, encoding) {
           encoding = String(encoding || "utf8").toLowerCase();
-          if (Buffer2.isNativeEncoding(encoding))
+          if (Buffer3.isNativeEncoding(encoding))
             return original.BufferByteLength.call(this, str, encoding);
           return iconv.encode(str, encoding).length;
         };
-        original.BufferToString = Buffer2.prototype.toString;
-        Buffer2.prototype.toString = function(encoding, start, end) {
+        original.BufferToString = Buffer3.prototype.toString;
+        Buffer3.prototype.toString = function(encoding, start, end) {
           encoding = String(encoding || "utf8").toLowerCase();
-          if (Buffer2.isNativeEncoding(encoding))
+          if (Buffer3.isNativeEncoding(encoding))
             return original.BufferToString.call(this, encoding, start, end);
           if (typeof start == "undefined") start = 0;
           if (typeof end == "undefined") end = this.length;
           return iconv.decode(this.slice(start, end), encoding);
         };
-        original.BufferWrite = Buffer2.prototype.write;
-        Buffer2.prototype.write = function(string, offset, length, encoding) {
+        original.BufferWrite = Buffer3.prototype.write;
+        Buffer3.prototype.write = function(string, offset, length, encoding) {
           var _offset = offset, _length = length, _encoding = encoding;
           if (isFinite(offset)) {
             if (!isFinite(length)) {
@@ -4852,7 +4878,7 @@ var require_extend_node = __commonJS({
             length = swap;
           }
           encoding = String(encoding || "utf8").toLowerCase();
-          if (Buffer2.isNativeEncoding(encoding))
+          if (Buffer3.isNativeEncoding(encoding))
             return original.BufferWrite.call(this, string, _offset, _length, _encoding);
           offset = +offset || 0;
           var remaining = this.length - offset;
@@ -4886,14 +4912,14 @@ var require_extend_node = __commonJS({
           return;
         if (!original)
           throw new Error("require('iconv-lite').undoExtendNodeEncodings(): Nothing to undo; extendNodeEncodings() is not called.");
-        delete Buffer2.isNativeEncoding;
+        delete Buffer3.isNativeEncoding;
         var SlowBuffer = require("buffer").SlowBuffer;
         SlowBuffer.prototype.toString = original.SlowBufferToString;
         SlowBuffer.prototype.write = original.SlowBufferWrite;
-        Buffer2.isEncoding = original.BufferIsEncoding;
-        Buffer2.byteLength = original.BufferByteLength;
-        Buffer2.prototype.toString = original.BufferToString;
-        Buffer2.prototype.write = original.BufferWrite;
+        Buffer3.isEncoding = original.BufferIsEncoding;
+        Buffer3.byteLength = original.BufferByteLength;
+        Buffer3.prototype.toString = original.BufferToString;
+        Buffer3.prototype.write = original.BufferWrite;
         if (iconv.supportsStreams) {
           var Readable = require("stream").Readable;
           Readable.prototype.setEncoding = original.ReadableSetEncoding;
@@ -4909,7 +4935,7 @@ var require_extend_node = __commonJS({
 var require_lib = __commonJS({
   "node_modules/iconv-lite/lib/index.js"(exports2, module2) {
     "use strict";
-    var Buffer2 = require_safer().Buffer;
+    var Buffer3 = require_safer().Buffer;
     var bomHandling = require_bom_handling();
     var iconv = module2.exports;
     iconv.encodings = null;
@@ -4920,7 +4946,7 @@ var require_lib = __commonJS({
       var encoder = iconv.getEncoder(encoding, options);
       var res = encoder.write(str);
       var trail = encoder.end();
-      return trail && trail.length > 0 ? Buffer2.concat([res, trail]) : res;
+      return trail && trail.length > 0 ? Buffer3.concat([res, trail]) : res;
     };
     iconv.decode = function decode(buf, encoding, options) {
       if (typeof buf === "string") {
@@ -4928,7 +4954,7 @@ var require_lib = __commonJS({
           console.error("Iconv-lite warning: decode()-ing strings is deprecated. Refer to https://github.com/ashtuchkin/iconv-lite/wiki/Use-Buffers-when-decoding");
           iconv.skipDecodeWarning = true;
         }
-        buf = Buffer2.from("" + (buf || ""), "binary");
+        buf = Buffer3.from("" + (buf || ""), "binary");
       }
       var decoder = iconv.getDecoder(encoding, options);
       var res = decoder.write(buf);
@@ -14182,7 +14208,7 @@ var require_mime_db = __commonJS({
 var require_mime_types = __commonJS({
   "node_modules/mime-types/index.js"(exports2) {
     "use strict";
-    var db = require_mime_db();
+    var db2 = require_mime_db();
     var extname = require("path").extname;
     var EXTRACT_TYPE_REGEXP = /^\s*([^;\s]*)(?:;|\s|$)/;
     var TEXT_TYPE_REGEXP = /^text\//i;
@@ -14199,7 +14225,7 @@ var require_mime_types = __commonJS({
         return false;
       }
       var match = EXTRACT_TYPE_REGEXP.exec(type);
-      var mime = match && db[match[1].toLowerCase()];
+      var mime = match && db2[match[1].toLowerCase()];
       if (mime && mime.charset) {
         return mime.charset;
       }
@@ -14233,11 +14259,11 @@ var require_mime_types = __commonJS({
       }
       return exts[0];
     }
-    function lookup(path) {
-      if (!path || typeof path !== "string") {
+    function lookup(path2) {
+      if (!path2 || typeof path2 !== "string") {
         return false;
       }
-      var extension2 = extname("x." + path).toLowerCase().substr(1);
+      var extension2 = extname("x." + path2).toLowerCase().substr(1);
       if (!extension2) {
         return false;
       }
@@ -14245,8 +14271,8 @@ var require_mime_types = __commonJS({
     }
     function populateMaps(extensions, types) {
       var preference = ["nginx", "apache", void 0, "iana"];
-      Object.keys(db).forEach(function forEachMimeType(type) {
-        var mime = db[type];
+      Object.keys(db2).forEach(function forEachMimeType(type) {
+        var mime = db2[type];
         var exts = mime.extensions;
         if (!exts || !exts.length) {
           return;
@@ -14255,7 +14281,7 @@ var require_mime_types = __commonJS({
         for (var i = 0; i < exts.length; i++) {
           var extension2 = exts[i];
           if (types[extension2]) {
-            var from = preference.indexOf(db[types[extension2]].source);
+            var from = preference.indexOf(db2[types[extension2]].source);
             var to = preference.indexOf(mime.source);
             if (types[extension2] !== "application/octet-stream" && (from > to || from === to && types[extension2].substr(0, 12) === "application/")) {
               continue;
@@ -14719,20 +14745,20 @@ var require_object_inspect = __commonJS({
     };
     module2.exports = function inspect_(obj, options, depth, seen) {
       var opts = options || {};
-      if (has(opts, "quoteStyle") && !has(quotes, opts.quoteStyle)) {
+      if (has2(opts, "quoteStyle") && !has2(quotes, opts.quoteStyle)) {
         throw new TypeError('option "quoteStyle" must be "single" or "double"');
       }
-      if (has(opts, "maxStringLength") && (typeof opts.maxStringLength === "number" ? opts.maxStringLength < 0 && opts.maxStringLength !== Infinity : opts.maxStringLength !== null)) {
+      if (has2(opts, "maxStringLength") && (typeof opts.maxStringLength === "number" ? opts.maxStringLength < 0 && opts.maxStringLength !== Infinity : opts.maxStringLength !== null)) {
         throw new TypeError('option "maxStringLength", if provided, must be a positive integer, Infinity, or `null`');
       }
-      var customInspect = has(opts, "customInspect") ? opts.customInspect : true;
+      var customInspect = has2(opts, "customInspect") ? opts.customInspect : true;
       if (typeof customInspect !== "boolean" && customInspect !== "symbol") {
         throw new TypeError("option \"customInspect\", if provided, must be `true`, `false`, or `'symbol'`");
       }
-      if (has(opts, "indent") && opts.indent !== null && opts.indent !== "	" && !(parseInt(opts.indent, 10) === opts.indent && opts.indent > 0)) {
+      if (has2(opts, "indent") && opts.indent !== null && opts.indent !== "	" && !(parseInt(opts.indent, 10) === opts.indent && opts.indent > 0)) {
         throw new TypeError('option "indent" must be "\\t", an integer > 0, or `null`');
       }
-      if (has(opts, "numericSeparator") && typeof opts.numericSeparator !== "boolean") {
+      if (has2(opts, "numericSeparator") && typeof opts.numericSeparator !== "boolean") {
         throw new TypeError('option "numericSeparator", if provided, must be `true` or `false`');
       }
       var numericSeparator = opts.numericSeparator;
@@ -14781,7 +14807,7 @@ var require_object_inspect = __commonJS({
           var newOpts = {
             depth: opts.depth
           };
-          if (has(opts, "quoteStyle")) {
+          if (has2(opts, "quoteStyle")) {
             newOpts.quoteStyle = opts.quoteStyle;
           }
           return inspect_(value, newOpts, depth + 1, seen);
@@ -14962,7 +14988,7 @@ var require_object_inspect = __commonJS({
     var hasOwn = Object.prototype.hasOwnProperty || function(key) {
       return key in this;
     };
-    function has(obj, key) {
+    function has2(obj, key) {
       return hasOwn.call(obj, key);
     }
     function toStr(obj) {
@@ -15143,7 +15169,7 @@ var require_object_inspect = __commonJS({
       if (isArr) {
         xs.length = obj.length;
         for (var i = 0; i < obj.length; i++) {
-          xs[i] = has(obj, i) ? inspect(obj[i], obj) : "";
+          xs[i] = has2(obj, i) ? inspect(obj[i], obj) : "";
         }
       }
       var syms = typeof gOPS === "function" ? gOPS(obj) : [];
@@ -15155,7 +15181,7 @@ var require_object_inspect = __commonJS({
         }
       }
       for (var key in obj) {
-        if (!has(obj, key)) {
+        if (!has2(obj, key)) {
           continue;
         }
         if (isArr && String(Number(key)) === key && key < obj.length) {
@@ -16294,7 +16320,7 @@ var require_utils = __commonJS({
     var formats = require_formats();
     var getSideChannel = require_side_channel();
     var defineProperty = require_es_define_property();
-    var has = Object.prototype.hasOwnProperty;
+    var has2 = Object.prototype.hasOwnProperty;
     var isArray = Array.isArray;
     var overflowChannel = getSideChannel();
     var markOverflow = function markOverflow2(obj, maxIndex) {
@@ -16374,7 +16400,7 @@ var require_utils = __commonJS({
             setMaxIndex(target, newIndex);
           } else if (options && options.strictMerge) {
             return [target, source];
-          } else if (options && (options.plainObjects || options.allowPrototypes) || !has.call(Object.prototype, source)) {
+          } else if (options && (options.plainObjects || options.allowPrototypes) || !has2.call(Object.prototype, source)) {
             target[source] = true;
           }
         } else {
@@ -16407,7 +16433,7 @@ var require_utils = __commonJS({
       }
       if (isArray(target) && isArray(source)) {
         source.forEach(function(item, i) {
-          if (has.call(target, i)) {
+          if (has2.call(target, i)) {
             var targetItem = target[i];
             if (targetItem && typeof targetItem === "object" && item && typeof item === "object") {
               target[i] = merge2(targetItem, item, options);
@@ -16428,7 +16454,7 @@ var require_utils = __commonJS({
       }
       return Object.keys(source).reduce(function(acc, key) {
         var value = source[key];
-        if (has.call(acc, key)) {
+        if (has2.call(acc, key)) {
           setProperty(acc, key, merge2(acc[key], value, options));
         } else {
           setProperty(acc, key, value);
@@ -16596,7 +16622,7 @@ var require_stringify = __commonJS({
     var getSideChannel = require_side_channel();
     var utils = require_utils();
     var formats = require_formats();
-    var has = Object.prototype.hasOwnProperty;
+    var has2 = Object.prototype.hasOwnProperty;
     var arrayPrefixGenerators = {
       brackets: function brackets(prefix) {
         return prefix + "[]";
@@ -16764,7 +16790,7 @@ var require_stringify = __commonJS({
       }
       var format = formats["default"];
       if (typeof opts.format !== "undefined") {
-        if (!has.call(formats.formatters, opts.format)) {
+        if (!has2.call(formats.formatters, opts.format)) {
           throw new TypeError("Unknown format option provided.");
         }
         format = opts.format;
@@ -16882,7 +16908,7 @@ var require_parse = __commonJS({
   "node_modules/qs/lib/parse.js"(exports2, module2) {
     "use strict";
     var utils = require_utils();
-    var has = Object.prototype.hasOwnProperty;
+    var has2 = Object.prototype.hasOwnProperty;
     var isArray = Array.isArray;
     var defaults = {
       allowDots: false,
@@ -17001,7 +17027,7 @@ var require_parse = __commonJS({
           val = utils.combine([], val, options.arrayLimit, options.plainObjects, options.throwOnLimitExceeded);
         }
         if (key !== null) {
-          var existing = has.call(obj, key);
+          var existing = has2.call(obj, key);
           if (existing && (options.duplicates === "combine" || part.indexOf("[]=") > -1)) {
             obj[key] = utils.combine(
               obj[key],
@@ -17066,7 +17092,7 @@ var require_parse = __commonJS({
     var splitKeyIntoSegments = function splitKeyIntoSegments2(originalKey, options) {
       var key = options.allowDots ? originalKey.replace(/\.([^.[]+)/g, "[$1]") : originalKey;
       if (options.depth <= 0) {
-        if (!options.plainObjects && has.call(Object.prototype, key)) {
+        if (!options.plainObjects && has2.call(Object.prototype, key)) {
           if (!options.allowPrototypes) {
             return;
           }
@@ -17077,7 +17103,7 @@ var require_parse = __commonJS({
       var first = key.indexOf("[");
       var parent = first >= 0 ? key.slice(0, first) : key;
       if (parent) {
-        if (!options.plainObjects && has.call(Object.prototype, parent)) {
+        if (!options.plainObjects && has2.call(Object.prototype, parent)) {
           if (!options.allowPrototypes) {
             return;
           }
@@ -17109,7 +17135,7 @@ var require_parse = __commonJS({
         }
         var seg = key.slice(open, close + 1);
         var content = seg.slice(1, -1);
-        if (!options.plainObjects && has.call(Object.prototype, content) && !options.allowPrototypes) {
+        if (!options.plainObjects && has2.call(Object.prototype, content) && !options.allowPrototypes) {
           return;
         }
         segments[segments.length] = seg;
@@ -17608,7 +17634,7 @@ var require_ms2 = __commonJS({
 var require_debug2 = __commonJS({
   "node_modules/finalhandler/node_modules/debug/src/debug.js"(exports2, module2) {
     exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
-    exports2.coerce = coerce;
+    exports2.coerce = coerce2;
     exports2.disable = disable;
     exports2.enable = enable;
     exports2.enabled = enabled;
@@ -17702,7 +17728,7 @@ var require_debug2 = __commonJS({
       }
       return false;
     }
-    function coerce(val) {
+    function coerce2(val) {
       if (val instanceof Error) return val.stack || val.message;
       return val;
     }
@@ -17799,7 +17825,7 @@ var require_browser2 = __commonJS({
 var require_node2 = __commonJS({
   "node_modules/finalhandler/node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
-    var util = require("util");
+    var util2 = require("util");
     exports2 = module2.exports = require_debug2();
     exports2.init = init;
     exports2.log = log;
@@ -17824,7 +17850,7 @@ var require_node2 = __commonJS({
     }, {});
     var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
     if (1 !== fd && 2 !== fd) {
-      util.deprecate(function() {
+      util2.deprecate(function() {
       }, "except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)")();
     }
     var stream = 1 === fd ? process.stdout : 2 === fd ? process.stderr : createWritableStdioStream(fd);
@@ -17833,13 +17859,13 @@ var require_node2 = __commonJS({
     }
     exports2.formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts).split("\n").map(function(str) {
+      return util2.inspect(v, this.inspectOpts).split("\n").map(function(str) {
         return str.trim();
       }).join(" ");
     };
     exports2.formatters.O = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts);
+      return util2.inspect(v, this.inspectOpts);
     };
     function formatArgs(args) {
       var name = this.namespace;
@@ -17854,7 +17880,7 @@ var require_node2 = __commonJS({
       }
     }
     function log() {
-      return stream.write(util.format.apply(util, arguments) + "\n");
+      return stream.write(util2.format.apply(util2, arguments) + "\n");
     }
     function save(namespaces) {
       if (null == namespaces) {
@@ -18327,7 +18353,7 @@ var require_ms3 = __commonJS({
 var require_debug3 = __commonJS({
   "node_modules/express/node_modules/debug/src/debug.js"(exports2, module2) {
     exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
-    exports2.coerce = coerce;
+    exports2.coerce = coerce2;
     exports2.disable = disable;
     exports2.enable = enable;
     exports2.enabled = enabled;
@@ -18421,7 +18447,7 @@ var require_debug3 = __commonJS({
       }
       return false;
     }
-    function coerce(val) {
+    function coerce2(val) {
       if (val instanceof Error) return val.stack || val.message;
       return val;
     }
@@ -18518,7 +18544,7 @@ var require_browser3 = __commonJS({
 var require_node3 = __commonJS({
   "node_modules/express/node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
-    var util = require("util");
+    var util2 = require("util");
     exports2 = module2.exports = require_debug3();
     exports2.init = init;
     exports2.log = log;
@@ -18543,7 +18569,7 @@ var require_node3 = __commonJS({
     }, {});
     var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
     if (1 !== fd && 2 !== fd) {
-      util.deprecate(function() {
+      util2.deprecate(function() {
       }, "except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)")();
     }
     var stream = 1 === fd ? process.stdout : 2 === fd ? process.stderr : createWritableStdioStream(fd);
@@ -18552,13 +18578,13 @@ var require_node3 = __commonJS({
     }
     exports2.formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts).split("\n").map(function(str) {
+      return util2.inspect(v, this.inspectOpts).split("\n").map(function(str) {
         return str.trim();
       }).join(" ");
     };
     exports2.formatters.O = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts);
+      return util2.inspect(v, this.inspectOpts);
     };
     function formatArgs(args) {
       var name = this.namespace;
@@ -18573,7 +18599,7 @@ var require_node3 = __commonJS({
       }
     }
     function log() {
-      return stream.write(util.format.apply(util, arguments) + "\n");
+      return stream.write(util2.format.apply(util2, arguments) + "\n");
     }
     function save(namespaces) {
       if (null == namespaces) {
@@ -18686,7 +18712,7 @@ var require_path_to_regexp = __commonJS({
   "node_modules/path-to-regexp/index.js"(exports2, module2) {
     module2.exports = pathToRegexp;
     var MATCHING_GROUP_REGEXP = /\\.|\((?:\?<(.*?)>)?(?!\?)/g;
-    function pathToRegexp(path, keys, options) {
+    function pathToRegexp(path2, keys, options) {
       options = options || {};
       keys = keys || [];
       var strict = options.strict;
@@ -18700,8 +18726,8 @@ var require_path_to_regexp = __commonJS({
       var pos = 0;
       var backtrack = "";
       var m;
-      if (path instanceof RegExp) {
-        while (m = MATCHING_GROUP_REGEXP.exec(path.source)) {
+      if (path2 instanceof RegExp) {
+        while (m = MATCHING_GROUP_REGEXP.exec(path2.source)) {
           if (m[0][0] === "\\") continue;
           keys.push({
             name: m[1] || name++,
@@ -18709,18 +18735,18 @@ var require_path_to_regexp = __commonJS({
             offset: m.index
           });
         }
-        return path;
+        return path2;
       }
-      if (Array.isArray(path)) {
-        path = path.map(function(value) {
+      if (Array.isArray(path2)) {
+        path2 = path2.map(function(value) {
           return pathToRegexp(value, keys, options).source;
         });
-        return new RegExp(path.join("|"), flags);
+        return new RegExp(path2.join("|"), flags);
       }
-      if (typeof path !== "string") {
+      if (typeof path2 !== "string") {
         throw new TypeError("path must be a string, array of strings, or regular expression");
       }
-      path = path.replace(
+      path2 = path2.replace(
         /\\.|(\/)?(\.)?:(\w+)(\(.*?\))?(\*)?(\?)?|[.*]|\/\(/g,
         function(match, slash, format, key, capture, star, optional, offset) {
           if (match[0] === "\\") {
@@ -18737,7 +18763,7 @@ var require_path_to_regexp = __commonJS({
           if (slash || format) {
             backtrack = "";
           } else {
-            backtrack += path.slice(pos, offset);
+            backtrack += path2.slice(pos, offset);
           }
           pos = offset + match.length;
           if (match === "*") {
@@ -18767,7 +18793,7 @@ var require_path_to_regexp = __commonJS({
           return result;
         }
       );
-      while (m = MATCHING_GROUP_REGEXP.exec(path)) {
+      while (m = MATCHING_GROUP_REGEXP.exec(path2)) {
         if (m[0][0] === "\\") continue;
         if (keysOffset + i === keys.length || keys[keysOffset + i].offset > m.index) {
           keys.splice(keysOffset + i, 0, {
@@ -18779,13 +18805,13 @@ var require_path_to_regexp = __commonJS({
         }
         i++;
       }
-      path += strict ? "" : path[path.length - 1] === "/" ? "?" : "/?";
+      path2 += strict ? "" : path2[path2.length - 1] === "/" ? "?" : "/?";
       if (end) {
-        path += "$";
-      } else if (path[path.length - 1] !== "/") {
-        path += lookahead ? "(?=/|$)" : "(?:/|$)";
+        path2 += "$";
+      } else if (path2[path2.length - 1] !== "/") {
+        path2 += lookahead ? "(?=/|$)" : "(?:/|$)";
       }
-      return new RegExp("^" + path, flags);
+      return new RegExp("^" + path2, flags);
     }
   }
 });
@@ -18798,19 +18824,19 @@ var require_layer = __commonJS({
     var debug = require_src3()("express:router:layer");
     var hasOwnProperty = Object.prototype.hasOwnProperty;
     module2.exports = Layer;
-    function Layer(path, options, fn) {
+    function Layer(path2, options, fn) {
       if (!(this instanceof Layer)) {
-        return new Layer(path, options, fn);
+        return new Layer(path2, options, fn);
       }
-      debug("new %o", path);
+      debug("new %o", path2);
       var opts = options || {};
       this.handle = fn;
       this.name = fn.name || "<anonymous>";
       this.params = void 0;
       this.path = void 0;
-      this.regexp = pathRegexp(path, this.keys = [], opts);
-      this.regexp.fast_star = path === "*";
-      this.regexp.fast_slash = path === "/" && opts.end === false;
+      this.regexp = pathRegexp(path2, this.keys = [], opts);
+      this.regexp.fast_star = path2 === "*";
+      this.regexp.fast_slash = path2 === "/" && opts.end === false;
     }
     Layer.prototype.handle_error = function handle_error(error, req, res, next) {
       var fn = this.handle;
@@ -18834,20 +18860,20 @@ var require_layer = __commonJS({
         next(err);
       }
     };
-    Layer.prototype.match = function match(path) {
+    Layer.prototype.match = function match(path2) {
       var match2;
-      if (path != null) {
+      if (path2 != null) {
         if (this.regexp.fast_slash) {
           this.params = {};
           this.path = "";
           return true;
         }
         if (this.regexp.fast_star) {
-          this.params = { "0": decode_param(path) };
-          this.path = path;
+          this.params = { "0": decode_param(path2) };
+          this.path = path2;
           return true;
         }
-        match2 = this.regexp.exec(path);
+        match2 = this.regexp.exec(path2);
       }
       if (!match2) {
         this.params = void 0;
@@ -18940,10 +18966,10 @@ var require_route = __commonJS({
     var slice = Array.prototype.slice;
     var toString = Object.prototype.toString;
     module2.exports = Route;
-    function Route(path) {
-      this.path = path;
+    function Route(path2) {
+      this.path = path2;
       this.stack = [];
-      debug("new %o", path);
+      debug("new %o", path2);
       this.methods = {};
     }
     Route.prototype._handles_method = function _handles_method(method) {
@@ -19073,17 +19099,17 @@ var require_router = __commonJS({
     var toString = Object.prototype.toString;
     var proto = module2.exports = function(options) {
       var opts = options || {};
-      function router(req, res, next) {
-        router.handle(req, res, next);
+      function router9(req, res, next) {
+        router9.handle(req, res, next);
       }
-      setPrototypeOf(router, proto);
-      router.params = {};
-      router._params = [];
-      router.caseSensitive = opts.caseSensitive;
-      router.mergeParams = opts.mergeParams;
-      router.strict = opts.strict;
-      router.stack = [];
-      return router;
+      setPrototypeOf(router9, proto);
+      router9.params = {};
+      router9._params = [];
+      router9.caseSensitive = opts.caseSensitive;
+      router9.mergeParams = opts.mergeParams;
+      router9.strict = opts.strict;
+      router9.stack = [];
+      return router9;
     };
     proto.param = function param(name, fn) {
       if (typeof name === "function") {
@@ -19155,8 +19181,8 @@ var require_router = __commonJS({
         if (++sync > 100) {
           return setImmediate(next, err);
         }
-        var path = getPathname(req);
-        if (path == null) {
+        var path2 = getPathname(req);
+        if (path2 == null) {
           return done(layerError);
         }
         var layer;
@@ -19164,7 +19190,7 @@ var require_router = __commonJS({
         var route;
         while (match !== true && idx < stack.length) {
           layer = stack[idx++];
-          match = matchLayer(layer, path);
+          match = matchLayer(layer, path2);
           route = layer.route;
           if (typeof match !== "boolean") {
             layerError = layerError || match;
@@ -19202,18 +19228,18 @@ var require_router = __commonJS({
           } else if (route) {
             layer.handle_request(req, res, next);
           } else {
-            trim_prefix(layer, layerError, layerPath, path);
+            trim_prefix(layer, layerError, layerPath, path2);
           }
           sync = 0;
         });
       }
-      function trim_prefix(layer, layerError, layerPath, path) {
+      function trim_prefix(layer, layerError, layerPath, path2) {
         if (layerPath.length !== 0) {
-          if (layerPath !== path.slice(0, layerPath.length)) {
+          if (layerPath !== path2.slice(0, layerPath.length)) {
             next(layerError);
             return;
           }
-          var c = path[layerPath.length];
+          var c = path2[layerPath.length];
           if (c && c !== "/" && c !== ".") return next(layerError);
           debug("trim prefix (%s) from url %s", layerPath, req.url);
           removed = layerPath;
@@ -19291,7 +19317,7 @@ var require_router = __commonJS({
     };
     proto.use = function use(fn) {
       var offset = 0;
-      var path = "/";
+      var path2 = "/";
       if (typeof fn !== "function") {
         var arg = fn;
         while (Array.isArray(arg) && arg.length !== 0) {
@@ -19299,7 +19325,7 @@ var require_router = __commonJS({
         }
         if (typeof arg !== "function") {
           offset = 1;
-          path = fn;
+          path2 = fn;
         }
       }
       var callbacks = flatten(slice.call(arguments, offset));
@@ -19311,8 +19337,8 @@ var require_router = __commonJS({
         if (typeof fn !== "function") {
           throw new TypeError("Router.use() requires a middleware function but got a " + gettype(fn));
         }
-        debug("use %o %s", path, fn.name || "<anonymous>");
-        var layer = new Layer(path, {
+        debug("use %o %s", path2, fn.name || "<anonymous>");
+        var layer = new Layer(path2, {
           sensitive: this.caseSensitive,
           strict: false,
           end: false
@@ -19322,9 +19348,9 @@ var require_router = __commonJS({
       }
       return this;
     };
-    proto.route = function route(path) {
-      var route2 = new Route(path);
-      var layer = new Layer(path, {
+    proto.route = function route(path2) {
+      var route2 = new Route(path2);
+      var layer = new Layer(path2, {
         sensitive: this.caseSensitive,
         strict: this.strict,
         end: true
@@ -19334,8 +19360,8 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      proto[method] = function(path) {
-        var route = this.route(path);
+      proto[method] = function(path2) {
+        var route = this.route(path2);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
       };
@@ -19371,9 +19397,9 @@ var require_router = __commonJS({
       }
       return toString.call(obj).replace(objectRegExp, "$1");
     }
-    function matchLayer(layer, path) {
+    function matchLayer(layer, path2) {
       try {
-        return layer.match(path);
+        return layer.match(path2);
       } catch (err) {
         return err;
       }
@@ -19491,13 +19517,13 @@ var require_view = __commonJS({
   "node_modules/express/lib/view.js"(exports2, module2) {
     "use strict";
     var debug = require_src3()("express:view");
-    var path = require("path");
+    var path2 = require("path");
     var fs = require("fs");
-    var dirname = path.dirname;
-    var basename = path.basename;
-    var extname = path.extname;
-    var join = path.join;
-    var resolve = path.resolve;
+    var dirname = path2.dirname;
+    var basename = path2.basename;
+    var extname = path2.extname;
+    var join = path2.join;
+    var resolve = path2.resolve;
     module2.exports = View;
     function View(name, options) {
       var opts = options || {};
@@ -19526,17 +19552,17 @@ var require_view = __commonJS({
       this.path = this.lookup(fileName);
     }
     View.prototype.lookup = function lookup(name) {
-      var path2;
+      var path3;
       var roots = [].concat(this.root);
       debug('lookup "%s"', name);
-      for (var i = 0; i < roots.length && !path2; i++) {
+      for (var i = 0; i < roots.length && !path3; i++) {
         var root = roots[i];
         var loc = resolve(root, name);
         var dir = dirname(loc);
         var file = basename(loc);
-        path2 = this.resolve(dir, file);
+        path3 = this.resolve(dir, file);
       }
-      return path2;
+      return path3;
     };
     View.prototype.render = function render(options, callback) {
       debug('render "%s"', this.path);
@@ -19544,21 +19570,21 @@ var require_view = __commonJS({
     };
     View.prototype.resolve = function resolve2(dir, file) {
       var ext = this.ext;
-      var path2 = join(dir, file);
-      var stat = tryStat(path2);
+      var path3 = join(dir, file);
+      var stat = tryStat(path3);
       if (stat && stat.isFile()) {
-        return path2;
+        return path3;
       }
-      path2 = join(dir, basename(file, ext), "index" + ext);
-      stat = tryStat(path2);
+      path3 = join(dir, basename(file, ext), "index" + ext);
+      stat = tryStat(path3);
       if (stat && stat.isFile()) {
-        return path2;
+        return path3;
       }
     };
-    function tryStat(path2) {
-      debug('stat "%s"', path2);
+    function tryStat(path3) {
+      debug('stat "%s"', path3);
       try {
-        return fs.statSync(path2);
+        return fs.statSync(path3);
       } catch (e) {
         return void 0;
       }
@@ -19570,34 +19596,34 @@ var require_view = __commonJS({
 var require_safe_buffer = __commonJS({
   "node_modules/safe-buffer/index.js"(exports2, module2) {
     var buffer = require("buffer");
-    var Buffer2 = buffer.Buffer;
+    var Buffer3 = buffer.Buffer;
     function copyProps(src, dst) {
       for (var key in src) {
         dst[key] = src[key];
       }
     }
-    if (Buffer2.from && Buffer2.alloc && Buffer2.allocUnsafe && Buffer2.allocUnsafeSlow) {
+    if (Buffer3.from && Buffer3.alloc && Buffer3.allocUnsafe && Buffer3.allocUnsafeSlow) {
       module2.exports = buffer;
     } else {
       copyProps(buffer, exports2);
       exports2.Buffer = SafeBuffer;
     }
     function SafeBuffer(arg, encodingOrOffset, length) {
-      return Buffer2(arg, encodingOrOffset, length);
+      return Buffer3(arg, encodingOrOffset, length);
     }
-    SafeBuffer.prototype = Object.create(Buffer2.prototype);
-    copyProps(Buffer2, SafeBuffer);
+    SafeBuffer.prototype = Object.create(Buffer3.prototype);
+    copyProps(Buffer3, SafeBuffer);
     SafeBuffer.from = function(arg, encodingOrOffset, length) {
       if (typeof arg === "number") {
         throw new TypeError("Argument must not be a number");
       }
-      return Buffer2(arg, encodingOrOffset, length);
+      return Buffer3(arg, encodingOrOffset, length);
     };
     SafeBuffer.alloc = function(size, fill, encoding) {
       if (typeof size !== "number") {
         throw new TypeError("Argument must be a number");
       }
-      var buf = Buffer2(size);
+      var buf = Buffer3(size);
       if (fill !== void 0) {
         if (typeof encoding === "string") {
           buf.fill(fill, encoding);
@@ -19613,7 +19639,7 @@ var require_safe_buffer = __commonJS({
       if (typeof size !== "number") {
         throw new TypeError("Argument must be a number");
       }
-      return Buffer2(size);
+      return Buffer3(size);
     };
     SafeBuffer.allocUnsafeSlow = function(size) {
       if (typeof size !== "number") {
@@ -19631,7 +19657,7 @@ var require_content_disposition = __commonJS({
     module2.exports = contentDisposition;
     module2.exports.parse = parse;
     var basename = require("path").basename;
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g;
     var HEX_ESCAPE_REGEXP = /%[0-9A-Fa-f]{2}/;
     var HEX_ESCAPE_REPLACE_REGEXP = /%([0-9A-Fa-f]{2})/g;
@@ -19710,7 +19736,7 @@ var require_content_disposition = __commonJS({
           value = getlatin1(binary);
           break;
         case "utf-8":
-          value = Buffer2.from(binary, "binary").toString("utf8");
+          value = Buffer3.from(binary, "binary").toString("utf8");
           break;
         default:
           throw new TypeError("unsupported charset in extended field");
@@ -20070,7 +20096,7 @@ var require_ms4 = __commonJS({
 var require_debug4 = __commonJS({
   "node_modules/send/node_modules/debug/src/debug.js"(exports2, module2) {
     exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
-    exports2.coerce = coerce;
+    exports2.coerce = coerce2;
     exports2.disable = disable;
     exports2.enable = enable;
     exports2.enabled = enabled;
@@ -20164,7 +20190,7 @@ var require_debug4 = __commonJS({
       }
       return false;
     }
-    function coerce(val) {
+    function coerce2(val) {
       if (val instanceof Error) return val.stack || val.message;
       return val;
     }
@@ -20261,7 +20287,7 @@ var require_browser4 = __commonJS({
 var require_node4 = __commonJS({
   "node_modules/send/node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
-    var util = require("util");
+    var util2 = require("util");
     exports2 = module2.exports = require_debug4();
     exports2.init = init;
     exports2.log = log;
@@ -20286,7 +20312,7 @@ var require_node4 = __commonJS({
     }, {});
     var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
     if (1 !== fd && 2 !== fd) {
-      util.deprecate(function() {
+      util2.deprecate(function() {
       }, "except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)")();
     }
     var stream = 1 === fd ? process.stdout : 2 === fd ? process.stderr : createWritableStdioStream(fd);
@@ -20295,13 +20321,13 @@ var require_node4 = __commonJS({
     }
     exports2.formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts).split("\n").map(function(str) {
+      return util2.inspect(v, this.inspectOpts).split("\n").map(function(str) {
         return str.trim();
       }).join(" ");
     };
     exports2.formatters.O = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts);
+      return util2.inspect(v, this.inspectOpts);
     };
     function formatArgs(args) {
       var name = this.namespace;
@@ -20316,7 +20342,7 @@ var require_node4 = __commonJS({
       }
     }
     function log() {
-      return stream.write(util.format.apply(util, arguments) + "\n");
+      return stream.write(util2.format.apply(util2, arguments) + "\n");
     }
     function save(namespaces) {
       if (null == namespaces) {
@@ -20393,14 +20419,14 @@ var require_etag = __commonJS({
   "node_modules/etag/index.js"(exports2, module2) {
     "use strict";
     module2.exports = etag;
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     var Stats = require("fs").Stats;
     var toString = Object.prototype.toString;
     function entitytag(entity) {
       if (entity.length === 0) {
         return '"0-2jmj7l5rSw0yVb/vlWAYkK/YBwk"';
       }
-      var hash = crypto.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
+      var hash = crypto2.createHash("sha1").update(entity, "utf8").digest("base64").substring(0, 27);
       var len = typeof entity === "string" ? Buffer.byteLength(entity, "utf8") : entity.length;
       return '"' + len.toString(16) + "-" + hash + '"';
     }
@@ -20513,7 +20539,7 @@ var require_types = __commonJS({
 // node_modules/mime/mime.js
 var require_mime = __commonJS({
   "node_modules/mime/mime.js"(exports2, module2) {
-    var path = require("path");
+    var path2 = require("path");
     var fs = require("fs");
     function Mime() {
       this.types = /* @__PURE__ */ Object.create(null);
@@ -20543,8 +20569,8 @@ var require_mime = __commonJS({
       this.define(map);
       this._loading = null;
     };
-    Mime.prototype.lookup = function(path2, fallback) {
-      var ext = path2.replace(/^.*[\.\/\\]/, "").toLowerCase();
+    Mime.prototype.lookup = function(path3, fallback) {
+      var ext = path3.replace(/^.*[\.\/\\]/, "").toLowerCase();
       return this.types[ext] || fallback || this.default_type;
     };
     Mime.prototype.extension = function(mimeType) {
@@ -20778,28 +20804,28 @@ var require_send = __commonJS({
     var ms = require_ms5();
     var onFinished = require_on_finished();
     var parseRange = require_range_parser();
-    var path = require("path");
+    var path2 = require("path");
     var statuses = require_statuses();
     var Stream = require("stream");
-    var util = require("util");
-    var extname = path.extname;
-    var join = path.join;
-    var normalize = path.normalize;
-    var resolve = path.resolve;
-    var sep = path.sep;
+    var util2 = require("util");
+    var extname = path2.extname;
+    var join = path2.join;
+    var normalize = path2.normalize;
+    var resolve = path2.resolve;
+    var sep = path2.sep;
     var BYTES_RANGE_REGEXP = /^ *bytes=/;
     var MAX_MAXAGE = 60 * 60 * 24 * 365 * 1e3;
     var UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/;
     module2.exports = send;
     module2.exports.mime = mime;
-    function send(req, path2, options) {
-      return new SendStream(req, path2, options);
+    function send(req, path3, options) {
+      return new SendStream(req, path3, options);
     }
-    function SendStream(req, path2, options) {
+    function SendStream(req, path3, options) {
       Stream.call(this);
       var opts = options || {};
       this.options = opts;
-      this.path = path2;
+      this.path = path3;
       this.req = req;
       this._acceptRanges = opts.acceptRanges !== void 0 ? Boolean(opts.acceptRanges) : true;
       this._cacheControl = opts.cacheControl !== void 0 ? Boolean(opts.cacheControl) : true;
@@ -20827,7 +20853,7 @@ var require_send = __commonJS({
         this.from(opts.from);
       }
     }
-    util.inherits(SendStream, Stream);
+    util2.inherits(SendStream, Stream);
     SendStream.prototype.etag = deprecate.function(function etag2(val) {
       this._etag = Boolean(val);
       debug("etag %s", this._etag);
@@ -20845,8 +20871,8 @@ var require_send = __commonJS({
       this._index = index2;
       return this;
     }, "send.index: pass index as option");
-    SendStream.prototype.root = function root(path2) {
-      this._root = resolve(String(path2));
+    SendStream.prototype.root = function root(path3) {
+      this._root = resolve(String(path3));
       debug("root %s", this._root);
       return this;
     };
@@ -20959,10 +20985,10 @@ var require_send = __commonJS({
       var lastModified = this.res.getHeader("Last-Modified");
       return parseHttpDate(lastModified) <= parseHttpDate(ifRange);
     };
-    SendStream.prototype.redirect = function redirect(path2) {
+    SendStream.prototype.redirect = function redirect(path3) {
       var res = this.res;
       if (hasListeners(this, "directory")) {
-        this.emit("directory", res, path2);
+        this.emit("directory", res, path3);
         return;
       }
       if (this.hasTrailingSlash()) {
@@ -20982,42 +21008,42 @@ var require_send = __commonJS({
     SendStream.prototype.pipe = function pipe(res) {
       var root = this._root;
       this.res = res;
-      var path2 = decode(this.path);
-      if (path2 === -1) {
+      var path3 = decode(this.path);
+      if (path3 === -1) {
         this.error(400);
         return res;
       }
-      if (~path2.indexOf("\0")) {
+      if (~path3.indexOf("\0")) {
         this.error(400);
         return res;
       }
       var parts;
       if (root !== null) {
-        if (path2) {
-          path2 = normalize("." + sep + path2);
+        if (path3) {
+          path3 = normalize("." + sep + path3);
         }
-        if (UP_PATH_REGEXP.test(path2)) {
-          debug('malicious path "%s"', path2);
+        if (UP_PATH_REGEXP.test(path3)) {
+          debug('malicious path "%s"', path3);
           this.error(403);
           return res;
         }
-        parts = path2.split(sep);
-        path2 = normalize(join(root, path2));
+        parts = path3.split(sep);
+        path3 = normalize(join(root, path3));
       } else {
-        if (UP_PATH_REGEXP.test(path2)) {
-          debug('malicious path "%s"', path2);
+        if (UP_PATH_REGEXP.test(path3)) {
+          debug('malicious path "%s"', path3);
           this.error(403);
           return res;
         }
-        parts = normalize(path2).split(sep);
-        path2 = resolve(path2);
+        parts = normalize(path3).split(sep);
+        path3 = resolve(path3);
       }
       if (containsDotFile(parts)) {
         var access = this._dotfiles;
         if (access === void 0) {
           access = parts[parts.length - 1][0] === "." ? this._hidden ? "allow" : "ignore" : "allow";
         }
-        debug('%s dotfile "%s"', access, path2);
+        debug('%s dotfile "%s"', access, path3);
         switch (access) {
           case "allow":
             break;
@@ -21031,13 +21057,13 @@ var require_send = __commonJS({
         }
       }
       if (this._index.length && this.hasTrailingSlash()) {
-        this.sendIndex(path2);
+        this.sendIndex(path3);
         return res;
       }
-      this.sendFile(path2);
+      this.sendFile(path3);
       return res;
     };
-    SendStream.prototype.send = function send2(path2, stat) {
+    SendStream.prototype.send = function send2(path3, stat) {
       var len = stat.size;
       var options = this.options;
       var opts = {};
@@ -21049,9 +21075,9 @@ var require_send = __commonJS({
         this.headersAlreadySent();
         return;
       }
-      debug('pipe "%s"', path2);
-      this.setHeader(path2, stat);
-      this.type(path2);
+      debug('pipe "%s"', path3);
+      this.setHeader(path3, stat);
+      this.type(path3);
       if (this.isConditionalGET()) {
         if (this.isPreconditionFailure()) {
           this.error(412);
@@ -21100,26 +21126,26 @@ var require_send = __commonJS({
         res.end();
         return;
       }
-      this.stream(path2, opts);
+      this.stream(path3, opts);
     };
-    SendStream.prototype.sendFile = function sendFile(path2) {
+    SendStream.prototype.sendFile = function sendFile(path3) {
       var i = 0;
       var self = this;
-      debug('stat "%s"', path2);
-      fs.stat(path2, function onstat(err, stat) {
-        if (err && err.code === "ENOENT" && !extname(path2) && path2[path2.length - 1] !== sep) {
+      debug('stat "%s"', path3);
+      fs.stat(path3, function onstat(err, stat) {
+        if (err && err.code === "ENOENT" && !extname(path3) && path3[path3.length - 1] !== sep) {
           return next(err);
         }
         if (err) return self.onStatError(err);
-        if (stat.isDirectory()) return self.redirect(path2);
-        self.emit("file", path2, stat);
-        self.send(path2, stat);
+        if (stat.isDirectory()) return self.redirect(path3);
+        self.emit("file", path3, stat);
+        self.send(path3, stat);
       });
       function next(err) {
         if (self._extensions.length <= i) {
           return err ? self.onStatError(err) : self.error(404);
         }
-        var p = path2 + "." + self._extensions[i++];
+        var p = path3 + "." + self._extensions[i++];
         debug('stat "%s"', p);
         fs.stat(p, function(err2, stat) {
           if (err2) return next(err2);
@@ -21129,7 +21155,7 @@ var require_send = __commonJS({
         });
       }
     };
-    SendStream.prototype.sendIndex = function sendIndex(path2) {
+    SendStream.prototype.sendIndex = function sendIndex(path3) {
       var i = -1;
       var self = this;
       function next(err) {
@@ -21137,7 +21163,7 @@ var require_send = __commonJS({
           if (err) return self.onStatError(err);
           return self.error(404);
         }
-        var p = join(path2, self._index[i]);
+        var p = join(path3, self._index[i]);
         debug('stat "%s"', p);
         fs.stat(p, function(err2, stat) {
           if (err2) return next(err2);
@@ -21148,10 +21174,10 @@ var require_send = __commonJS({
       }
       next();
     };
-    SendStream.prototype.stream = function stream(path2, options) {
+    SendStream.prototype.stream = function stream(path3, options) {
       var self = this;
       var res = this.res;
-      var stream2 = fs.createReadStream(path2, options);
+      var stream2 = fs.createReadStream(path3, options);
       this.emit("stream", stream2);
       stream2.pipe(res);
       function cleanup() {
@@ -21166,10 +21192,10 @@ var require_send = __commonJS({
         self.emit("end");
       });
     };
-    SendStream.prototype.type = function type(path2) {
+    SendStream.prototype.type = function type(path3) {
       var res = this.res;
       if (res.getHeader("Content-Type")) return;
-      var type2 = mime.lookup(path2);
+      var type2 = mime.lookup(path3);
       if (!type2) {
         debug("no content-type");
         return;
@@ -21178,9 +21204,9 @@ var require_send = __commonJS({
       debug("content-type %s", type2);
       res.setHeader("Content-Type", type2 + (charset ? "; charset=" + charset : ""));
     };
-    SendStream.prototype.setHeader = function setHeader(path2, stat) {
+    SendStream.prototype.setHeader = function setHeader(path3, stat) {
       var res = this.res;
-      this.emit("headers", res, path2, stat);
+      this.emit("headers", res, path3, stat);
       if (this._acceptRanges && !res.getHeader("Accept-Ranges")) {
         debug("accept ranges");
         res.setHeader("Accept-Ranges", "bytes");
@@ -21239,9 +21265,9 @@ var require_send = __commonJS({
       }
       return err instanceof Error ? createError(status, err, { expose: false }) : createError(status, err);
     }
-    function decode(path2) {
+    function decode(path3) {
       try {
-        return decodeURIComponent(path2);
+        return decodeURIComponent(path3);
       } catch (err) {
         return -1;
       }
@@ -22138,7 +22164,7 @@ var require_proxy_addr = __commonJS({
 var require_utils2 = __commonJS({
   "node_modules/express/lib/utils.js"(exports2) {
     "use strict";
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var contentDisposition = require_content_disposition();
     var contentType = require_content_type();
     var deprecate = require_depd()("express");
@@ -22150,10 +22176,10 @@ var require_utils2 = __commonJS({
     var querystring = require("querystring");
     exports2.etag = createETagGenerator({ weak: false });
     exports2.wetag = createETagGenerator({ weak: true });
-    exports2.isAbsolute = function(path) {
-      if ("/" === path[0]) return true;
-      if (":" === path[1] && ("\\" === path[2] || "/" === path[2])) return true;
-      if ("\\\\" === path.substring(0, 2)) return true;
+    exports2.isAbsolute = function(path2) {
+      if ("/" === path2[0]) return true;
+      if (":" === path2[1] && ("\\" === path2[2] || "/" === path2[2])) return true;
+      if ("\\\\" === path2.substring(0, 2)) return true;
     };
     exports2.flatten = deprecate.function(
       flatten,
@@ -22256,7 +22282,7 @@ var require_utils2 = __commonJS({
     };
     function createETagGenerator(options) {
       return function generateETag(body, encoding) {
-        var buf = !Buffer2.isBuffer(body) ? Buffer2.from(body, encoding) : body;
+        var buf = !Buffer3.isBuffer(body) ? Buffer3.from(body, encoding) : body;
         return etag(buf, options);
       };
     }
@@ -22277,7 +22303,7 @@ var require_application = __commonJS({
   "node_modules/express/lib/application.js"(exports2, module2) {
     "use strict";
     var finalhandler = require_finalhandler();
-    var Router = require_router();
+    var Router9 = require_router();
     var methods = require_methods();
     var middleware = require_init();
     var query = require_query();
@@ -22342,7 +22368,7 @@ var require_application = __commonJS({
     };
     app2.lazyrouter = function lazyrouter() {
       if (!this._router) {
-        this._router = new Router({
+        this._router = new Router9({
           caseSensitive: this.enabled("case sensitive routing"),
           strict: this.enabled("strict routing")
         });
@@ -22351,21 +22377,21 @@ var require_application = __commonJS({
       }
     };
     app2.handle = function handle(req, res, callback) {
-      var router = this._router;
+      var router9 = this._router;
       var done = callback || finalhandler(req, res, {
         env: this.get("env"),
         onerror: logerror.bind(this)
       });
-      if (!router) {
+      if (!router9) {
         debug("no routes defined on app");
         done();
         return;
       }
-      router.handle(req, res, done);
+      router9.handle(req, res, done);
     };
     app2.use = function use(fn) {
       var offset = 0;
-      var path = "/";
+      var path2 = "/";
       if (typeof fn !== "function") {
         var arg = fn;
         while (Array.isArray(arg) && arg.length !== 0) {
@@ -22373,7 +22399,7 @@ var require_application = __commonJS({
         }
         if (typeof arg !== "function") {
           offset = 1;
-          path = fn;
+          path2 = fn;
         }
       }
       var fns = flatten(slice.call(arguments, offset));
@@ -22381,15 +22407,15 @@ var require_application = __commonJS({
         throw new TypeError("app.use() requires a middleware function");
       }
       this.lazyrouter();
-      var router = this._router;
+      var router9 = this._router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router.use(path, fn2);
+          return router9.use(path2, fn2);
         }
-        debug(".use app under %s", path);
-        fn2.mountpath = path;
+        debug(".use app under %s", path2);
+        fn2.mountpath = path2;
         fn2.parent = this;
-        router.use(path, function mounted_app(req, res, next) {
+        router9.use(path2, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             setPrototypeOf(req, orig.request);
@@ -22401,9 +22427,9 @@ var require_application = __commonJS({
       }, this);
       return this;
     };
-    app2.route = function route(path) {
+    app2.route = function route(path2) {
       this.lazyrouter();
-      return this._router.route(path);
+      return this._router.route(path2);
     };
     app2.engine = function engine(ext, fn) {
       if (typeof fn !== "function") {
@@ -22454,7 +22480,7 @@ var require_application = __commonJS({
       }
       return this;
     };
-    app2.path = function path() {
+    app2.path = function path2() {
       return this.parent ? this.parent.path() + this.mountpath : "";
     };
     app2.enabled = function enabled(setting) {
@@ -22470,19 +22496,19 @@ var require_application = __commonJS({
       return this.set(setting, false);
     };
     methods.forEach(function(method) {
-      app2[method] = function(path) {
+      app2[method] = function(path2) {
         if (method === "get" && arguments.length === 1) {
-          return this.set(path);
+          return this.set(path2);
         }
         this.lazyrouter();
-        var route = this._router.route(path);
+        var route = this._router.route(path2);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
       };
     });
-    app2.all = function all(path) {
+    app2.all = function all(path2) {
       this.lazyrouter();
-      var route = this._router.route(path);
+      var route = this._router.route(path2);
       var args = slice.call(arguments, 1);
       for (var i = 0; i < methods.length; i++) {
         route[methods[i]].apply(route, args);
@@ -23132,7 +23158,7 @@ var require_request = __commonJS({
     "use strict";
     var accepts = require_accepts();
     var deprecate = require_depd()("express");
-    var isIP = require("net").isIP;
+    var isIP2 = require("net").isIP;
     var typeis = require_type_is();
     var http = require("http");
     var fresh = require_fresh();
@@ -23238,10 +23264,10 @@ var require_request = __commonJS({
       var hostname = this.hostname;
       if (!hostname) return [];
       var offset = this.app.get("subdomain offset");
-      var subdomains2 = !isIP(hostname) ? hostname.split(".").reverse() : [hostname];
+      var subdomains2 = !isIP2(hostname) ? hostname.split(".").reverse() : [hostname];
       return subdomains2.slice(offset);
     });
-    defineGetter(req, "path", function path() {
+    defineGetter(req, "path", function path2() {
       return parse(this).pathname;
     });
     defineGetter(req, "hostname", function hostname() {
@@ -23470,11 +23496,11 @@ var require_http_errors4 = __commonJS({
 // node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
   "node_modules/cookie-signature/index.js"(exports2) {
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     exports2.sign = function(val, secret) {
       if ("string" != typeof val) throw new TypeError("Cookie value must be provided as a string.");
       if ("string" != typeof secret) throw new TypeError("Secret string must be provided.");
-      return val + "." + crypto.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
+      return val + "." + crypto2.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
     };
     exports2.unsign = function(val, secret) {
       if ("string" != typeof val) throw new TypeError("Signed cookie string must be provided.");
@@ -23483,7 +23509,7 @@ var require_cookie_signature = __commonJS({
       return sha1(mac) == sha1(val) ? str : false;
     };
     function sha1(str) {
-      return crypto.createHash("sha1").update(str).digest("hex");
+      return crypto2.createHash("sha1").update(str).digest("hex");
     }
   }
 });
@@ -23731,7 +23757,7 @@ var require_vary = __commonJS({
 var require_response = __commonJS({
   "node_modules/express/lib/response.js"(exports2, module2) {
     "use strict";
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var contentDisposition = require_content_disposition();
     var createError = require_http_errors4();
     var deprecate = require_depd()("express");
@@ -23740,18 +23766,18 @@ var require_response = __commonJS({
     var http = require("http");
     var isAbsolute = require_utils2().isAbsolute;
     var onFinished = require_on_finished();
-    var path = require("path");
+    var path2 = require("path");
     var statuses = require_statuses();
     var merge = require_utils_merge();
     var sign = require_cookie_signature().sign;
     var normalizeType = require_utils2().normalizeType;
     var normalizeTypes = require_utils2().normalizeTypes;
     var setCharset = require_utils2().setCharset;
-    var cookie = require_cookie();
+    var cookie2 = require_cookie();
     var send = require_send();
-    var extname = path.extname;
+    var extname = path2.extname;
     var mime = send.mime;
-    var resolve = path.resolve;
+    var resolve = path2.resolve;
     var vary = require_vary();
     var res = Object.create(http.ServerResponse.prototype);
     module2.exports = res;
@@ -23806,7 +23832,7 @@ var require_response = __commonJS({
         case "object":
           if (chunk === null) {
             chunk = "";
-          } else if (Buffer2.isBuffer(chunk)) {
+          } else if (Buffer3.isBuffer(chunk)) {
             if (!this.get("Content-Type")) {
               this.type("bin");
             }
@@ -23826,12 +23852,12 @@ var require_response = __commonJS({
       var generateETag = !this.get("ETag") && typeof etagFn === "function";
       var len;
       if (chunk !== void 0) {
-        if (Buffer2.isBuffer(chunk)) {
+        if (Buffer3.isBuffer(chunk)) {
           len = chunk.length;
         } else if (!generateETag && chunk.length < 1e3) {
-          len = Buffer2.byteLength(chunk, encoding);
+          len = Buffer3.byteLength(chunk, encoding);
         } else {
-          chunk = Buffer2.from(chunk, encoding);
+          chunk = Buffer3.from(chunk, encoding);
           encoding = void 0;
           len = chunk.length;
         }
@@ -23928,26 +23954,26 @@ var require_response = __commonJS({
       this.type("txt");
       return this.send(body);
     };
-    res.sendFile = function sendFile(path2, options, callback) {
+    res.sendFile = function sendFile(path3, options, callback) {
       var done = callback;
       var req = this.req;
       var res2 = this;
       var next = req.next;
       var opts = options || {};
-      if (!path2) {
+      if (!path3) {
         throw new TypeError("path argument is required to res.sendFile");
       }
-      if (typeof path2 !== "string") {
+      if (typeof path3 !== "string") {
         throw new TypeError("path must be a string to res.sendFile");
       }
       if (typeof options === "function") {
         done = options;
         opts = {};
       }
-      if (!opts.root && !isAbsolute(path2)) {
+      if (!opts.root && !isAbsolute(path3)) {
         throw new TypeError("path must be absolute or specify root to res.sendFile");
       }
-      var pathname = encodeURI(path2);
+      var pathname = encodeURI(path3);
       var file = send(req, pathname, opts);
       sendfile(res2, file, opts, function(err) {
         if (done) return done(err);
@@ -23957,7 +23983,7 @@ var require_response = __commonJS({
         }
       });
     };
-    res.sendfile = function(path2, options, callback) {
+    res.sendfile = function(path3, options, callback) {
       var done = callback;
       var req = this.req;
       var res2 = this;
@@ -23967,7 +23993,7 @@ var require_response = __commonJS({
         done = options;
         opts = {};
       }
-      var file = send(req, path2, opts);
+      var file = send(req, path3, opts);
       sendfile(res2, file, opts, function(err) {
         if (done) return done(err);
         if (err && err.code === "EISDIR") return next();
@@ -23980,7 +24006,7 @@ var require_response = __commonJS({
       res.sendfile,
       "res.sendfile: Use res.sendFile instead"
     );
-    res.download = function download(path2, filename, options, callback) {
+    res.download = function download(path3, filename, options, callback) {
       var done = callback;
       var name = filename;
       var opts = options || null;
@@ -23997,7 +24023,7 @@ var require_response = __commonJS({
         opts = filename;
       }
       var headers = {
-        "Content-Disposition": contentDisposition(name || path2)
+        "Content-Disposition": contentDisposition(name || path3)
       };
       if (opts && opts.headers) {
         var keys = Object.keys(opts.headers);
@@ -24010,7 +24036,7 @@ var require_response = __commonJS({
       }
       opts = Object.create(opts);
       opts.headers = headers;
-      var fullPath = !opts.root ? resolve(path2) : path2;
+      var fullPath = !opts.root ? resolve(path3) : path3;
       return this.sendFile(fullPath, opts, done);
     };
     res.contentType = res.type = function contentType(type) {
@@ -24110,7 +24136,7 @@ var require_response = __commonJS({
       if (opts.path == null) {
         opts.path = "/";
       }
-      this.append("Set-Cookie", cookie.serialize(name, String(val), opts));
+      this.append("Set-Cookie", cookie2.serialize(name, String(val), opts));
       return this;
     };
     res.location = function location(url) {
@@ -24150,7 +24176,7 @@ var require_response = __commonJS({
         }
       });
       this.statusCode = status;
-      this.set("Content-Length", Buffer2.byteLength(body));
+      this.set("Content-Length", Buffer3.byteLength(body));
       if (this.req.method === "HEAD") {
         this.end();
       } else {
@@ -24311,11 +24337,11 @@ var require_serve_static = __commonJS({
         }
         var forwardError = !fallthrough;
         var originalUrl = parseUrl.original(req);
-        var path = parseUrl(req).pathname;
-        if (path === "/" && originalUrl.pathname.substr(-1) !== "/") {
-          path = "";
+        var path2 = parseUrl(req).pathname;
+        if (path2 === "/" && originalUrl.pathname.substr(-1) !== "/") {
+          path2 = "";
         }
-        var stream = send(req, path, opts);
+        var stream = send(req, path2, opts);
         stream.on("directory", onDirectory);
         if (setHeaders) {
           stream.on("headers", setHeaders);
@@ -24383,7 +24409,7 @@ var require_express = __commonJS({
     var mixin = require_merge_descriptors();
     var proto = require_application();
     var Route = require_route();
-    var Router = require_router();
+    var Router9 = require_router();
     var req = require_request();
     var res = require_response();
     exports2 = module2.exports = createApplication;
@@ -24406,7 +24432,7 @@ var require_express = __commonJS({
     exports2.request = req;
     exports2.response = res;
     exports2.Route = Route;
-    exports2.Router = Router;
+    exports2.Router = Router9;
     exports2.json = bodyParser.json;
     exports2.query = require_query();
     exports2.raw = bodyParser.raw;
@@ -24455,16 +24481,16 @@ var require_express2 = __commonJS({
 var require_cookie_parser = __commonJS({
   "node_modules/cookie-parser/index.js"(exports2, module2) {
     "use strict";
-    var cookie = require_cookie();
+    var cookie2 = require_cookie();
     var signature = require_cookie_signature();
-    module2.exports = cookieParser;
+    module2.exports = cookieParser2;
     module2.exports.JSONCookie = JSONCookie;
     module2.exports.JSONCookies = JSONCookies;
     module2.exports.signedCookie = signedCookie;
     module2.exports.signedCookies = signedCookies;
-    function cookieParser(secret, options) {
+    function cookieParser2(secret, options) {
       var secrets = !secret || Array.isArray(secret) ? secret || [] : [secret];
-      return function cookieParser2(req, res, next) {
+      return function cookieParser3(req, res, next) {
         if (req.cookies) {
           return next();
         }
@@ -24475,7 +24501,7 @@ var require_cookie_parser = __commonJS({
         if (!cookies) {
           return next();
         }
-        req.cookies = cookie.parse(cookies, options);
+        req.cookies = cookie2.parse(cookies, options);
         if (secrets.length !== 0) {
           req.signedCookies = signedCookies(req.cookies, secrets);
           req.signedCookies = JSONCookies(req.signedCookies);
@@ -25059,7 +25085,7 @@ var require_negotiator2 = __commonJS({
 var require_compressible = __commonJS({
   "node_modules/compressible/index.js"(exports2, module2) {
     "use strict";
-    var db = require_mime_db();
+    var db2 = require_mime_db();
     var COMPRESSIBLE_TYPE_REGEXP = /^text\/|\+(?:json|text|xml)$/i;
     var EXTRACT_TYPE_REGEXP = /^\s*([^;\s]*)(?:;|\s|$)/;
     module2.exports = compressible;
@@ -25069,7 +25095,7 @@ var require_compressible = __commonJS({
       }
       var match = EXTRACT_TYPE_REGEXP.exec(type);
       var mime = match && match[1].toLowerCase();
-      var data = db[mime];
+      var data = db2[mime];
       if (data && data.compressible !== void 0) {
         return data.compressible;
       }
@@ -25184,7 +25210,7 @@ var require_ms6 = __commonJS({
 var require_debug5 = __commonJS({
   "node_modules/compression/node_modules/debug/src/debug.js"(exports2, module2) {
     exports2 = module2.exports = createDebug.debug = createDebug["default"] = createDebug;
-    exports2.coerce = coerce;
+    exports2.coerce = coerce2;
     exports2.disable = disable;
     exports2.enable = enable;
     exports2.enabled = enabled;
@@ -25278,7 +25304,7 @@ var require_debug5 = __commonJS({
       }
       return false;
     }
-    function coerce(val) {
+    function coerce2(val) {
       if (val instanceof Error) return val.stack || val.message;
       return val;
     }
@@ -25375,7 +25401,7 @@ var require_browser5 = __commonJS({
 var require_node5 = __commonJS({
   "node_modules/compression/node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
-    var util = require("util");
+    var util2 = require("util");
     exports2 = module2.exports = require_debug5();
     exports2.init = init;
     exports2.log = log;
@@ -25400,7 +25426,7 @@ var require_node5 = __commonJS({
     }, {});
     var fd = parseInt(process.env.DEBUG_FD, 10) || 2;
     if (1 !== fd && 2 !== fd) {
-      util.deprecate(function() {
+      util2.deprecate(function() {
       }, "except for stderr(2) and stdout(1), any other usage of DEBUG_FD is deprecated. Override debug.log if you want to use a different log function (https://git.io/debug_fd)")();
     }
     var stream = 1 === fd ? process.stdout : 2 === fd ? process.stderr : createWritableStdioStream(fd);
@@ -25409,13 +25435,13 @@ var require_node5 = __commonJS({
     }
     exports2.formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts).split("\n").map(function(str) {
+      return util2.inspect(v, this.inspectOpts).split("\n").map(function(str) {
         return str.trim();
       }).join(" ");
     };
     exports2.formatters.O = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts);
+      return util2.inspect(v, this.inspectOpts);
     };
     function formatArgs(args) {
       var name = this.namespace;
@@ -25430,7 +25456,7 @@ var require_node5 = __commonJS({
       }
     }
     function log() {
-      return stream.write(util.format.apply(util, arguments) + "\n");
+      return stream.write(util2.format.apply(util2, arguments) + "\n");
     }
     function save(namespaces) {
       if (null == namespaces) {
@@ -25605,21 +25631,21 @@ var require_compression = __commonJS({
   "node_modules/compression/index.js"(exports2, module2) {
     "use strict";
     var Negotiator = require_negotiator2();
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var bytes = require_bytes();
     var compressible = require_compressible();
     var debug = require_src5()("compression");
     var onHeaders = require_on_headers();
     var vary = require_vary();
     var zlib = require("zlib");
-    module2.exports = compression;
+    module2.exports = compression2;
     module2.exports.filter = shouldCompress;
     var hasBrotliSupport = "createBrotliCompress" in zlib;
     var cacheControlNoTransformRegExp = /(?:^|,)\s*?no-transform\s*?(?:,|$)/;
     var SUPPORTED_ENCODING = hasBrotliSupport ? ["br", "gzip", "deflate", "identity"] : ["gzip", "deflate", "identity"];
     var PREFERRED_ENCODING = hasBrotliSupport ? ["br", "gzip"] : ["gzip"];
     var encodingSupported = ["gzip", "deflate", "identity", "br"];
-    function compression(options) {
+    function compression2(options) {
       var opts = options || {};
       var optsBrotli = {};
       if (hasBrotliSupport) {
@@ -25634,7 +25660,7 @@ var require_compression = __commonJS({
       if (threshold == null) {
         threshold = 1024;
       }
-      return function compression2(req, res, next) {
+      return function compression3(req, res, next) {
         var ended = false;
         var length;
         var listeners = [];
@@ -25748,7 +25774,7 @@ var require_compression = __commonJS({
       if (!chunk) {
         return 0;
       }
-      return Buffer2.isBuffer(chunk) ? chunk.length : Buffer2.byteLength(chunk, encoding);
+      return Buffer3.isBuffer(chunk) ? chunk.length : Buffer3.byteLength(chunk, encoding);
     }
     function shouldCompress(req, res) {
       var type = res.getHeader("Content-Type");
@@ -25763,590 +25789,11 @@ var require_compression = __commonJS({
       return !cacheControl || !cacheControlNoTransformRegExp.test(cacheControl);
     }
     function toBuffer(chunk, encoding) {
-      return Buffer2.isBuffer(chunk) ? chunk : Buffer2.from(chunk, encoding);
+      return Buffer3.isBuffer(chunk) ? chunk : Buffer3.from(chunk, encoding);
     }
     function headersSent(res) {
       return typeof res.headersSent !== "boolean" ? Boolean(res._header) : res.headersSent;
     }
-  }
-});
-
-// node_modules/helmet/index.cjs
-var require_helmet = __commonJS({
-  "node_modules/helmet/index.cjs"(exports2, module2) {
-    "use strict";
-    Object.defineProperties(exports2, { __esModule: { value: true }, [Symbol.toStringTag]: { value: "Module" } });
-    var dangerouslyDisableDefaultSrc = /* @__PURE__ */ Symbol("dangerouslyDisableDefaultSrc");
-    var DEFAULT_DIRECTIVES = {
-      "default-src": ["'self'"],
-      "base-uri": ["'self'"],
-      "font-src": ["'self'", "https:", "data:"],
-      "form-action": ["'self'"],
-      "frame-ancestors": ["'self'"],
-      "img-src": ["'self'", "data:"],
-      "object-src": ["'none'"],
-      "script-src": ["'self'"],
-      "script-src-attr": ["'none'"],
-      "style-src": ["'self'", "https:", "'unsafe-inline'"],
-      "upgrade-insecure-requests": []
-    };
-    var SHOULD_BE_QUOTED = /* @__PURE__ */ new Set(["none", "self", "strict-dynamic", "report-sample", "inline-speculation-rules", "unsafe-inline", "unsafe-eval", "unsafe-hashes", "wasm-unsafe-eval"]);
-    var getDefaultDirectives = () => Object.assign({}, DEFAULT_DIRECTIVES);
-    var dashify = (str) => str.replace(/[A-Z]/g, (capitalLetter) => "-" + capitalLetter.toLowerCase());
-    var isDirectiveValueInvalid = (directiveValue) => /;|,/.test(directiveValue);
-    var shouldDirectiveValueEntryBeQuoted = (directiveValueEntry) => SHOULD_BE_QUOTED.has(directiveValueEntry) || directiveValueEntry.startsWith("nonce-") || directiveValueEntry.startsWith("sha256-") || directiveValueEntry.startsWith("sha384-") || directiveValueEntry.startsWith("sha512-");
-    var warnIfDirectiveValueEntryShouldBeQuoted = (value) => {
-      if (shouldDirectiveValueEntryBeQuoted(value)) {
-        console.warn(`Content-Security-Policy got directive value \`${value}\` which should be single-quoted and changed to \`'${value}'\`. This will be an error in future versions of Helmet.`);
-      }
-    };
-    var has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
-    function normalizeDirectives(options) {
-      const defaultDirectives = getDefaultDirectives();
-      const { useDefaults = true, directives: rawDirectives = defaultDirectives } = options;
-      const result = /* @__PURE__ */ new Map();
-      const directiveNamesSeen = /* @__PURE__ */ new Set();
-      const directivesExplicitlyDisabled = /* @__PURE__ */ new Set();
-      for (const rawDirectiveName in rawDirectives) {
-        if (!has(rawDirectives, rawDirectiveName)) {
-          continue;
-        }
-        if (rawDirectiveName.length === 0 || /[^a-zA-Z0-9-]/.test(rawDirectiveName)) {
-          throw new Error(`Content-Security-Policy received an invalid directive name ${JSON.stringify(rawDirectiveName)}`);
-        }
-        const directiveName = dashify(rawDirectiveName);
-        if (directiveNamesSeen.has(directiveName)) {
-          throw new Error(`Content-Security-Policy received a duplicate directive ${JSON.stringify(directiveName)}`);
-        }
-        directiveNamesSeen.add(directiveName);
-        const rawDirectiveValue = rawDirectives[rawDirectiveName];
-        let directiveValue;
-        if (rawDirectiveValue === null) {
-          if (directiveName === "default-src") {
-            throw new Error("Content-Security-Policy needs a default-src but it was set to `null`. If you really want to disable it, set it to `contentSecurityPolicy.dangerouslyDisableDefaultSrc`.");
-          }
-          directivesExplicitlyDisabled.add(directiveName);
-          continue;
-        } else if (typeof rawDirectiveValue === "string") {
-          directiveValue = [rawDirectiveValue];
-        } else if (!rawDirectiveValue) {
-          throw new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
-        } else if (rawDirectiveValue === dangerouslyDisableDefaultSrc) {
-          if (directiveName === "default-src") {
-            directivesExplicitlyDisabled.add("default-src");
-            continue;
-          } else {
-            throw new Error(`Content-Security-Policy: tried to disable ${JSON.stringify(directiveName)} as if it were default-src; simply omit the key`);
-          }
-        } else {
-          directiveValue = rawDirectiveValue;
-        }
-        for (const element of directiveValue) {
-          if (typeof element === "string") {
-            if (isDirectiveValueInvalid(element)) {
-              throw new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
-            }
-            warnIfDirectiveValueEntryShouldBeQuoted(element);
-          }
-        }
-        result.set(directiveName, directiveValue);
-      }
-      if (useDefaults) {
-        Object.entries(defaultDirectives).forEach(([defaultDirectiveName, defaultDirectiveValue]) => {
-          if (!result.has(defaultDirectiveName) && !directivesExplicitlyDisabled.has(defaultDirectiveName)) {
-            result.set(defaultDirectiveName, defaultDirectiveValue);
-          }
-        });
-      }
-      if (!result.size) {
-        throw new Error("Content-Security-Policy has no directives. Either set some or disable the header");
-      }
-      if (!result.has("default-src") && !directivesExplicitlyDisabled.has("default-src")) {
-        throw new Error("Content-Security-Policy needs a default-src but none was provided. If you really want to disable it, set it to `contentSecurityPolicy.dangerouslyDisableDefaultSrc`.");
-      }
-      return result;
-    }
-    function getHeaderValue(req, res, normalizedDirectives) {
-      let err;
-      const result = [];
-      normalizedDirectives.forEach((rawDirectiveValue, directiveName) => {
-        let directiveValue = "";
-        for (const element of rawDirectiveValue) {
-          if (typeof element === "function") {
-            const newElement = element(req, res);
-            warnIfDirectiveValueEntryShouldBeQuoted(newElement);
-            directiveValue += " " + newElement;
-          } else {
-            directiveValue += " " + element;
-          }
-        }
-        if (!directiveValue) {
-          result.push(directiveName);
-        } else if (isDirectiveValueInvalid(directiveValue)) {
-          err = new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
-        } else {
-          result.push(`${directiveName}${directiveValue}`);
-        }
-      });
-      return err ? err : result.join(";");
-    }
-    var contentSecurityPolicy = function contentSecurityPolicy2(options = {}) {
-      const headerName = options.reportOnly ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
-      const normalizedDirectives = normalizeDirectives(options);
-      return function contentSecurityPolicyMiddleware(req, res, next) {
-        const result = getHeaderValue(req, res, normalizedDirectives);
-        if (result instanceof Error) {
-          next(result);
-        } else {
-          res.setHeader(headerName, result);
-          next();
-        }
-      };
-    };
-    contentSecurityPolicy.getDefaultDirectives = getDefaultDirectives;
-    contentSecurityPolicy.dangerouslyDisableDefaultSrc = dangerouslyDisableDefaultSrc;
-    var ALLOWED_POLICIES$2 = /* @__PURE__ */ new Set(["require-corp", "credentialless", "unsafe-none"]);
-    function getHeaderValueFromOptions$6({ policy = "require-corp" }) {
-      if (ALLOWED_POLICIES$2.has(policy)) {
-        return policy;
-      } else {
-        throw new Error(`Cross-Origin-Embedder-Policy does not support the ${JSON.stringify(policy)} policy`);
-      }
-    }
-    function crossOriginEmbedderPolicy(options = {}) {
-      const headerValue = getHeaderValueFromOptions$6(options);
-      return function crossOriginEmbedderPolicyMiddleware(_req, res, next) {
-        res.setHeader("Cross-Origin-Embedder-Policy", headerValue);
-        next();
-      };
-    }
-    var ALLOWED_POLICIES$1 = /* @__PURE__ */ new Set(["same-origin", "same-origin-allow-popups", "unsafe-none"]);
-    function getHeaderValueFromOptions$5({ policy = "same-origin" }) {
-      if (ALLOWED_POLICIES$1.has(policy)) {
-        return policy;
-      } else {
-        throw new Error(`Cross-Origin-Opener-Policy does not support the ${JSON.stringify(policy)} policy`);
-      }
-    }
-    function crossOriginOpenerPolicy(options = {}) {
-      const headerValue = getHeaderValueFromOptions$5(options);
-      return function crossOriginOpenerPolicyMiddleware(_req, res, next) {
-        res.setHeader("Cross-Origin-Opener-Policy", headerValue);
-        next();
-      };
-    }
-    var ALLOWED_POLICIES = /* @__PURE__ */ new Set(["same-origin", "same-site", "cross-origin"]);
-    function getHeaderValueFromOptions$4({ policy = "same-origin" }) {
-      if (ALLOWED_POLICIES.has(policy)) {
-        return policy;
-      } else {
-        throw new Error(`Cross-Origin-Resource-Policy does not support the ${JSON.stringify(policy)} policy`);
-      }
-    }
-    function crossOriginResourcePolicy(options = {}) {
-      const headerValue = getHeaderValueFromOptions$4(options);
-      return function crossOriginResourcePolicyMiddleware(_req, res, next) {
-        res.setHeader("Cross-Origin-Resource-Policy", headerValue);
-        next();
-      };
-    }
-    function originAgentCluster() {
-      return function originAgentClusterMiddleware(_req, res, next) {
-        res.setHeader("Origin-Agent-Cluster", "?1");
-        next();
-      };
-    }
-    var ALLOWED_TOKENS = /* @__PURE__ */ new Set(["no-referrer", "no-referrer-when-downgrade", "same-origin", "origin", "strict-origin", "origin-when-cross-origin", "strict-origin-when-cross-origin", "unsafe-url", ""]);
-    function getHeaderValueFromOptions$3({ policy = ["no-referrer"] }) {
-      const tokens = typeof policy === "string" ? [policy] : policy;
-      if (tokens.length === 0) {
-        throw new Error("Referrer-Policy received no policy tokens");
-      }
-      const tokensSeen = /* @__PURE__ */ new Set();
-      tokens.forEach((token) => {
-        if (!ALLOWED_TOKENS.has(token)) {
-          throw new Error(`Referrer-Policy received an unexpected policy token ${JSON.stringify(token)}`);
-        } else if (tokensSeen.has(token)) {
-          throw new Error(`Referrer-Policy received a duplicate policy token ${JSON.stringify(token)}`);
-        }
-        tokensSeen.add(token);
-      });
-      return tokens.join(",");
-    }
-    function referrerPolicy(options = {}) {
-      const headerValue = getHeaderValueFromOptions$3(options);
-      return function referrerPolicyMiddleware(_req, res, next) {
-        res.setHeader("Referrer-Policy", headerValue);
-        next();
-      };
-    }
-    var DEFAULT_MAX_AGE = 180 * 24 * 60 * 60;
-    function parseMaxAge(value = DEFAULT_MAX_AGE) {
-      if (value >= 0 && Number.isFinite(value)) {
-        return Math.floor(value);
-      } else {
-        throw new Error(`Strict-Transport-Security: ${JSON.stringify(value)} is not a valid value for maxAge. Please choose a positive integer.`);
-      }
-    }
-    function getHeaderValueFromOptions$2(options) {
-      if ("maxage" in options) {
-        throw new Error("Strict-Transport-Security received an unsupported property, `maxage`. Did you mean to pass `maxAge`?");
-      }
-      if ("includeSubdomains" in options) {
-        console.warn('Strict-Transport-Security middleware should use `includeSubDomains` instead of `includeSubdomains`. (The correct one has an uppercase "D".)');
-      }
-      const directives = [`max-age=${parseMaxAge(options.maxAge)}`];
-      if (options.includeSubDomains === void 0 || options.includeSubDomains) {
-        directives.push("includeSubDomains");
-      }
-      if (options.preload) {
-        directives.push("preload");
-      }
-      return directives.join("; ");
-    }
-    function strictTransportSecurity(options = {}) {
-      const headerValue = getHeaderValueFromOptions$2(options);
-      return function strictTransportSecurityMiddleware(_req, res, next) {
-        res.setHeader("Strict-Transport-Security", headerValue);
-        next();
-      };
-    }
-    function xContentTypeOptions() {
-      return function xContentTypeOptionsMiddleware(_req, res, next) {
-        res.setHeader("X-Content-Type-Options", "nosniff");
-        next();
-      };
-    }
-    function xDnsPrefetchControl(options = {}) {
-      const headerValue = options.allow ? "on" : "off";
-      return function xDnsPrefetchControlMiddleware(_req, res, next) {
-        res.setHeader("X-DNS-Prefetch-Control", headerValue);
-        next();
-      };
-    }
-    function xDownloadOptions() {
-      return function xDownloadOptionsMiddleware(_req, res, next) {
-        res.setHeader("X-Download-Options", "noopen");
-        next();
-      };
-    }
-    function getHeaderValueFromOptions$1({ action = "sameorigin" }) {
-      const normalizedAction = typeof action === "string" ? action.toUpperCase() : action;
-      switch (normalizedAction) {
-        case "SAME-ORIGIN":
-          return "SAMEORIGIN";
-        case "DENY":
-        case "SAMEORIGIN":
-          return normalizedAction;
-        default:
-          throw new Error(`X-Frame-Options received an invalid action ${JSON.stringify(action)}`);
-      }
-    }
-    function xFrameOptions(options = {}) {
-      const headerValue = getHeaderValueFromOptions$1(options);
-      return function xFrameOptionsMiddleware(_req, res, next) {
-        res.setHeader("X-Frame-Options", headerValue);
-        next();
-      };
-    }
-    var ALLOWED_PERMITTED_POLICIES = /* @__PURE__ */ new Set(["none", "master-only", "by-content-type", "all"]);
-    function getHeaderValueFromOptions({ permittedPolicies = "none" }) {
-      if (ALLOWED_PERMITTED_POLICIES.has(permittedPolicies)) {
-        return permittedPolicies;
-      } else {
-        throw new Error(`X-Permitted-Cross-Domain-Policies does not support ${JSON.stringify(permittedPolicies)}`);
-      }
-    }
-    function xPermittedCrossDomainPolicies(options = {}) {
-      const headerValue = getHeaderValueFromOptions(options);
-      return function xPermittedCrossDomainPoliciesMiddleware(_req, res, next) {
-        res.setHeader("X-Permitted-Cross-Domain-Policies", headerValue);
-        next();
-      };
-    }
-    function xPoweredBy() {
-      return function xPoweredByMiddleware(_req, res, next) {
-        res.removeHeader("X-Powered-By");
-        next();
-      };
-    }
-    function xXssProtection() {
-      return function xXssProtectionMiddleware(_req, res, next) {
-        res.setHeader("X-XSS-Protection", "0");
-        next();
-      };
-    }
-    function getMiddlewareFunctionsFromOptions(options) {
-      var _a, _b, _c, _d, _e, _f, _g, _h;
-      const result = [];
-      switch (options.contentSecurityPolicy) {
-        case void 0:
-        case true:
-          result.push(contentSecurityPolicy());
-          break;
-        case false:
-          break;
-        default:
-          result.push(contentSecurityPolicy(options.contentSecurityPolicy));
-          break;
-      }
-      switch (options.crossOriginEmbedderPolicy) {
-        case void 0:
-        case false:
-          break;
-        case true:
-          result.push(crossOriginEmbedderPolicy());
-          break;
-        default:
-          result.push(crossOriginEmbedderPolicy(options.crossOriginEmbedderPolicy));
-          break;
-      }
-      switch (options.crossOriginOpenerPolicy) {
-        case void 0:
-        case true:
-          result.push(crossOriginOpenerPolicy());
-          break;
-        case false:
-          break;
-        default:
-          result.push(crossOriginOpenerPolicy(options.crossOriginOpenerPolicy));
-          break;
-      }
-      switch (options.crossOriginResourcePolicy) {
-        case void 0:
-        case true:
-          result.push(crossOriginResourcePolicy());
-          break;
-        case false:
-          break;
-        default:
-          result.push(crossOriginResourcePolicy(options.crossOriginResourcePolicy));
-          break;
-      }
-      switch (options.originAgentCluster) {
-        case void 0:
-        case true:
-          result.push(originAgentCluster());
-          break;
-        case false:
-          break;
-        default:
-          console.warn("Origin-Agent-Cluster does not take options. Remove the property to silence this warning.");
-          result.push(originAgentCluster());
-          break;
-      }
-      switch (options.referrerPolicy) {
-        case void 0:
-        case true:
-          result.push(referrerPolicy());
-          break;
-        case false:
-          break;
-        default:
-          result.push(referrerPolicy(options.referrerPolicy));
-          break;
-      }
-      if ("strictTransportSecurity" in options && "hsts" in options) {
-        throw new Error("Strict-Transport-Security option was specified twice. Remove `hsts` to silence this warning.");
-      }
-      const strictTransportSecurityOption = (_a = options.strictTransportSecurity) !== null && _a !== void 0 ? _a : options.hsts;
-      switch (strictTransportSecurityOption) {
-        case void 0:
-        case true:
-          result.push(strictTransportSecurity());
-          break;
-        case false:
-          break;
-        default:
-          result.push(strictTransportSecurity(strictTransportSecurityOption));
-          break;
-      }
-      if ("xContentTypeOptions" in options && "noSniff" in options) {
-        throw new Error("X-Content-Type-Options option was specified twice. Remove `noSniff` to silence this warning.");
-      }
-      const xContentTypeOptionsOption = (_b = options.xContentTypeOptions) !== null && _b !== void 0 ? _b : options.noSniff;
-      switch (xContentTypeOptionsOption) {
-        case void 0:
-        case true:
-          result.push(xContentTypeOptions());
-          break;
-        case false:
-          break;
-        default:
-          console.warn("X-Content-Type-Options does not take options. Remove the property to silence this warning.");
-          result.push(xContentTypeOptions());
-          break;
-      }
-      if ("xDnsPrefetchControl" in options && "dnsPrefetchControl" in options) {
-        throw new Error("X-DNS-Prefetch-Control option was specified twice. Remove `dnsPrefetchControl` to silence this warning.");
-      }
-      const xDnsPrefetchControlOption = (_c = options.xDnsPrefetchControl) !== null && _c !== void 0 ? _c : options.dnsPrefetchControl;
-      switch (xDnsPrefetchControlOption) {
-        case void 0:
-        case true:
-          result.push(xDnsPrefetchControl());
-          break;
-        case false:
-          break;
-        default:
-          result.push(xDnsPrefetchControl(xDnsPrefetchControlOption));
-          break;
-      }
-      if ("xDownloadOptions" in options && "ieNoOpen" in options) {
-        throw new Error("X-Download-Options option was specified twice. Remove `ieNoOpen` to silence this warning.");
-      }
-      const xDownloadOptionsOption = (_d = options.xDownloadOptions) !== null && _d !== void 0 ? _d : options.ieNoOpen;
-      switch (xDownloadOptionsOption) {
-        case void 0:
-        case true:
-          result.push(xDownloadOptions());
-          break;
-        case false:
-          break;
-        default:
-          console.warn("X-Download-Options does not take options. Remove the property to silence this warning.");
-          result.push(xDownloadOptions());
-          break;
-      }
-      if ("xFrameOptions" in options && "frameguard" in options) {
-        throw new Error("X-Frame-Options option was specified twice. Remove `frameguard` to silence this warning.");
-      }
-      const xFrameOptionsOption = (_e = options.xFrameOptions) !== null && _e !== void 0 ? _e : options.frameguard;
-      switch (xFrameOptionsOption) {
-        case void 0:
-        case true:
-          result.push(xFrameOptions());
-          break;
-        case false:
-          break;
-        default:
-          result.push(xFrameOptions(xFrameOptionsOption));
-          break;
-      }
-      if ("xPermittedCrossDomainPolicies" in options && "permittedCrossDomainPolicies" in options) {
-        throw new Error("X-Permitted-Cross-Domain-Policies option was specified twice. Remove `permittedCrossDomainPolicies` to silence this warning.");
-      }
-      const xPermittedCrossDomainPoliciesOption = (_f = options.xPermittedCrossDomainPolicies) !== null && _f !== void 0 ? _f : options.permittedCrossDomainPolicies;
-      switch (xPermittedCrossDomainPoliciesOption) {
-        case void 0:
-        case true:
-          result.push(xPermittedCrossDomainPolicies());
-          break;
-        case false:
-          break;
-        default:
-          result.push(xPermittedCrossDomainPolicies(xPermittedCrossDomainPoliciesOption));
-          break;
-      }
-      if ("xPoweredBy" in options && "hidePoweredBy" in options) {
-        throw new Error("X-Powered-By option was specified twice. Remove `hidePoweredBy` to silence this warning.");
-      }
-      const xPoweredByOption = (_g = options.xPoweredBy) !== null && _g !== void 0 ? _g : options.hidePoweredBy;
-      switch (xPoweredByOption) {
-        case void 0:
-        case true:
-          result.push(xPoweredBy());
-          break;
-        case false:
-          break;
-        default:
-          console.warn("X-Powered-By does not take options. Remove the property to silence this warning.");
-          result.push(xPoweredBy());
-          break;
-      }
-      if ("xXssProtection" in options && "xssFilter" in options) {
-        throw new Error("X-XSS-Protection option was specified twice. Remove `xssFilter` to silence this warning.");
-      }
-      const xXssProtectionOption = (_h = options.xXssProtection) !== null && _h !== void 0 ? _h : options.xssFilter;
-      switch (xXssProtectionOption) {
-        case void 0:
-        case true:
-          result.push(xXssProtection());
-          break;
-        case false:
-          break;
-        default:
-          console.warn("X-XSS-Protection does not take options. Remove the property to silence this warning.");
-          result.push(xXssProtection());
-          break;
-      }
-      return result;
-    }
-    var helmet = Object.assign(
-      function helmet2(options = {}) {
-        var _a;
-        if (((_a = options.constructor) === null || _a === void 0 ? void 0 : _a.name) === "IncomingMessage") {
-          throw new Error("It appears you have done something like `app.use(helmet)`, but it should be `app.use(helmet())`.");
-        }
-        const middlewareFunctions = getMiddlewareFunctionsFromOptions(options);
-        return function helmetMiddleware(req, res, next) {
-          let middlewareIndex = 0;
-          (function internalNext(err) {
-            if (err) {
-              next(err);
-              return;
-            }
-            const middlewareFunction = middlewareFunctions[middlewareIndex];
-            if (middlewareFunction) {
-              middlewareIndex++;
-              middlewareFunction(req, res, internalNext);
-            } else {
-              next();
-            }
-          })();
-        };
-      },
-      {
-        contentSecurityPolicy,
-        crossOriginEmbedderPolicy,
-        crossOriginOpenerPolicy,
-        crossOriginResourcePolicy,
-        originAgentCluster,
-        referrerPolicy,
-        strictTransportSecurity,
-        xContentTypeOptions,
-        xDnsPrefetchControl,
-        xDownloadOptions,
-        xFrameOptions,
-        xPermittedCrossDomainPolicies,
-        xPoweredBy,
-        xXssProtection,
-        // Legacy aliases
-        dnsPrefetchControl: xDnsPrefetchControl,
-        xssFilter: xXssProtection,
-        permittedCrossDomainPolicies: xPermittedCrossDomainPolicies,
-        ieNoOpen: xDownloadOptions,
-        noSniff: xContentTypeOptions,
-        frameguard: xFrameOptions,
-        hidePoweredBy: xPoweredBy,
-        hsts: strictTransportSecurity
-      }
-    );
-    exports2.contentSecurityPolicy = contentSecurityPolicy;
-    exports2.crossOriginEmbedderPolicy = crossOriginEmbedderPolicy;
-    exports2.crossOriginOpenerPolicy = crossOriginOpenerPolicy;
-    exports2.crossOriginResourcePolicy = crossOriginResourcePolicy;
-    exports2.default = helmet;
-    exports2.dnsPrefetchControl = xDnsPrefetchControl;
-    exports2.frameguard = xFrameOptions;
-    exports2.hidePoweredBy = xPoweredBy;
-    exports2.hsts = strictTransportSecurity;
-    exports2.ieNoOpen = xDownloadOptions;
-    exports2.noSniff = xContentTypeOptions;
-    exports2.originAgentCluster = originAgentCluster;
-    exports2.permittedCrossDomainPolicies = xPermittedCrossDomainPolicies;
-    exports2.referrerPolicy = referrerPolicy;
-    exports2.strictTransportSecurity = strictTransportSecurity;
-    exports2.xContentTypeOptions = xContentTypeOptions;
-    exports2.xDnsPrefetchControl = xDnsPrefetchControl;
-    exports2.xDownloadOptions = xDownloadOptions;
-    exports2.xFrameOptions = xFrameOptions;
-    exports2.xPermittedCrossDomainPolicies = xPermittedCrossDomainPolicies;
-    exports2.xPoweredBy = xPoweredBy;
-    exports2.xXssProtection = xXssProtection;
-    exports2.xssFilter = xXssProtection;
-    module2.exports = exports2.default;
-    module2.exports.default = module2.exports;
   }
 });
 
@@ -26559,7 +26006,7 @@ var require_lib3 = __commonJS({
           }
         }
       }
-      function cors(options, req, res, next) {
+      function cors2(options, req, res, next) {
         var headers = [], method = req.method && req.method.toUpperCase && req.method.toUpperCase();
         if (method === "OPTIONS") {
           headers.push(configureOrigin(options, req));
@@ -26613,7 +26060,7 @@ var require_lib3 = __commonJS({
                     next(err2);
                   } else {
                     corsOptions.origin = origin;
-                    cors(corsOptions, req, res, next);
+                    cors2(corsOptions, req, res, next);
                   }
                 });
               } else {
@@ -26700,9 +26147,9 @@ var require_package = __commonJS({
 var require_main = __commonJS({
   "server/node_modules/dotenv/lib/main.js"(exports2, module2) {
     var fs = require("fs");
-    var path = require("path");
+    var path2 = require("path");
     var os = require("os");
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     var packageJson = require_package();
     var version = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
@@ -26816,7 +26263,7 @@ var require_main = __commonJS({
           possibleVaultPath = options.path.endsWith(".vault") ? options.path : `${options.path}.vault`;
         }
       } else {
-        possibleVaultPath = path.resolve(process.cwd(), ".env.vault");
+        possibleVaultPath = path2.resolve(process.cwd(), ".env.vault");
       }
       if (fs.existsSync(possibleVaultPath)) {
         return possibleVaultPath;
@@ -26824,7 +26271,7 @@ var require_main = __commonJS({
       return null;
     }
     function _resolveHome(envPath) {
-      return envPath[0] === "~" ? path.join(os.homedir(), envPath.slice(1)) : envPath;
+      return envPath[0] === "~" ? path2.join(os.homedir(), envPath.slice(1)) : envPath;
     }
     function _configVault(options) {
       const debug = Boolean(options && options.debug);
@@ -26841,7 +26288,7 @@ var require_main = __commonJS({
       return { parsed };
     }
     function configDotenv(options) {
-      const dotenvPath = path.resolve(process.cwd(), ".env");
+      const dotenvPath = path2.resolve(process.cwd(), ".env");
       let encoding = "utf8";
       const debug = Boolean(options && options.debug);
       const quiet = options && "quiet" in options ? options.quiet : true;
@@ -26865,13 +26312,13 @@ var require_main = __commonJS({
       }
       let lastError;
       const parsedAll = {};
-      for (const path2 of optionPaths) {
+      for (const path3 of optionPaths) {
         try {
-          const parsed = DotenvModule.parse(fs.readFileSync(path2, { encoding }));
+          const parsed = DotenvModule.parse(fs.readFileSync(path3, { encoding }));
           DotenvModule.populate(parsedAll, parsed, options);
         } catch (e) {
           if (debug) {
-            _debug(`Failed to load ${path2} ${e.message}`);
+            _debug(`Failed to load ${path3} ${e.message}`);
           }
           lastError = e;
         }
@@ -26886,7 +26333,7 @@ var require_main = __commonJS({
         const shortPaths = [];
         for (const filePath of optionPaths) {
           try {
-            const relative = path.relative(process.cwd(), filePath);
+            const relative = path2.relative(process.cwd(), filePath);
             shortPaths.push(relative);
           } catch (e) {
             if (debug) {
@@ -26921,7 +26368,7 @@ var require_main = __commonJS({
       const authTag = ciphertext.subarray(-16);
       ciphertext = ciphertext.subarray(12, -16);
       try {
-        const aesgcm = crypto.createDecipheriv("aes-256-gcm", key, nonce);
+        const aesgcm = crypto2.createDecipheriv("aes-256-gcm", key, nonce);
         aesgcm.setAuthTag(authTag);
         return `${aesgcm.update(ciphertext)}${aesgcm.final()}`;
       } catch (error) {
@@ -27840,7 +27287,7 @@ var require_ipv6 = __commonJS({
     function unsignByte(b) {
       return b & 255;
     }
-    var Address6 = class _Address6 {
+    var Address62 = class _Address6 {
       constructor(address, optionalGroups) {
         this.addressMinusSuffix = "";
         this.parsedSubnet = "";
@@ -28985,17 +28432,17 @@ var require_ipv6 = __commonJS({
         return new RegExp(this.regularExpressionString(substringSearch), "i");
       }
     };
-    exports2.Address6 = Address6;
+    exports2.Address6 = Address62;
     var TYPE_SUBNETS = Object.keys(constants6.TYPES).map((subnet) => [
-      new Address6(subnet),
+      new Address62(subnet),
       constants6.TYPES[subnet]
     ]);
-    var TEREDO_SUBNET = new Address6("2001::/32");
-    var SIX_TO_FOUR_SUBNET = new Address6("2002::/16");
-    var ULA_SUBNET = new Address6("fc00::/7");
-    var DOCUMENTATION_SUBNET = new Address6("2001:db8::/32");
-    var IPV4_MAPPED_SUBNET = new Address6("::ffff:0:0/96");
-    var NAT64_WELL_KNOWN_SUBNET = new Address6("64:ff9b::/96");
+    var TEREDO_SUBNET = new Address62("2001::/32");
+    var SIX_TO_FOUR_SUBNET = new Address62("2002::/16");
+    var ULA_SUBNET = new Address62("fc00::/7");
+    var DOCUMENTATION_SUBNET = new Address62("2001:db8::/32");
+    var IPV4_MAPPED_SUBNET = new Address62("::ffff:0:0/96");
+    var NAT64_WELL_KNOWN_SUBNET = new Address62("64:ff9b::/96");
   }
 });
 
@@ -29055,7 +28502,7 @@ var require_common2 = __commonJS({
     function setup(env) {
       createDebug.debug = createDebug;
       createDebug.default = createDebug;
-      createDebug.coerce = coerce;
+      createDebug.coerce = coerce2;
       createDebug.disable = disable;
       createDebug.enable = enable;
       createDebug.enabled = enabled;
@@ -29210,7 +28657,7 @@ var require_common2 = __commonJS({
         }
         return false;
       }
-      function coerce(val) {
+      function coerce2(val) {
         if (val instanceof Error) {
           return val.stack || val.message;
         }
@@ -29527,14 +28974,14 @@ var require_supports_color = __commonJS({
 var require_node6 = __commonJS({
   "node_modules/debug/src/node.js"(exports2, module2) {
     var tty = require("tty");
-    var util = require("util");
+    var util2 = require("util");
     exports2.init = init;
     exports2.log = log;
     exports2.formatArgs = formatArgs;
     exports2.save = save;
     exports2.load = load;
     exports2.useColors = useColors;
-    exports2.destroy = util.deprecate(
+    exports2.destroy = util2.deprecate(
       () => {
       },
       "Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."
@@ -29665,7 +29112,7 @@ var require_node6 = __commonJS({
       return (/* @__PURE__ */ new Date()).toISOString() + " ";
     }
     function log(...args) {
-      return process.stderr.write(util.formatWithOptions(exports2.inspectOpts, ...args) + "\n");
+      return process.stderr.write(util2.formatWithOptions(exports2.inspectOpts, ...args) + "\n");
     }
     function save(namespaces) {
       if (namespaces) {
@@ -29688,11 +29135,11 @@ var require_node6 = __commonJS({
     var { formatters } = module2.exports;
     formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts).split("\n").map((str) => str.trim()).join(" ");
+      return util2.inspect(v, this.inspectOpts).split("\n").map((str) => str.trim()).join(" ");
     };
     formatters.O = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util.inspect(v, this.inspectOpts);
+      return util2.inspect(v, this.inspectOpts);
     };
   }
 });
@@ -29708,5441 +29155,22 @@ var require_src6 = __commonJS({
   }
 });
 
-// node_modules/express-rate-limit/dist/index.cjs
-var require_dist = __commonJS({
-  "node_modules/express-rate-limit/dist/index.cjs"(exports2, module2) {
-    "use strict";
-    var __create = Object.create;
-    var __defProp = Object.defineProperty;
-    var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-    var __getOwnPropNames2 = Object.getOwnPropertyNames;
-    var __getProtoOf = Object.getPrototypeOf;
-    var __hasOwnProp = Object.prototype.hasOwnProperty;
-    var __export = (target, all) => {
-      for (var name in all)
-        __defProp(target, name, { get: all[name], enumerable: true });
-    };
-    var __copyProps = (to, from, except, desc) => {
-      if (from && typeof from === "object" || typeof from === "function") {
-        for (let key of __getOwnPropNames2(from))
-          if (!__hasOwnProp.call(to, key) && key !== except)
-            __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-      }
-      return to;
-    };
-    var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-      // If the importer is in node compatibility mode or this is not an ESM
-      // file that has been converted to a CommonJS file using a Babel-
-      // compatible transform (i.e. "__esModule" has not been set), then set
-      // "default" to the CommonJS "module.exports" for node compatibility.
-      isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-      mod
-    ));
-    var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-    var index_exports = {};
-    __export(index_exports, {
-      DAY: () => DAY,
-      HOUR: () => HOUR,
-      MINUTE: () => MINUTE,
-      MemoryStore: () => MemoryStore,
-      SECOND: () => SECOND,
-      default: () => rate_limit_default,
-      ipKeyGenerator: () => ipKeyGenerator,
-      rateLimit: () => rate_limit_default
-    });
-    module2.exports = __toCommonJS(index_exports);
-    var import_node_net = require("node:net");
-    var import_ip_address = require_ip_address();
-    var ipv4CompatibleSubnet = new import_ip_address.Address6("::/96");
-    function ipKeyGenerator(ip, ipv6Subnet = 56) {
-      if ((0, import_node_net.isIPv6)(ip)) {
-        const address = new import_ip_address.Address6(ip);
-        if (address.isMapped4() || // The deprecated IPv4-compatible notation keeps its existing behavior.
-        // Its range is shared with addresses that embed no IPv4 address at all
-        // (`::`, `::1`), so here the notation is what tells them apart.
-        address.is4() && address.isInSubnet(ipv4CompatibleSubnet))
-          return address.to4().correctForm();
-        if (ipv6Subnet) {
-          const subnet = new import_ip_address.Address6(`${ip}/${ipv6Subnet}`);
-          return subnet.networkForm();
-        }
-      }
-      return ip;
-    }
-    var MemoryStore = class {
-      constructor(validations2) {
-        this.validations = validations2;
-        this.previous = /* @__PURE__ */ new Map();
-        this.current = /* @__PURE__ */ new Map();
-        this.localKeys = true;
-      }
-      /**
-       * Method that initializes the store.
-       *
-       * @param options {Options} - The options used to setup the middleware.
-       */
-      init(options) {
-        this.windowMs = options.windowMs;
-        this.validations?.windowMs(this.windowMs);
-        if (this.interval) clearInterval(this.interval);
-        this.interval = setInterval(() => {
-          this.clearExpired();
-        }, this.windowMs);
-        this.interval.unref?.();
-      }
-      /**
-       * Method to fetch a client's hit count and reset time.
-       *
-       * @param key {string} - The identifier for a client.
-       *
-       * @returns {ClientRateLimitInfo | undefined} - The number of hits and reset time for that client.
-       *
-       * @public
-       */
-      async get(key) {
-        return this.current.get(key) ?? this.previous.get(key);
-      }
-      /**
-       * Method to increment a client's hit counter.
-       *
-       * @param key {string} - The identifier for a client.
-       *
-       * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
-       *
-       * @public
-       */
-      async increment(key) {
-        const client = this.getClient(key);
-        const now = Date.now();
-        if (client.resetTime.getTime() <= now) {
-          this.resetClient(client, now);
-        }
-        client.totalHits++;
-        return client;
-      }
-      /**
-       * Method to decrement a client's hit counter.
-       *
-       * @param key {string} - The identifier for a client.
-       *
-       * @public
-       */
-      async decrement(key) {
-        const client = this.getClient(key);
-        if (client.totalHits > 0) client.totalHits--;
-      }
-      /**
-       * Method to reset a client's hit counter.
-       *
-       * @param key {string} - The identifier for a client.
-       *
-       * @public
-       */
-      async resetKey(key) {
-        this.current.delete(key);
-        this.previous.delete(key);
-      }
-      /**
-       * Method to reset everyone's hit counter.
-       *
-       * @public
-       */
-      async resetAll() {
-        this.current.clear();
-        this.previous.clear();
-      }
-      /**
-       * Method to stop the timer (if currently running) and prevent any memory
-       * leaks.
-       *
-       * @public
-       */
-      shutdown() {
-        clearInterval(this.interval);
-        void this.resetAll();
-      }
-      /**
-       * Recycles a client by setting its hit count to zero, and reset time to
-       * `windowMs` milliseconds from now.
-       *
-       * NOT to be confused with `#resetKey()`, which removes a client from both the
-       * `current` and `previous` maps.
-       *
-       * @param client {Client} - The client to recycle.
-       * @param now {number} - The current time, to which the `windowMs` is added to get the `resetTime` for the client.
-       *
-       * @return {Client} - The modified client that was passed in, to allow for chaining.
-       */
-      resetClient(client, now = Date.now()) {
-        client.totalHits = 0;
-        client.resetTime.setTime(now + this.windowMs);
-        return client;
-      }
-      /**
-       * Retrieves or creates a client, given a key. Also ensures that the client being
-       * returned is in the `current` map.
-       *
-       * @param key {string} - The key under which the client is (or is to be) stored.
-       *
-       * @returns {Client} - The requested client.
-       */
-      getClient(key) {
-        if (this.current.has(key)) return this.current.get(key);
-        let client;
-        if (this.previous.has(key)) {
-          client = this.previous.get(key);
-          this.previous.delete(key);
-        } else {
-          client = { totalHits: 0, resetTime: /* @__PURE__ */ new Date() };
-          this.resetClient(client);
-        }
-        this.current.set(key, client);
-        return client;
-      }
-      /**
-       * Move current clients to previous, create a new map for current.
-       *
-       * This function is called every `windowMs`.
-       */
-      clearExpired() {
-        this.previous = this.current;
-        this.current = /* @__PURE__ */ new Map();
-      }
-    };
-    var import_node_net3 = require("node:net");
-    var import_debug = __toESM(require_src6(), 1);
-    var ConsoleLogger = {
-      warn(...args) {
-        console.warn(...args.reverse());
-      },
-      error(...args) {
-        console.error(...args.reverse());
-      }
-    };
-    var import_node_buffer = require("node:buffer");
-    var import_node_crypto = require("node:crypto");
-    var SUPPORTED_DRAFT_VERSIONS = [
-      "draft-6",
-      "draft-7",
-      "draft-8"
-    ];
-    var getResetSeconds = (windowMs, resetTime) => {
-      let resetSeconds;
-      if (resetTime) {
-        const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1e3);
-        resetSeconds = Math.max(0, deltaSeconds);
-      } else {
-        resetSeconds = Math.ceil(windowMs / 1e3);
-      }
-      return resetSeconds;
-    };
-    var getPartitionKey = (key) => {
-      const hash = (0, import_node_crypto.createHash)("sha256");
-      hash.update(key);
-      const partitionKey = hash.digest("hex").slice(0, 12);
-      return import_node_buffer.Buffer.from(partitionKey).toString("base64");
-    };
-    var setLegacyHeaders = (response, info) => {
-      if (response.headersSent) return;
-      response.setHeader("X-RateLimit-Limit", info.limit.toString());
-      response.setHeader("X-RateLimit-Remaining", info.remaining.toString());
-      if (info.resetTime instanceof Date) {
-        response.setHeader("Date", (/* @__PURE__ */ new Date()).toUTCString());
-        response.setHeader(
-          "X-RateLimit-Reset",
-          Math.ceil(info.resetTime.getTime() / 1e3).toString()
-        );
-      }
-    };
-    var setDraft6Headers = (response, info, windowMs) => {
-      if (response.headersSent) return;
-      const windowSeconds = Math.ceil(windowMs / 1e3);
-      const resetSeconds = getResetSeconds(windowMs, info.resetTime);
-      response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
-      response.setHeader("RateLimit-Limit", info.limit.toString());
-      response.setHeader("RateLimit-Remaining", info.remaining.toString());
-      if (typeof resetSeconds === "number")
-        response.setHeader("RateLimit-Reset", resetSeconds.toString());
-    };
-    var setDraft7Headers = (response, info, windowMs) => {
-      if (response.headersSent) return;
-      const windowSeconds = Math.ceil(windowMs / 1e3);
-      const resetSeconds = getResetSeconds(windowMs, info.resetTime);
-      response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
-      response.setHeader(
-        "RateLimit",
-        `limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds}`
-      );
-    };
-    var setDraft8Headers = (response, info, windowMs, name, key) => {
-      if (response.headersSent) return;
-      const windowSeconds = Math.ceil(windowMs / 1e3);
-      const resetSeconds = getResetSeconds(windowMs, info.resetTime);
-      const partitionKey = getPartitionKey(key);
-      const header = `r=${info.remaining}; t=${resetSeconds}`;
-      const policy = `q=${info.limit}; w=${windowSeconds}; pk=:${partitionKey}:`;
-      response.append("RateLimit", `"${name}"; ${header}`);
-      response.append("RateLimit-Policy", `"${name}"; ${policy}`);
-    };
-    var setRetryAfterHeader = (response, info, windowMs) => {
-      if (response.headersSent) return;
-      const resetSeconds = getResetSeconds(windowMs, info.resetTime);
-      response.setHeader("Retry-After", resetSeconds.toString());
-    };
-    var omitUndefinedProperties = (passedOptions) => {
-      const omittedOptions = {};
-      for (const k of Object.keys(passedOptions)) {
-        const key = k;
-        if (passedOptions[key] !== void 0) {
-          omittedOptions[key] = passedOptions[key];
-        }
-      }
-      return omittedOptions;
-    };
-    var import_node_net2 = require("node:net");
-    var ValidationError = class extends Error {
-      /**
-       * The code must be a string, in snake case and all capital, that starts with
-       * the substring `ERR_ERL_`.
-       *
-       * The message must be a string, starting with an uppercase character,
-       * describing the issue in detail.
-       */
-      constructor(code, message) {
-        const url = `https://express-rate-limit.github.io/${code}/`;
-        super(`${message} See ${url} for more information.`);
-        this.name = this.constructor.name;
-        this.code = code;
-        this.help = url;
-      }
-    };
-    var ChangeWarning = class extends ValidationError {
-    };
-    var usedStores = /* @__PURE__ */ new Set();
-    var singleCountKeys = /* @__PURE__ */ new WeakMap();
-    var validations = {
-      enabled: {
-        default: true
-      },
-      // Should be EnabledValidations type, but that's a circular reference
-      disable() {
-        for (const k of Object.keys(this.enabled)) this.enabled[k] = false;
-      },
-      /**
-       * Checks whether the IP address is valid, and that it does not have a port
-       * number in it.
-       *
-       * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_invalid_ip_address.
-       *
-       * @param ip {string | undefined} - The IP address provided by Express as request.ip.
-       *
-       * @returns {void}
-       */
-      ip(ip) {
-        if (ip === void 0) {
-          throw new ValidationError(
-            "ERR_ERL_UNDEFINED_IP_ADDRESS",
-            `An undefined 'request.ip' was detected. This might indicate a misconfiguration or the connection being destroyed prematurely.`
-          );
-        }
-        if (!(0, import_node_net2.isIP)(ip)) {
-          throw new ValidationError(
-            "ERR_ERL_INVALID_IP_ADDRESS",
-            `An invalid 'request.ip' (${ip}) was detected. Consider passing a custom 'keyGenerator' function to the rate limiter.`
-          );
-        }
-      },
-      /**
-       * Makes sure the trust proxy setting is not set to `true`.
-       *
-       * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_permissive_trust_proxy.
-       *
-       * @param request {Request} - The Express request object.
-       *
-       * @returns {void}
-       */
-      trustProxy(request) {
-        if (request.app.get("trust proxy") === true) {
-          throw new ValidationError(
-            "ERR_ERL_PERMISSIVE_TRUST_PROXY",
-            `The Express 'trust proxy' setting is true, which allows anyone to trivially bypass IP-based rate limiting.`
-          );
-        }
-      },
-      /**
-       * Makes sure the trust proxy setting is set in case the `X-Forwarded-For`
-       * header is present.
-       *
-       * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_unset_trust_proxy.
-       *
-       * @param request {Request} - The Express request object.
-       *
-       * @returns {void}
-       */
-      xForwardedForHeader(request) {
-        if (request.headers["x-forwarded-for"] && request.app.get("trust proxy") === false) {
-          throw new ValidationError(
-            "ERR_ERL_UNEXPECTED_X_FORWARDED_FOR",
-            `The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users.`
-          );
-        }
-      },
-      /**
-       * Alert the user if the Forwarded header is set (standardized version of X-Forwarded-For - not supported by express as of version 5.1.0)
-       *
-       * @param request {Request} - The Express request object.
-       *
-       * @returns {void}
-       */
-      forwardedHeader(request) {
-        if (request.headers.forwarded && request.ip === request.socket?.remoteAddress) {
-          throw new ValidationError(
-            "ERR_ERL_FORWARDED_HEADER",
-            `The 'Forwarded' header (standardized X-Forwarded-For) is set but currently being ignored. Add a custom keyGenerator to use a value from this header.`
-          );
-        }
-      },
-      /**
-       * Ensures totalHits value from store is a positive integer.
-       *
-       * @param hits {any} - The `totalHits` returned by the store.
-       */
-      positiveHits(hits) {
-        if (typeof hits !== "number" || hits < 1 || hits !== Math.round(hits)) {
-          throw new ValidationError(
-            "ERR_ERL_INVALID_HITS",
-            `The totalHits value returned from the store must be a positive integer, got ${hits}`
-          );
-        }
-      },
-      /**
-       * Ensures a single store instance is not used with multiple express-rate-limit instances
-       */
-      unsharedStore(store) {
-        if (usedStores.has(store)) {
-          const maybeUniquePrefix = store?.localKeys ? "" : " (with a unique prefix)";
-          throw new ValidationError(
-            "ERR_ERL_STORE_REUSE",
-            `A Store instance must not be shared across multiple rate limiters. Create a new instance of ${store.constructor.name}${maybeUniquePrefix} for each limiter instead.`
-          );
-        }
-        usedStores.add(store);
-      },
-      /**
-       * Ensures a given key is incremented only once per request.
-       *
-       * @param request {Request} - The Express request object.
-       * @param store {Store} - The store class.
-       * @param key {string} - The key used to store the client's hit count.
-       *
-       * @returns {void}
-       */
-      singleCount(request, store, key) {
-        let storeKeys = singleCountKeys.get(request);
-        if (!storeKeys) {
-          storeKeys = /* @__PURE__ */ new Map();
-          singleCountKeys.set(request, storeKeys);
-        }
-        const storeKey = store.localKeys ? store : store.constructor.name;
-        let keys = storeKeys.get(storeKey);
-        if (!keys) {
-          keys = [];
-          storeKeys.set(storeKey, keys);
-        }
-        const prefixedKey = `${store.prefix ?? ""}${key}`;
-        if (keys.includes(prefixedKey)) {
-          throw new ValidationError(
-            "ERR_ERL_DOUBLE_COUNT",
-            `The hit count for ${key} was incremented more than once for a single request.`
-          );
-        }
-        keys.push(prefixedKey);
-      },
-      /**
-       * Warns the user that the behaviour for `max: 0` / `limit: 0` is
-       * changing in the next major release.
-       *
-       * @param limit {number} - The maximum number of hits per client.
-       *
-       * @returns {void}
-       */
-      limit(limit) {
-        if (limit === 0) {
-          throw new ChangeWarning(
-            "WRN_ERL_MAX_ZERO",
-            "Setting limit or max to 0 disables rate limiting in express-rate-limit v6 and older, but will cause all requests to be blocked in v7"
-          );
-        }
-      },
-      /**
-       * Warns the user that the `draft_polli_ratelimit_headers` option is deprecated
-       * and will be removed in the next major release.
-       *
-       * @param draft_polli_ratelimit_headers {any | undefined} - The now-deprecated setting that was used to enable standard headers.
-       *
-       * @returns {void}
-       */
-      draftPolliHeaders(draft_polli_ratelimit_headers) {
-        if (draft_polli_ratelimit_headers) {
-          throw new ChangeWarning(
-            "WRN_ERL_DEPRECATED_DRAFT_POLLI_HEADERS",
-            `The draft_polli_ratelimit_headers configuration option is deprecated and has been removed in express-rate-limit v7, please set standardHeaders: 'draft-6' instead.`
-          );
-        }
-      },
-      /**
-       * Warns the user that the `onLimitReached` option is deprecated and
-       * will be removed in the next major release.
-       *
-       * @param onLimitReached {any | undefined} - The maximum number of hits per client.
-       *
-       * @returns {void}
-       */
-      onLimitReached(onLimitReached) {
-        if (onLimitReached) {
-          throw new ChangeWarning(
-            "WRN_ERL_DEPRECATED_ON_LIMIT_REACHED",
-            "The onLimitReached configuration option is deprecated and has been removed in express-rate-limit v7."
-          );
-        }
-      },
-      /**
-       * Warns the user when an invalid/unsupported version of the draft spec is passed.
-       *
-       * @param version {any | undefined} - The version passed by the user.
-       *
-       * @returns {void}
-       */
-      headersDraftVersion(version) {
-        if (typeof version !== "string" || // @ts-expect-error This is fine. If version is not in the array, it will just return false.
-        !SUPPORTED_DRAFT_VERSIONS.includes(version)) {
-          const versionString = SUPPORTED_DRAFT_VERSIONS.join(", ");
-          throw new ValidationError(
-            "ERR_ERL_HEADERS_UNSUPPORTED_DRAFT_VERSION",
-            `standardHeaders: only the following versions of the IETF draft specification are supported: ${versionString}.`
-          );
-        }
-      },
-      /**
-       * Warns the user when the selected headers option requires a reset time but
-       * the store does not provide one.
-       *
-       * @param resetTime {Date | undefined} - The timestamp when the client's hit count will be reset.
-       *
-       * @returns {void}
-       */
-      headersResetTime(resetTime) {
-        if (!resetTime) {
-          throw new ValidationError(
-            "ERR_ERL_HEADERS_NO_RESET",
-            `standardHeaders:  'draft-7' requires a 'resetTime', but the store did not provide one. The 'windowMs' value will be used instead, which may cause clients to wait longer than necessary.`
-          );
-        }
-      },
-      knownOptions(passedOptions) {
-        if (!passedOptions) return;
-        const optionsMap = {
-          windowMs: true,
-          limit: true,
-          message: true,
-          statusCode: true,
-          legacyHeaders: true,
-          standardHeaders: true,
-          identifier: true,
-          requestPropertyName: true,
-          skipFailedRequests: true,
-          skipSuccessfulRequests: true,
-          keyGenerator: true,
-          ipv6Subnet: true,
-          handler: true,
-          skip: true,
-          requestWasSuccessful: true,
-          store: true,
-          validate: true,
-          headers: true,
-          max: true,
-          passOnStoreError: true,
-          logger: true
-        };
-        const validOptions = Object.keys(optionsMap).concat(
-          "draft_polli_ratelimit_headers",
-          // not a valid option anymore, but we have a more specific check for this one, so don't warn for it here
-          // from express-slow-down - https://github.com/express-rate-limit/express-slow-down/blob/main/source/types.ts#L65
-          "delayAfter",
-          "delayMs",
-          "maxDelayMs"
-        );
-        for (const key of Object.keys(passedOptions)) {
-          if (!validOptions.includes(key)) {
-            throw new ValidationError(
-              "ERR_ERL_UNKNOWN_OPTION",
-              `Unexpected configuration option: ${key}`
-              // todo: suggest a valid option with a short levenstein distance?
-            );
-          }
-        }
-      },
-      /**
-       * Checks the options.validate setting to ensure that only recognized
-       * validations are enabled or disabled.
-       *
-       * If any unrecognized values are found, an error is logged that
-       * includes the list of supported validations.
-       */
-      validationsConfig() {
-        const supportedValidations = Object.keys(this).filter(
-          (k) => !["enabled", "disable"].includes(k)
-        );
-        supportedValidations.push("default");
-        for (const key of Object.keys(this.enabled)) {
-          if (!supportedValidations.includes(key)) {
-            throw new ValidationError(
-              "ERR_ERL_UNKNOWN_VALIDATION",
-              `options.validate.${key} is not recognized. Supported validate options are: ${supportedValidations.join(
-                ", "
-              )}.`
-            );
-          }
-        }
-      },
-      /**
-       * Checks to see if the instance was created inside of a request handler,
-       * which would prevent it from working correctly, with the default memory
-       * store (or any other store with localKeys.)
-       */
-      creationStack(store) {
-        const { stack } = new Error(
-          "express-rate-limit validation check (set options.validate.creationStack=false to disable)"
-        );
-        if (stack?.includes("Layer.handle [as handle_request]") || // express v4
-        stack?.includes("Layer.handleRequest")) {
-          if (!store.localKeys) {
-            throw new ValidationError(
-              "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
-              "express-rate-limit instance should *usually* be created at app initialization, not when responding to a request."
-            );
-          }
-          throw new ValidationError(
-            "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
-            "express-rate-limit instance should be created at app initialization, not when responding to a request."
-          );
-        }
-      },
-      ipv6Subnet(ipv6Subnet) {
-        if (ipv6Subnet === false) {
-          return;
-        }
-        if (!Number.isInteger(ipv6Subnet) || ipv6Subnet < 32 || ipv6Subnet > 64) {
-          throw new ValidationError(
-            "ERR_ERL_IPV6_SUBNET",
-            `Unexpected ipv6Subnet value: ${ipv6Subnet}. Expected an integer between 32 and 64 (usually 48-64).`
-          );
-        }
-      },
-      ipv6SubnetOrKeyGenerator(options) {
-        if (options.ipv6Subnet !== void 0 && options.keyGenerator) {
-          throw new ValidationError(
-            "ERR_ERL_IPV6SUBNET_OR_KEYGENERATOR",
-            `Incompatible options: the 'ipv6Subnet' option is ignored when a custom 'keyGenerator' function is also set.`
-          );
-        }
-      },
-      keyGeneratorIpFallback(keyGenerator) {
-        if (!keyGenerator) {
-          return;
-        }
-        const src = keyGenerator.toString();
-        if ((src.includes("req.ip") || src.includes("request.ip")) && !src.includes("ipKeyGenerator")) {
-          throw new ValidationError(
-            "ERR_ERL_KEY_GEN_IPV6",
-            "Custom keyGenerator appears to use request IP without calling the ipKeyGenerator helper function for IPv6 addresses. This could allow IPv6 users to bypass limits."
-          );
-        }
-      },
-      /**
-       * Checks to see if the window duration is greater than 2^32 - 1. This is only
-       * called by the default MemoryStore, since it uses Node's setInterval method.
-       *
-       * See https://nodejs.org/api/timers.html#setintervalcallback-delay-args.
-       */
-      windowMs(windowMs) {
-        const SET_TIMEOUT_MAX = 2 ** 31 - 1;
-        if (typeof windowMs !== "number" || Number.isNaN(windowMs) || windowMs < 1 || windowMs > SET_TIMEOUT_MAX) {
-          throw new ValidationError(
-            "ERR_ERL_WINDOW_MS",
-            `Invalid windowMs value: ${windowMs}${typeof windowMs !== "number" ? ` (${typeof windowMs})` : ""}, must be a number between 1 and ${SET_TIMEOUT_MAX} when using the default MemoryStore`
-          );
-        }
-      }
-    };
-    function validateLogger(logger) {
-      if (typeof logger !== "object" || typeof logger.error !== "function" || typeof logger.warn !== "function") {
-        throw new TypeError(
-          "Provided logger does not implement the Logger interface"
-        );
-      }
-    }
-    var getValidations = (_enabled, logger) => {
-      validateLogger(logger);
-      let enabled;
-      if (typeof _enabled === "boolean") {
-        enabled = {
-          default: _enabled
-        };
-      } else {
-        enabled = {
-          default: true,
-          ..._enabled
-        };
-      }
-      const wrappedValidations = { enabled };
-      for (const [name, validation] of Object.entries(validations)) {
-        if (typeof validation === "function")
-          wrappedValidations[name] = (...args) => {
-            if (!(enabled[name] ?? enabled.default)) {
-              return;
-            }
-            enabled[name] = false;
-            try {
-              ;
-              validation.apply(
-                wrappedValidations,
-                args
-              );
-            } catch (error) {
-              if (error instanceof ChangeWarning) logger.warn(error);
-              else logger.error(error);
-            }
-          };
-      }
-      const inspect = /* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom");
-      if (inspect)
-        wrappedValidations[inspect] = () => wrappedValidations.enabled;
-      return wrappedValidations;
-    };
-    var isLegacyStore = (store) => (
-      // Check that `incr` exists but `increment` does not - store authors might want
-      // to keep both around for backwards compatibility.
-      typeof store.incr === "function" && typeof store.increment !== "function"
-    );
-    var promisifyStore = (passedStore) => {
-      if (!isLegacyStore(passedStore)) {
-        return passedStore;
-      }
-      const legacyStore = passedStore;
-      class PromisifiedStore {
-        async increment(key) {
-          return new Promise((resolve, reject) => {
-            legacyStore.incr(
-              key,
-              (error, totalHits, resetTime) => {
-                if (error) reject(error);
-                resolve({ totalHits, resetTime });
-              }
-            );
-          });
-        }
-        async decrement(key) {
-          return legacyStore.decrement(key);
-        }
-        async resetKey(key) {
-          return legacyStore.resetKey(key);
-        }
-        /* istanbul ignore next */
-        async resetAll() {
-          if (typeof legacyStore.resetAll === "function")
-            return legacyStore.resetAll();
-        }
-      }
-      return new PromisifiedStore();
-    };
-    var getOptionsFromConfig = (config) => {
-      const { validations: validations2, ...directlyPassableEntries } = config;
-      return {
-        ...directlyPassableEntries,
-        validate: validations2.enabled
-      };
-    };
-    var parseOptions = (passedOptions) => {
-      const notUndefinedOptions = omitUndefinedProperties(passedOptions);
-      const logger = passedOptions.logger ?? ConsoleLogger;
-      const validations2 = getValidations(
-        notUndefinedOptions?.validate ?? true,
-        logger
-      );
-      validations2.validationsConfig();
-      validations2.knownOptions(passedOptions);
-      validations2.draftPolliHeaders(
-        // @ts-expect-error see the note above.
-        notUndefinedOptions.draft_polli_ratelimit_headers
-      );
-      validations2.onLimitReached(notUndefinedOptions.onLimitReached);
-      if (notUndefinedOptions.ipv6Subnet !== void 0 && typeof notUndefinedOptions.ipv6Subnet !== "function") {
-        validations2.ipv6Subnet(notUndefinedOptions.ipv6Subnet);
-      }
-      validations2.keyGeneratorIpFallback(notUndefinedOptions.keyGenerator);
-      validations2.ipv6SubnetOrKeyGenerator(notUndefinedOptions);
-      let standardHeaders = notUndefinedOptions.standardHeaders ?? false;
-      if (standardHeaders === true) standardHeaders = "draft-6";
-      const config = {
-        windowMs: 60 * 1e3,
-        limit: passedOptions.max ?? 5,
-        // `max` is deprecated, but support it anyways.
-        message: "Too many requests, please try again later.",
-        statusCode: 429,
-        legacyHeaders: passedOptions.headers ?? true,
-        identifier(request, _response) {
-          let duration = "";
-          const property = config.requestPropertyName;
-          const { limit } = request[property];
-          const seconds = config.windowMs / 1e3;
-          const minutes = config.windowMs / (1e3 * 60);
-          const hours = config.windowMs / (1e3 * 60 * 60);
-          const days = config.windowMs / (1e3 * 60 * 60 * 24);
-          if (seconds < 60) duration = `${seconds}sec`;
-          else if (minutes < 60) duration = `${minutes}min`;
-          else if (hours < 24) duration = `${hours}hr${hours > 1 ? "s" : ""}`;
-          else duration = `${days}day${days > 1 ? "s" : ""}`;
-          return `${limit}-in-${duration}`;
-        },
-        requestPropertyName: "rateLimit",
-        skipFailedRequests: false,
-        skipSuccessfulRequests: false,
-        requestWasSuccessful: (_request, response) => response.statusCode < 400,
-        skip: (_request, _response) => false,
-        async keyGenerator(request, response) {
-          validations2.ip(request.ip);
-          validations2.trustProxy(request);
-          validations2.xForwardedForHeader(request);
-          validations2.forwardedHeader(request);
-          const ip = request.ip;
-          let subnet = 56;
-          if ((0, import_node_net3.isIPv6)(ip)) {
-            subnet = typeof config.ipv6Subnet === "function" ? await config.ipv6Subnet(request, response) : config.ipv6Subnet;
-            if (typeof config.ipv6Subnet === "function")
-              validations2.ipv6Subnet(subnet);
-          }
-          return ipKeyGenerator(ip, subnet);
-        },
-        ipv6Subnet: 56,
-        async handler(request, response, _next, _optionsUsed) {
-          response.status(config.statusCode);
-          const message = typeof config.message === "function" ? await config.message(
-            request,
-            response
-          ) : config.message;
-          if (!response.writableEnded) response.send(message);
-        },
-        passOnStoreError: false,
-        // Allow the default options to be overridden by the passed options.
-        ...notUndefinedOptions,
-        // `standardHeaders` is resolved into a draft version above, use that.
-        standardHeaders,
-        // Note that this field is declared after the user's options are spread in,
-        // so that this field doesn't get overridden with an un-promisified store!
-        store: promisifyStore(
-          notUndefinedOptions.store ?? new MemoryStore(validations2)
-        ),
-        // Print an error to the console if a few known misconfigurations are detected.
-        validations: validations2,
-        logger
-      };
-      if (typeof config.store.increment !== "function" || typeof config.store.decrement !== "function" || typeof config.store.resetKey !== "function" || config.store.resetAll !== void 0 && typeof config.store.resetAll !== "function" || config.store.init !== void 0 && typeof config.store.init !== "function") {
-        throw new TypeError(
-          "An invalid store was passed. Please ensure that the store is a class that implements the `Store` interface."
-        );
-      }
-      return config;
-    };
-    var handleAsyncErrors = (fn) => async (request, response, next) => {
-      try {
-        await Promise.resolve(fn(request, response, next)).catch(next);
-      } catch (error) {
-        next(error);
-      }
-    };
-    var rateLimit = (passedOptions) => {
-      const config = parseOptions(passedOptions ?? {});
-      const options = getOptionsFromConfig(config);
-      const debug = (0, import_debug.default)("express-rate-limit");
-      debug("creating new rate limiter with %o", config.store.constructor.name);
-      for (const [key, val] of Object.entries(config))
-        debug("set %s to %o", key, val);
-      config.validations.creationStack(config.store);
-      config.validations.unsharedStore(config.store);
-      if (typeof config.store.init === "function") {
-        debug("executing init for store");
-        try {
-          const storeInit = config.store.init(options);
-          if (storeInit instanceof Promise) {
-            storeInit.catch(
-              (error) => config.logger.error(
-                error,
-                "express-rate-limit: async error during store initialization."
-              )
-            );
-          }
-        } catch (error) {
-          config.logger.error(
-            error,
-            "express-rate-limit: error during store initialization."
-          );
-        }
-      }
-      const middleware = handleAsyncErrors(
-        async (request, response, next) => {
-          const closePromise = config.skipFailedRequests && new Promise((resolve) => response.once("close", resolve));
-          const finishPromise = (config.skipFailedRequests || config.skipSuccessfulRequests) && new Promise((resolve) => response.once("finish", resolve));
-          const errorPromise = config.skipFailedRequests && new Promise((resolve) => response.once("error", resolve));
-          debug("requested %o", request.originalUrl);
-          debug("request from ip %o", request.ip);
-          const skip = await config.skip(request, response);
-          if (skip) {
-            debug("skipping request");
-            next();
-            return;
-          }
-          const augmentedRequest = request;
-          const key = await config.keyGenerator(request, response);
-          debug("computed key %o", key);
-          debug("incrementing count");
-          let totalHits = 0;
-          let resetTime;
-          try {
-            const incrementResult = await config.store.increment(key);
-            totalHits = incrementResult.totalHits;
-            resetTime = incrementResult.resetTime;
-          } catch (error) {
-            if (config.passOnStoreError) {
-              config.logger.error(
-                error,
-                "express-rate-limit: error from store, allowing request without rate-limiting."
-              );
-              next();
-              return;
-            }
-            throw error;
-          }
-          config.validations.positiveHits(totalHits);
-          config.validations.singleCount(request, config.store, key);
-          const retrieveLimit = typeof config.limit === "function" ? config.limit(request, response) : config.limit;
-          const limit = await retrieveLimit;
-          config.validations.limit(limit);
-          const info = {
-            limit,
-            used: totalHits,
-            remaining: Math.max(limit - totalHits, 0),
-            resetTime,
-            key
-          };
-          for (const [key2, val] of Object.entries(info))
-            debug(
-              "set request.%s.%s to be %o",
-              config.requestPropertyName,
-              key2,
-              val
-            );
-          Object.defineProperty(info, "current", {
-            configurable: false,
-            enumerable: false,
-            value: totalHits
-          });
-          augmentedRequest[config.requestPropertyName] = info;
-          if (config.legacyHeaders && !response.headersSent) {
-            debug("set legacy headers");
-            setLegacyHeaders(response, info);
-          }
-          if (config.standardHeaders && !response.headersSent) {
-            switch (config.standardHeaders) {
-              case "draft-6": {
-                debug("set ietf draft 6 headers");
-                setDraft6Headers(response, info, config.windowMs);
-                break;
-              }
-              case "draft-7": {
-                debug("set ietf draft 7 headers");
-                config.validations.headersResetTime(info.resetTime);
-                setDraft7Headers(response, info, config.windowMs);
-                break;
-              }
-              case "draft-8": {
-                const retrieveName = typeof config.identifier === "function" ? config.identifier(request, response) : config.identifier;
-                const name = await retrieveName;
-                debug("set ietf draft 8 headers");
-                debug("set name to %o", name);
-                config.validations.headersResetTime(info.resetTime);
-                setDraft8Headers(response, info, config.windowMs, name, key);
-                break;
-              }
-              default: {
-                config.validations.headersDraftVersion(config.standardHeaders);
-                break;
-              }
-            }
-          }
-          if (config.skipFailedRequests || config.skipSuccessfulRequests) {
-            let decremented = false;
-            const decrementKey = async () => {
-              if (!decremented) {
-                if (resetTime && Date.now() >= resetTime.getTime()) {
-                  return;
-                }
-                debug("decrementing count");
-                await config.store.decrement(key);
-                decremented = true;
-              }
-            };
-            if (config.skipFailedRequests) {
-              if (finishPromise) {
-                void finishPromise.then(async () => {
-                  const success = await config.requestWasSuccessful(
-                    request,
-                    response
-                  );
-                  debug("computed requestWasSuccessful as %o", success);
-                  if (!success) await decrementKey();
-                });
-              }
-              if (closePromise) {
-                void closePromise.then(async () => {
-                  if (!response.writableEnded) await decrementKey();
-                });
-              }
-              if (errorPromise) {
-                void errorPromise.then(async () => {
-                  await decrementKey();
-                });
-              }
-            }
-            if (config.skipSuccessfulRequests) {
-              if (finishPromise) {
-                void finishPromise.then(async () => {
-                  const success = await config.requestWasSuccessful(
-                    request,
-                    response
-                  );
-                  debug("computed requestWasSuccessful as %o", success);
-                  if (success) await decrementKey();
-                });
-              }
-            }
-          }
-          if (totalHits > limit) {
-            debug("limit exceeded");
-            if (config.legacyHeaders || config.standardHeaders) {
-              debug("set retry-after header");
-              setRetryAfterHeader(response, info, config.windowMs);
-            }
-            config.handler(request, response, next, options);
-            return;
-          }
-          next();
-        }
-      );
-      const getThrowFn = () => {
-        throw new Error("The current store does not support the get/getKey method");
-      };
-      middleware.resetKey = config.store.resetKey.bind(config.store);
-      middleware.getKey = typeof config.store.get === "function" ? config.store.get.bind(config.store) : getThrowFn;
-      return middleware;
-    };
-    var rate_limit_default = rateLimit;
-    var SECOND = 1e3;
-    var MINUTE = 60 * SECOND;
-    var HOUR = 60 * MINUTE;
-    var DAY = 24 * HOUR;
-    module2.exports = Object.assign(rateLimit, module2.exports);
-  }
-});
-
-// server/dist/middleware/rateLimit.js
-var require_rateLimit = __commonJS({
-  "server/dist/middleware/rateLimit.js"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.sensitiveLimiter = exports2.authLimiter = exports2.apiLimiter = void 0;
-    var express_rate_limit_1 = __importDefault2(require_dist());
-    exports2.apiLimiter = (0, express_rate_limit_1.default)({
-      windowMs: 1 * 60 * 1e3,
-      // 1 minutes
-      max: 100,
-      standardHeaders: true,
-      legacyHeaders: false,
-      message: {
-        success: false,
-        error: {
-          code: "RATE_LIMITED",
-          message: "Too many requests. Please try again later."
-        }
-      }
-    });
-    exports2.authLimiter = (0, express_rate_limit_1.default)({
-      windowMs: 15 * 60 * 1e3,
-      // 15 minutes
-      max: 10,
-      standardHeaders: true,
-      legacyHeaders: false,
-      message: {
-        success: false,
-        error: {
-          code: "RATE_LIMITED",
-          message: "Too many authentication attempts. Please try again in 15 minutes."
-        }
-      }
-    });
-    exports2.sensitiveLimiter = (0, express_rate_limit_1.default)({
-      windowMs: 15 * 60 * 1e3,
-      // 15 minutes
-      max: 5,
-      standardHeaders: true,
-      legacyHeaders: false,
-      message: {
-        success: false,
-        error: {
-          code: "RATE_LIMITED",
-          message: "Too many attempts. Please try again in 15 minutes."
-        }
-      }
-    });
-  }
-});
-
-// node_modules/zod/v3/helpers/util.cjs
-var require_util = __commonJS({
-  "node_modules/zod/v3/helpers/util.cjs"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.getParsedType = exports2.ZodParsedType = exports2.objectUtil = exports2.util = void 0;
-    var util;
-    (function(util2) {
-      util2.assertEqual = (_) => {
-      };
-      function assertIs(_arg) {
-      }
-      util2.assertIs = assertIs;
-      function assertNever(_x) {
-        throw new Error();
-      }
-      util2.assertNever = assertNever;
-      util2.arrayToEnum = (items) => {
-        const obj = {};
-        for (const item of items) {
-          obj[item] = item;
-        }
-        return obj;
-      };
-      util2.getValidEnumValues = (obj) => {
-        const validKeys = util2.objectKeys(obj).filter((k) => typeof obj[obj[k]] !== "number");
-        const filtered = {};
-        for (const k of validKeys) {
-          filtered[k] = obj[k];
-        }
-        return util2.objectValues(filtered);
-      };
-      util2.objectValues = (obj) => {
-        return util2.objectKeys(obj).map(function(e) {
-          return obj[e];
-        });
-      };
-      util2.objectKeys = typeof Object.keys === "function" ? (obj) => Object.keys(obj) : (object) => {
-        const keys = [];
-        for (const key in object) {
-          if (Object.prototype.hasOwnProperty.call(object, key)) {
-            keys.push(key);
-          }
-        }
-        return keys;
-      };
-      util2.find = (arr, checker) => {
-        for (const item of arr) {
-          if (checker(item))
-            return item;
-        }
-        return void 0;
-      };
-      util2.isInteger = typeof Number.isInteger === "function" ? (val) => Number.isInteger(val) : (val) => typeof val === "number" && Number.isFinite(val) && Math.floor(val) === val;
-      function joinValues(array, separator = " | ") {
-        return array.map((val) => typeof val === "string" ? `'${val}'` : val).join(separator);
-      }
-      util2.joinValues = joinValues;
-      util2.jsonStringifyReplacer = (_, value) => {
-        if (typeof value === "bigint") {
-          return value.toString();
-        }
-        return value;
-      };
-    })(util || (exports2.util = util = {}));
-    var objectUtil;
-    (function(objectUtil2) {
-      objectUtil2.mergeShapes = (first, second) => {
-        return {
-          ...first,
-          ...second
-          // second overwrites first
-        };
-      };
-    })(objectUtil || (exports2.objectUtil = objectUtil = {}));
-    exports2.ZodParsedType = util.arrayToEnum([
-      "string",
-      "nan",
-      "number",
-      "integer",
-      "float",
-      "boolean",
-      "date",
-      "bigint",
-      "symbol",
-      "function",
-      "undefined",
-      "null",
-      "array",
-      "object",
-      "unknown",
-      "promise",
-      "void",
-      "never",
-      "map",
-      "set"
-    ]);
-    var getParsedType = (data) => {
-      const t = typeof data;
-      switch (t) {
-        case "undefined":
-          return exports2.ZodParsedType.undefined;
-        case "string":
-          return exports2.ZodParsedType.string;
-        case "number":
-          return Number.isNaN(data) ? exports2.ZodParsedType.nan : exports2.ZodParsedType.number;
-        case "boolean":
-          return exports2.ZodParsedType.boolean;
-        case "function":
-          return exports2.ZodParsedType.function;
-        case "bigint":
-          return exports2.ZodParsedType.bigint;
-        case "symbol":
-          return exports2.ZodParsedType.symbol;
-        case "object":
-          if (Array.isArray(data)) {
-            return exports2.ZodParsedType.array;
-          }
-          if (data === null) {
-            return exports2.ZodParsedType.null;
-          }
-          if (data.then && typeof data.then === "function" && data.catch && typeof data.catch === "function") {
-            return exports2.ZodParsedType.promise;
-          }
-          if (typeof Map !== "undefined" && data instanceof Map) {
-            return exports2.ZodParsedType.map;
-          }
-          if (typeof Set !== "undefined" && data instanceof Set) {
-            return exports2.ZodParsedType.set;
-          }
-          if (typeof Date !== "undefined" && data instanceof Date) {
-            return exports2.ZodParsedType.date;
-          }
-          return exports2.ZodParsedType.object;
-        default:
-          return exports2.ZodParsedType.unknown;
-      }
-    };
-    exports2.getParsedType = getParsedType;
-  }
-});
-
-// node_modules/zod/v3/ZodError.cjs
-var require_ZodError = __commonJS({
-  "node_modules/zod/v3/ZodError.cjs"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.ZodError = exports2.quotelessJson = exports2.ZodIssueCode = void 0;
-    var util_js_1 = require_util();
-    exports2.ZodIssueCode = util_js_1.util.arrayToEnum([
-      "invalid_type",
-      "invalid_literal",
-      "custom",
-      "invalid_union",
-      "invalid_union_discriminator",
-      "invalid_enum_value",
-      "unrecognized_keys",
-      "invalid_arguments",
-      "invalid_return_type",
-      "invalid_date",
-      "invalid_string",
-      "too_small",
-      "too_big",
-      "invalid_intersection_types",
-      "not_multiple_of",
-      "not_finite"
-    ]);
-    var quotelessJson = (obj) => {
-      const json = JSON.stringify(obj, null, 2);
-      return json.replace(/"([^"]+)":/g, "$1:");
-    };
-    exports2.quotelessJson = quotelessJson;
-    var ZodError = class _ZodError extends Error {
-      get errors() {
-        return this.issues;
-      }
-      constructor(issues) {
-        super();
-        this.issues = [];
-        this.addIssue = (sub) => {
-          this.issues = [...this.issues, sub];
-        };
-        this.addIssues = (subs = []) => {
-          this.issues = [...this.issues, ...subs];
-        };
-        const actualProto = new.target.prototype;
-        if (Object.setPrototypeOf) {
-          Object.setPrototypeOf(this, actualProto);
-        } else {
-          this.__proto__ = actualProto;
-        }
-        this.name = "ZodError";
-        this.issues = issues;
-      }
-      format(_mapper) {
-        const mapper = _mapper || function(issue) {
-          return issue.message;
-        };
-        const fieldErrors = { _errors: [] };
-        const processError = (error) => {
-          for (const issue of error.issues) {
-            if (issue.code === "invalid_union") {
-              issue.unionErrors.map(processError);
-            } else if (issue.code === "invalid_return_type") {
-              processError(issue.returnTypeError);
-            } else if (issue.code === "invalid_arguments") {
-              processError(issue.argumentsError);
-            } else if (issue.path.length === 0) {
-              fieldErrors._errors.push(mapper(issue));
-            } else {
-              let curr = fieldErrors;
-              let i = 0;
-              while (i < issue.path.length) {
-                const el = issue.path[i];
-                const terminal = i === issue.path.length - 1;
-                if (!terminal) {
-                  curr[el] = curr[el] || { _errors: [] };
-                } else {
-                  curr[el] = curr[el] || { _errors: [] };
-                  curr[el]._errors.push(mapper(issue));
-                }
-                curr = curr[el];
-                i++;
-              }
-            }
-          }
-        };
-        processError(this);
-        return fieldErrors;
-      }
-      static assert(value) {
-        if (!(value instanceof _ZodError)) {
-          throw new Error(`Not a ZodError: ${value}`);
-        }
-      }
-      toString() {
-        return this.message;
-      }
-      get message() {
-        return JSON.stringify(this.issues, util_js_1.util.jsonStringifyReplacer, 2);
-      }
-      get isEmpty() {
-        return this.issues.length === 0;
-      }
-      flatten(mapper = (issue) => issue.message) {
-        const fieldErrors = {};
-        const formErrors = [];
-        for (const sub of this.issues) {
-          if (sub.path.length > 0) {
-            const firstEl = sub.path[0];
-            fieldErrors[firstEl] = fieldErrors[firstEl] || [];
-            fieldErrors[firstEl].push(mapper(sub));
-          } else {
-            formErrors.push(mapper(sub));
-          }
-        }
-        return { formErrors, fieldErrors };
-      }
-      get formErrors() {
-        return this.flatten();
-      }
-    };
-    exports2.ZodError = ZodError;
-    ZodError.create = (issues) => {
-      const error = new ZodError(issues);
-      return error;
-    };
-  }
-});
-
-// node_modules/zod/v3/locales/en.cjs
-var require_en = __commonJS({
-  "node_modules/zod/v3/locales/en.cjs"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var ZodError_js_1 = require_ZodError();
-    var util_js_1 = require_util();
-    var errorMap = (issue, _ctx) => {
-      let message;
-      switch (issue.code) {
-        case ZodError_js_1.ZodIssueCode.invalid_type:
-          if (issue.received === util_js_1.ZodParsedType.undefined) {
-            message = "Required";
-          } else {
-            message = `Expected ${issue.expected}, received ${issue.received}`;
-          }
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_literal:
-          message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util_js_1.util.jsonStringifyReplacer)}`;
-          break;
-        case ZodError_js_1.ZodIssueCode.unrecognized_keys:
-          message = `Unrecognized key(s) in object: ${util_js_1.util.joinValues(issue.keys, ", ")}`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_union:
-          message = `Invalid input`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_union_discriminator:
-          message = `Invalid discriminator value. Expected ${util_js_1.util.joinValues(issue.options)}`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_enum_value:
-          message = `Invalid enum value. Expected ${util_js_1.util.joinValues(issue.options)}, received '${issue.received}'`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_arguments:
-          message = `Invalid function arguments`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_return_type:
-          message = `Invalid function return type`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_date:
-          message = `Invalid date`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_string:
-          if (typeof issue.validation === "object") {
-            if ("includes" in issue.validation) {
-              message = `Invalid input: must include "${issue.validation.includes}"`;
-              if (typeof issue.validation.position === "number") {
-                message = `${message} at one or more positions greater than or equal to ${issue.validation.position}`;
-              }
-            } else if ("startsWith" in issue.validation) {
-              message = `Invalid input: must start with "${issue.validation.startsWith}"`;
-            } else if ("endsWith" in issue.validation) {
-              message = `Invalid input: must end with "${issue.validation.endsWith}"`;
-            } else {
-              util_js_1.util.assertNever(issue.validation);
-            }
-          } else if (issue.validation !== "regex") {
-            message = `Invalid ${issue.validation}`;
-          } else {
-            message = "Invalid";
-          }
-          break;
-        case ZodError_js_1.ZodIssueCode.too_small:
-          if (issue.type === "array")
-            message = `Array must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `more than`} ${issue.minimum} element(s)`;
-          else if (issue.type === "string")
-            message = `String must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `over`} ${issue.minimum} character(s)`;
-          else if (issue.type === "number")
-            message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
-          else if (issue.type === "bigint")
-            message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
-          else if (issue.type === "date")
-            message = `Date must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${new Date(Number(issue.minimum))}`;
-          else
-            message = "Invalid input";
-          break;
-        case ZodError_js_1.ZodIssueCode.too_big:
-          if (issue.type === "array")
-            message = `Array must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `less than`} ${issue.maximum} element(s)`;
-          else if (issue.type === "string")
-            message = `String must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `under`} ${issue.maximum} character(s)`;
-          else if (issue.type === "number")
-            message = `Number must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
-          else if (issue.type === "bigint")
-            message = `BigInt must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
-          else if (issue.type === "date")
-            message = `Date must be ${issue.exact ? `exactly` : issue.inclusive ? `smaller than or equal to` : `smaller than`} ${new Date(Number(issue.maximum))}`;
-          else
-            message = "Invalid input";
-          break;
-        case ZodError_js_1.ZodIssueCode.custom:
-          message = `Invalid input`;
-          break;
-        case ZodError_js_1.ZodIssueCode.invalid_intersection_types:
-          message = `Intersection results could not be merged`;
-          break;
-        case ZodError_js_1.ZodIssueCode.not_multiple_of:
-          message = `Number must be a multiple of ${issue.multipleOf}`;
-          break;
-        case ZodError_js_1.ZodIssueCode.not_finite:
-          message = "Number must be finite";
-          break;
-        default:
-          message = _ctx.defaultError;
-          util_js_1.util.assertNever(issue);
-      }
-      return { message };
-    };
-    exports2.default = errorMap;
-  }
-});
-
-// node_modules/zod/v3/errors.cjs
-var require_errors = __commonJS({
-  "node_modules/zod/v3/errors.cjs"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.defaultErrorMap = void 0;
-    exports2.setErrorMap = setErrorMap;
-    exports2.getErrorMap = getErrorMap;
-    var en_js_1 = __importDefault2(require_en());
-    exports2.defaultErrorMap = en_js_1.default;
-    var overrideErrorMap = en_js_1.default;
-    function setErrorMap(map) {
-      overrideErrorMap = map;
-    }
-    function getErrorMap() {
-      return overrideErrorMap;
-    }
-  }
-});
-
-// node_modules/zod/v3/helpers/parseUtil.cjs
-var require_parseUtil = __commonJS({
-  "node_modules/zod/v3/helpers/parseUtil.cjs"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isAsync = exports2.isValid = exports2.isDirty = exports2.isAborted = exports2.OK = exports2.DIRTY = exports2.INVALID = exports2.ParseStatus = exports2.EMPTY_PATH = exports2.makeIssue = void 0;
-    exports2.addIssueToContext = addIssueToContext;
-    var errors_js_1 = require_errors();
-    var en_js_1 = __importDefault2(require_en());
-    var makeIssue = (params) => {
-      const { data, path, errorMaps, issueData } = params;
-      const fullPath = [...path, ...issueData.path || []];
-      const fullIssue = {
-        ...issueData,
-        path: fullPath
-      };
-      if (issueData.message !== void 0) {
-        return {
-          ...issueData,
-          path: fullPath,
-          message: issueData.message
-        };
-      }
-      let errorMessage = "";
-      const maps = errorMaps.filter((m) => !!m).slice().reverse();
-      for (const map of maps) {
-        errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;
-      }
-      return {
-        ...issueData,
-        path: fullPath,
-        message: errorMessage
-      };
-    };
-    exports2.makeIssue = makeIssue;
-    exports2.EMPTY_PATH = [];
-    function addIssueToContext(ctx, issueData) {
-      const overrideMap = (0, errors_js_1.getErrorMap)();
-      const issue = (0, exports2.makeIssue)({
-        issueData,
-        data: ctx.data,
-        path: ctx.path,
-        errorMaps: [
-          ctx.common.contextualErrorMap,
-          // contextual error map is first priority
-          ctx.schemaErrorMap,
-          // then schema-bound map if available
-          overrideMap,
-          // then global override map
-          overrideMap === en_js_1.default ? void 0 : en_js_1.default
-          // then global default map
-        ].filter((x) => !!x)
-      });
-      ctx.common.issues.push(issue);
-    }
-    var ParseStatus = class _ParseStatus {
-      constructor() {
-        this.value = "valid";
-      }
-      dirty() {
-        if (this.value === "valid")
-          this.value = "dirty";
-      }
-      abort() {
-        if (this.value !== "aborted")
-          this.value = "aborted";
-      }
-      static mergeArray(status, results) {
-        const arrayValue = [];
-        for (const s of results) {
-          if (s.status === "aborted")
-            return exports2.INVALID;
-          if (s.status === "dirty")
-            status.dirty();
-          arrayValue.push(s.value);
-        }
-        return { status: status.value, value: arrayValue };
-      }
-      static async mergeObjectAsync(status, pairs) {
-        const syncPairs = [];
-        for (const pair of pairs) {
-          const key = await pair.key;
-          const value = await pair.value;
-          syncPairs.push({
-            key,
-            value
-          });
-        }
-        return _ParseStatus.mergeObjectSync(status, syncPairs);
-      }
-      static mergeObjectSync(status, pairs) {
-        const finalObject = {};
-        for (const pair of pairs) {
-          const { key, value } = pair;
-          if (key.status === "aborted")
-            return exports2.INVALID;
-          if (value.status === "aborted")
-            return exports2.INVALID;
-          if (key.status === "dirty")
-            status.dirty();
-          if (value.status === "dirty")
-            status.dirty();
-          if (key.value !== "__proto__" && (typeof value.value !== "undefined" || pair.alwaysSet)) {
-            finalObject[key.value] = value.value;
-          }
-        }
-        return { status: status.value, value: finalObject };
-      }
-    };
-    exports2.ParseStatus = ParseStatus;
-    exports2.INVALID = Object.freeze({
-      status: "aborted"
-    });
-    var DIRTY = (value) => ({ status: "dirty", value });
-    exports2.DIRTY = DIRTY;
-    var OK = (value) => ({ status: "valid", value });
-    exports2.OK = OK;
-    var isAborted = (x) => x.status === "aborted";
-    exports2.isAborted = isAborted;
-    var isDirty = (x) => x.status === "dirty";
-    exports2.isDirty = isDirty;
-    var isValid = (x) => x.status === "valid";
-    exports2.isValid = isValid;
-    var isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
-    exports2.isAsync = isAsync;
-  }
-});
-
-// node_modules/zod/v3/helpers/typeAliases.cjs
-var require_typeAliases = __commonJS({
-  "node_modules/zod/v3/helpers/typeAliases.cjs"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-  }
-});
-
-// node_modules/zod/v3/helpers/errorUtil.cjs
-var require_errorUtil = __commonJS({
-  "node_modules/zod/v3/helpers/errorUtil.cjs"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.errorUtil = void 0;
-    var errorUtil;
-    (function(errorUtil2) {
-      errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
-      errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
-    })(errorUtil || (exports2.errorUtil = errorUtil = {}));
-  }
-});
-
-// node_modules/zod/v3/types.cjs
-var require_types2 = __commonJS({
-  "node_modules/zod/v3/types.cjs"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.discriminatedUnion = exports2.date = exports2.boolean = exports2.bigint = exports2.array = exports2.any = exports2.coerce = exports2.ZodFirstPartyTypeKind = exports2.late = exports2.ZodSchema = exports2.Schema = exports2.ZodReadonly = exports2.ZodPipeline = exports2.ZodBranded = exports2.BRAND = exports2.ZodNaN = exports2.ZodCatch = exports2.ZodDefault = exports2.ZodNullable = exports2.ZodOptional = exports2.ZodTransformer = exports2.ZodEffects = exports2.ZodPromise = exports2.ZodNativeEnum = exports2.ZodEnum = exports2.ZodLiteral = exports2.ZodLazy = exports2.ZodFunction = exports2.ZodSet = exports2.ZodMap = exports2.ZodRecord = exports2.ZodTuple = exports2.ZodIntersection = exports2.ZodDiscriminatedUnion = exports2.ZodUnion = exports2.ZodObject = exports2.ZodArray = exports2.ZodVoid = exports2.ZodNever = exports2.ZodUnknown = exports2.ZodAny = exports2.ZodNull = exports2.ZodUndefined = exports2.ZodSymbol = exports2.ZodDate = exports2.ZodBoolean = exports2.ZodBigInt = exports2.ZodNumber = exports2.ZodString = exports2.ZodType = void 0;
-    exports2.NEVER = exports2.void = exports2.unknown = exports2.union = exports2.undefined = exports2.tuple = exports2.transformer = exports2.symbol = exports2.string = exports2.strictObject = exports2.set = exports2.record = exports2.promise = exports2.preprocess = exports2.pipeline = exports2.ostring = exports2.optional = exports2.onumber = exports2.oboolean = exports2.object = exports2.number = exports2.nullable = exports2.null = exports2.never = exports2.nativeEnum = exports2.nan = exports2.map = exports2.literal = exports2.lazy = exports2.intersection = exports2.instanceof = exports2.function = exports2.enum = exports2.effect = void 0;
-    exports2.datetimeRegex = datetimeRegex;
-    exports2.custom = custom;
-    var ZodError_js_1 = require_ZodError();
-    var errors_js_1 = require_errors();
-    var errorUtil_js_1 = require_errorUtil();
-    var parseUtil_js_1 = require_parseUtil();
-    var util_js_1 = require_util();
-    var ParseInputLazyPath = class {
-      constructor(parent, value, path, key) {
-        this._cachedPath = [];
-        this.parent = parent;
-        this.data = value;
-        this._path = path;
-        this._key = key;
-      }
-      get path() {
-        if (!this._cachedPath.length) {
-          if (Array.isArray(this._key)) {
-            this._cachedPath.push(...this._path, ...this._key);
-          } else {
-            this._cachedPath.push(...this._path, this._key);
-          }
-        }
-        return this._cachedPath;
-      }
-    };
-    var handleResult = (ctx, result) => {
-      if ((0, parseUtil_js_1.isValid)(result)) {
-        return { success: true, data: result.value };
-      } else {
-        if (!ctx.common.issues.length) {
-          throw new Error("Validation failed but no issues detected.");
-        }
-        return {
-          success: false,
-          get error() {
-            if (this._error)
-              return this._error;
-            const error = new ZodError_js_1.ZodError(ctx.common.issues);
-            this._error = error;
-            return this._error;
-          }
-        };
-      }
-    };
-    function processCreateParams(params) {
-      if (!params)
-        return {};
-      const { errorMap, invalid_type_error, required_error, description } = params;
-      if (errorMap && (invalid_type_error || required_error)) {
-        throw new Error(`Can't use "invalid_type_error" or "required_error" in conjunction with custom error map.`);
-      }
-      if (errorMap)
-        return { errorMap, description };
-      const customMap = (iss, ctx) => {
-        const { message } = params;
-        if (iss.code === "invalid_enum_value") {
-          return { message: message ?? ctx.defaultError };
-        }
-        if (typeof ctx.data === "undefined") {
-          return { message: message ?? required_error ?? ctx.defaultError };
-        }
-        if (iss.code !== "invalid_type")
-          return { message: ctx.defaultError };
-        return { message: message ?? invalid_type_error ?? ctx.defaultError };
-      };
-      return { errorMap: customMap, description };
-    }
-    var ZodType = class {
-      get description() {
-        return this._def.description;
-      }
-      _getType(input) {
-        return (0, util_js_1.getParsedType)(input.data);
-      }
-      _getOrReturnCtx(input, ctx) {
-        return ctx || {
-          common: input.parent.common,
-          data: input.data,
-          parsedType: (0, util_js_1.getParsedType)(input.data),
-          schemaErrorMap: this._def.errorMap,
-          path: input.path,
-          parent: input.parent
-        };
-      }
-      _processInputParams(input) {
-        return {
-          status: new parseUtil_js_1.ParseStatus(),
-          ctx: {
-            common: input.parent.common,
-            data: input.data,
-            parsedType: (0, util_js_1.getParsedType)(input.data),
-            schemaErrorMap: this._def.errorMap,
-            path: input.path,
-            parent: input.parent
-          }
-        };
-      }
-      _parseSync(input) {
-        const result = this._parse(input);
-        if ((0, parseUtil_js_1.isAsync)(result)) {
-          throw new Error("Synchronous parse encountered promise.");
-        }
-        return result;
-      }
-      _parseAsync(input) {
-        const result = this._parse(input);
-        return Promise.resolve(result);
-      }
-      parse(data, params) {
-        const result = this.safeParse(data, params);
-        if (result.success)
-          return result.data;
-        throw result.error;
-      }
-      safeParse(data, params) {
-        const ctx = {
-          common: {
-            issues: [],
-            async: params?.async ?? false,
-            contextualErrorMap: params?.errorMap
-          },
-          path: params?.path || [],
-          schemaErrorMap: this._def.errorMap,
-          parent: null,
-          data,
-          parsedType: (0, util_js_1.getParsedType)(data)
-        };
-        const result = this._parseSync({ data, path: ctx.path, parent: ctx });
-        return handleResult(ctx, result);
-      }
-      "~validate"(data) {
-        const ctx = {
-          common: {
-            issues: [],
-            async: !!this["~standard"].async
-          },
-          path: [],
-          schemaErrorMap: this._def.errorMap,
-          parent: null,
-          data,
-          parsedType: (0, util_js_1.getParsedType)(data)
-        };
-        if (!this["~standard"].async) {
-          try {
-            const result = this._parseSync({ data, path: [], parent: ctx });
-            return (0, parseUtil_js_1.isValid)(result) ? {
-              value: result.value
-            } : {
-              issues: ctx.common.issues
-            };
-          } catch (err) {
-            if (err?.message?.toLowerCase()?.includes("encountered")) {
-              this["~standard"].async = true;
-            }
-            ctx.common = {
-              issues: [],
-              async: true
-            };
-          }
-        }
-        return this._parseAsync({ data, path: [], parent: ctx }).then((result) => (0, parseUtil_js_1.isValid)(result) ? {
-          value: result.value
-        } : {
-          issues: ctx.common.issues
-        });
-      }
-      async parseAsync(data, params) {
-        const result = await this.safeParseAsync(data, params);
-        if (result.success)
-          return result.data;
-        throw result.error;
-      }
-      async safeParseAsync(data, params) {
-        const ctx = {
-          common: {
-            issues: [],
-            contextualErrorMap: params?.errorMap,
-            async: true
-          },
-          path: params?.path || [],
-          schemaErrorMap: this._def.errorMap,
-          parent: null,
-          data,
-          parsedType: (0, util_js_1.getParsedType)(data)
-        };
-        const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
-        const result = await ((0, parseUtil_js_1.isAsync)(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult));
-        return handleResult(ctx, result);
-      }
-      refine(check, message) {
-        const getIssueProperties = (val) => {
-          if (typeof message === "string" || typeof message === "undefined") {
-            return { message };
-          } else if (typeof message === "function") {
-            return message(val);
-          } else {
-            return message;
-          }
-        };
-        return this._refinement((val, ctx) => {
-          const result = check(val);
-          const setError = () => ctx.addIssue({
-            code: ZodError_js_1.ZodIssueCode.custom,
-            ...getIssueProperties(val)
-          });
-          if (typeof Promise !== "undefined" && result instanceof Promise) {
-            return result.then((data) => {
-              if (!data) {
-                setError();
-                return false;
-              } else {
-                return true;
-              }
-            });
-          }
-          if (!result) {
-            setError();
-            return false;
-          } else {
-            return true;
-          }
-        });
-      }
-      refinement(check, refinementData) {
-        return this._refinement((val, ctx) => {
-          if (!check(val)) {
-            ctx.addIssue(typeof refinementData === "function" ? refinementData(val, ctx) : refinementData);
-            return false;
-          } else {
-            return true;
-          }
-        });
-      }
-      _refinement(refinement) {
-        return new ZodEffects({
-          schema: this,
-          typeName: ZodFirstPartyTypeKind.ZodEffects,
-          effect: { type: "refinement", refinement }
-        });
-      }
-      superRefine(refinement) {
-        return this._refinement(refinement);
-      }
-      constructor(def) {
-        this.spa = this.safeParseAsync;
-        this._def = def;
-        this.parse = this.parse.bind(this);
-        this.safeParse = this.safeParse.bind(this);
-        this.parseAsync = this.parseAsync.bind(this);
-        this.safeParseAsync = this.safeParseAsync.bind(this);
-        this.spa = this.spa.bind(this);
-        this.refine = this.refine.bind(this);
-        this.refinement = this.refinement.bind(this);
-        this.superRefine = this.superRefine.bind(this);
-        this.optional = this.optional.bind(this);
-        this.nullable = this.nullable.bind(this);
-        this.nullish = this.nullish.bind(this);
-        this.array = this.array.bind(this);
-        this.promise = this.promise.bind(this);
-        this.or = this.or.bind(this);
-        this.and = this.and.bind(this);
-        this.transform = this.transform.bind(this);
-        this.brand = this.brand.bind(this);
-        this.default = this.default.bind(this);
-        this.catch = this.catch.bind(this);
-        this.describe = this.describe.bind(this);
-        this.pipe = this.pipe.bind(this);
-        this.readonly = this.readonly.bind(this);
-        this.isNullable = this.isNullable.bind(this);
-        this.isOptional = this.isOptional.bind(this);
-        this["~standard"] = {
-          version: 1,
-          vendor: "zod",
-          validate: (data) => this["~validate"](data)
-        };
-      }
-      optional() {
-        return ZodOptional.create(this, this._def);
-      }
-      nullable() {
-        return ZodNullable.create(this, this._def);
-      }
-      nullish() {
-        return this.nullable().optional();
-      }
-      array() {
-        return ZodArray.create(this);
-      }
-      promise() {
-        return ZodPromise.create(this, this._def);
-      }
-      or(option) {
-        return ZodUnion.create([this, option], this._def);
-      }
-      and(incoming) {
-        return ZodIntersection.create(this, incoming, this._def);
-      }
-      transform(transform) {
-        return new ZodEffects({
-          ...processCreateParams(this._def),
-          schema: this,
-          typeName: ZodFirstPartyTypeKind.ZodEffects,
-          effect: { type: "transform", transform }
-        });
-      }
-      default(def) {
-        const defaultValueFunc = typeof def === "function" ? def : () => def;
-        return new ZodDefault({
-          ...processCreateParams(this._def),
-          innerType: this,
-          defaultValue: defaultValueFunc,
-          typeName: ZodFirstPartyTypeKind.ZodDefault
-        });
-      }
-      brand() {
-        return new ZodBranded({
-          typeName: ZodFirstPartyTypeKind.ZodBranded,
-          type: this,
-          ...processCreateParams(this._def)
-        });
-      }
-      catch(def) {
-        const catchValueFunc = typeof def === "function" ? def : () => def;
-        return new ZodCatch({
-          ...processCreateParams(this._def),
-          innerType: this,
-          catchValue: catchValueFunc,
-          typeName: ZodFirstPartyTypeKind.ZodCatch
-        });
-      }
-      describe(description) {
-        const This = this.constructor;
-        return new This({
-          ...this._def,
-          description
-        });
-      }
-      pipe(target) {
-        return ZodPipeline.create(this, target);
-      }
-      readonly() {
-        return ZodReadonly.create(this);
-      }
-      isOptional() {
-        return this.safeParse(void 0).success;
-      }
-      isNullable() {
-        return this.safeParse(null).success;
-      }
-    };
-    exports2.ZodType = ZodType;
-    exports2.Schema = ZodType;
-    exports2.ZodSchema = ZodType;
-    var cuidRegex = /^c[^\s-]{8,}$/i;
-    var cuid2Regex = /^[0-9a-z]+$/;
-    var ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
-    var uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i;
-    var nanoidRegex = /^[a-z0-9_-]{21}$/i;
-    var jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
-    var durationRegex = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
-    var emailRegex = /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
-    var _emojiRegex = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
-    var emojiRegex;
-    var ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
-    var ipv4CidrRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/;
-    var ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
-    var ipv6CidrRegex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/;
-    var base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-    var base64urlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/;
-    var dateRegexSource = `((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))`;
-    var dateRegex = new RegExp(`^${dateRegexSource}$`);
-    function timeRegexSource(args) {
-      let secondsRegexSource = `[0-5]\\d`;
-      if (args.precision) {
-        secondsRegexSource = `${secondsRegexSource}\\.\\d{${args.precision}}`;
-      } else if (args.precision == null) {
-        secondsRegexSource = `${secondsRegexSource}(\\.\\d+)?`;
-      }
-      const secondsQuantifier = args.precision ? "+" : "?";
-      return `([01]\\d|2[0-3]):[0-5]\\d(:${secondsRegexSource})${secondsQuantifier}`;
-    }
-    function timeRegex(args) {
-      return new RegExp(`^${timeRegexSource(args)}$`);
-    }
-    function datetimeRegex(args) {
-      let regex = `${dateRegexSource}T${timeRegexSource(args)}`;
-      const opts = [];
-      opts.push(args.local ? `Z?` : `Z`);
-      if (args.offset)
-        opts.push(`([+-]\\d{2}:?\\d{2})`);
-      regex = `${regex}(${opts.join("|")})`;
-      return new RegExp(`^${regex}$`);
-    }
-    function isValidIP(ip, version) {
-      if ((version === "v4" || !version) && ipv4Regex.test(ip)) {
-        return true;
-      }
-      if ((version === "v6" || !version) && ipv6Regex.test(ip)) {
-        return true;
-      }
-      return false;
-    }
-    function isValidJWT(jwt, alg) {
-      if (!jwtRegex.test(jwt))
-        return false;
-      try {
-        const [header] = jwt.split(".");
-        if (!header)
-          return false;
-        const base64 = header.replace(/-/g, "+").replace(/_/g, "/").padEnd(header.length + (4 - header.length % 4) % 4, "=");
-        const decoded = JSON.parse(atob(base64));
-        if (typeof decoded !== "object" || decoded === null)
-          return false;
-        if ("typ" in decoded && decoded?.typ !== "JWT")
-          return false;
-        if (!decoded.alg)
-          return false;
-        if (alg && decoded.alg !== alg)
-          return false;
-        return true;
-      } catch {
-        return false;
-      }
-    }
-    function isValidCidr(ip, version) {
-      if ((version === "v4" || !version) && ipv4CidrRegex.test(ip)) {
-        return true;
-      }
-      if ((version === "v6" || !version) && ipv6CidrRegex.test(ip)) {
-        return true;
-      }
-      return false;
-    }
-    var ZodString = class _ZodString extends ZodType {
-      _parse(input) {
-        if (this._def.coerce) {
-          input.data = String(input.data);
-        }
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.string) {
-          const ctx2 = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx2, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.string,
-            received: ctx2.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const status = new parseUtil_js_1.ParseStatus();
-        let ctx = void 0;
-        for (const check of this._def.checks) {
-          if (check.kind === "min") {
-            if (input.data.length < check.value) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_small,
-                minimum: check.value,
-                type: "string",
-                inclusive: true,
-                exact: false,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "max") {
-            if (input.data.length > check.value) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_big,
-                maximum: check.value,
-                type: "string",
-                inclusive: true,
-                exact: false,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "length") {
-            const tooBig = input.data.length > check.value;
-            const tooSmall = input.data.length < check.value;
-            if (tooBig || tooSmall) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              if (tooBig) {
-                (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                  code: ZodError_js_1.ZodIssueCode.too_big,
-                  maximum: check.value,
-                  type: "string",
-                  inclusive: true,
-                  exact: true,
-                  message: check.message
-                });
-              } else if (tooSmall) {
-                (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                  code: ZodError_js_1.ZodIssueCode.too_small,
-                  minimum: check.value,
-                  type: "string",
-                  inclusive: true,
-                  exact: true,
-                  message: check.message
-                });
-              }
-              status.dirty();
-            }
-          } else if (check.kind === "email") {
-            if (!emailRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "email",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "emoji") {
-            if (!emojiRegex) {
-              emojiRegex = new RegExp(_emojiRegex, "u");
-            }
-            if (!emojiRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "emoji",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "uuid") {
-            if (!uuidRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "uuid",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "nanoid") {
-            if (!nanoidRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "nanoid",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "cuid") {
-            if (!cuidRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "cuid",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "cuid2") {
-            if (!cuid2Regex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "cuid2",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "ulid") {
-            if (!ulidRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "ulid",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "url") {
-            try {
-              new URL(input.data);
-            } catch {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "url",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "regex") {
-            check.regex.lastIndex = 0;
-            const testResult = check.regex.test(input.data);
-            if (!testResult) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "regex",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "trim") {
-            input.data = input.data.trim();
-          } else if (check.kind === "includes") {
-            if (!input.data.includes(check.value, check.position)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                validation: { includes: check.value, position: check.position },
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "toLowerCase") {
-            input.data = input.data.toLowerCase();
-          } else if (check.kind === "toUpperCase") {
-            input.data = input.data.toUpperCase();
-          } else if (check.kind === "startsWith") {
-            if (!input.data.startsWith(check.value)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                validation: { startsWith: check.value },
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "endsWith") {
-            if (!input.data.endsWith(check.value)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                validation: { endsWith: check.value },
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "datetime") {
-            const regex = datetimeRegex(check);
-            if (!regex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                validation: "datetime",
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "date") {
-            const regex = dateRegex;
-            if (!regex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                validation: "date",
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "time") {
-            const regex = timeRegex(check);
-            if (!regex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                validation: "time",
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "duration") {
-            if (!durationRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "duration",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "ip") {
-            if (!isValidIP(input.data, check.version)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "ip",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "jwt") {
-            if (!isValidJWT(input.data, check.alg)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "jwt",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "cidr") {
-            if (!isValidCidr(input.data, check.version)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "cidr",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "base64") {
-            if (!base64Regex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "base64",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "base64url") {
-            if (!base64urlRegex.test(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                validation: "base64url",
-                code: ZodError_js_1.ZodIssueCode.invalid_string,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else {
-            util_js_1.util.assertNever(check);
-          }
-        }
-        return { status: status.value, value: input.data };
-      }
-      _regex(regex, validation, message) {
-        return this.refinement((data) => regex.test(data), {
-          validation,
-          code: ZodError_js_1.ZodIssueCode.invalid_string,
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      _addCheck(check) {
-        return new _ZodString({
-          ...this._def,
-          checks: [...this._def.checks, check]
-        });
-      }
-      email(message) {
-        return this._addCheck({ kind: "email", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      url(message) {
-        return this._addCheck({ kind: "url", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      emoji(message) {
-        return this._addCheck({ kind: "emoji", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      uuid(message) {
-        return this._addCheck({ kind: "uuid", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      nanoid(message) {
-        return this._addCheck({ kind: "nanoid", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      cuid(message) {
-        return this._addCheck({ kind: "cuid", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      cuid2(message) {
-        return this._addCheck({ kind: "cuid2", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      ulid(message) {
-        return this._addCheck({ kind: "ulid", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      base64(message) {
-        return this._addCheck({ kind: "base64", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      base64url(message) {
-        return this._addCheck({
-          kind: "base64url",
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      jwt(options) {
-        return this._addCheck({ kind: "jwt", ...errorUtil_js_1.errorUtil.errToObj(options) });
-      }
-      ip(options) {
-        return this._addCheck({ kind: "ip", ...errorUtil_js_1.errorUtil.errToObj(options) });
-      }
-      cidr(options) {
-        return this._addCheck({ kind: "cidr", ...errorUtil_js_1.errorUtil.errToObj(options) });
-      }
-      datetime(options) {
-        if (typeof options === "string") {
-          return this._addCheck({
-            kind: "datetime",
-            precision: null,
-            offset: false,
-            local: false,
-            message: options
-          });
-        }
-        return this._addCheck({
-          kind: "datetime",
-          precision: typeof options?.precision === "undefined" ? null : options?.precision,
-          offset: options?.offset ?? false,
-          local: options?.local ?? false,
-          ...errorUtil_js_1.errorUtil.errToObj(options?.message)
-        });
-      }
-      date(message) {
-        return this._addCheck({ kind: "date", message });
-      }
-      time(options) {
-        if (typeof options === "string") {
-          return this._addCheck({
-            kind: "time",
-            precision: null,
-            message: options
-          });
-        }
-        return this._addCheck({
-          kind: "time",
-          precision: typeof options?.precision === "undefined" ? null : options?.precision,
-          ...errorUtil_js_1.errorUtil.errToObj(options?.message)
-        });
-      }
-      duration(message) {
-        return this._addCheck({ kind: "duration", ...errorUtil_js_1.errorUtil.errToObj(message) });
-      }
-      regex(regex, message) {
-        return this._addCheck({
-          kind: "regex",
-          regex,
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      includes(value, options) {
-        return this._addCheck({
-          kind: "includes",
-          value,
-          position: options?.position,
-          ...errorUtil_js_1.errorUtil.errToObj(options?.message)
-        });
-      }
-      startsWith(value, message) {
-        return this._addCheck({
-          kind: "startsWith",
-          value,
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      endsWith(value, message) {
-        return this._addCheck({
-          kind: "endsWith",
-          value,
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      min(minLength, message) {
-        return this._addCheck({
-          kind: "min",
-          value: minLength,
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      max(maxLength, message) {
-        return this._addCheck({
-          kind: "max",
-          value: maxLength,
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      length(len, message) {
-        return this._addCheck({
-          kind: "length",
-          value: len,
-          ...errorUtil_js_1.errorUtil.errToObj(message)
-        });
-      }
-      /**
-       * Equivalent to `.min(1)`
-       */
-      nonempty(message) {
-        return this.min(1, errorUtil_js_1.errorUtil.errToObj(message));
-      }
-      trim() {
-        return new _ZodString({
-          ...this._def,
-          checks: [...this._def.checks, { kind: "trim" }]
-        });
-      }
-      toLowerCase() {
-        return new _ZodString({
-          ...this._def,
-          checks: [...this._def.checks, { kind: "toLowerCase" }]
-        });
-      }
-      toUpperCase() {
-        return new _ZodString({
-          ...this._def,
-          checks: [...this._def.checks, { kind: "toUpperCase" }]
-        });
-      }
-      get isDatetime() {
-        return !!this._def.checks.find((ch) => ch.kind === "datetime");
-      }
-      get isDate() {
-        return !!this._def.checks.find((ch) => ch.kind === "date");
-      }
-      get isTime() {
-        return !!this._def.checks.find((ch) => ch.kind === "time");
-      }
-      get isDuration() {
-        return !!this._def.checks.find((ch) => ch.kind === "duration");
-      }
-      get isEmail() {
-        return !!this._def.checks.find((ch) => ch.kind === "email");
-      }
-      get isURL() {
-        return !!this._def.checks.find((ch) => ch.kind === "url");
-      }
-      get isEmoji() {
-        return !!this._def.checks.find((ch) => ch.kind === "emoji");
-      }
-      get isUUID() {
-        return !!this._def.checks.find((ch) => ch.kind === "uuid");
-      }
-      get isNANOID() {
-        return !!this._def.checks.find((ch) => ch.kind === "nanoid");
-      }
-      get isCUID() {
-        return !!this._def.checks.find((ch) => ch.kind === "cuid");
-      }
-      get isCUID2() {
-        return !!this._def.checks.find((ch) => ch.kind === "cuid2");
-      }
-      get isULID() {
-        return !!this._def.checks.find((ch) => ch.kind === "ulid");
-      }
-      get isIP() {
-        return !!this._def.checks.find((ch) => ch.kind === "ip");
-      }
-      get isCIDR() {
-        return !!this._def.checks.find((ch) => ch.kind === "cidr");
-      }
-      get isBase64() {
-        return !!this._def.checks.find((ch) => ch.kind === "base64");
-      }
-      get isBase64url() {
-        return !!this._def.checks.find((ch) => ch.kind === "base64url");
-      }
-      get minLength() {
-        let min = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "min") {
-            if (min === null || ch.value > min)
-              min = ch.value;
-          }
-        }
-        return min;
-      }
-      get maxLength() {
-        let max = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "max") {
-            if (max === null || ch.value < max)
-              max = ch.value;
-          }
-        }
-        return max;
-      }
-    };
-    exports2.ZodString = ZodString;
-    ZodString.create = (params) => {
-      return new ZodString({
-        checks: [],
-        typeName: ZodFirstPartyTypeKind.ZodString,
-        coerce: params?.coerce ?? false,
-        ...processCreateParams(params)
-      });
-    };
-    function floatSafeRemainder(val, step) {
-      const valDecCount = (val.toString().split(".")[1] || "").length;
-      const stepDecCount = (step.toString().split(".")[1] || "").length;
-      const decCount = valDecCount > stepDecCount ? valDecCount : stepDecCount;
-      const valInt = Number.parseInt(val.toFixed(decCount).replace(".", ""));
-      const stepInt = Number.parseInt(step.toFixed(decCount).replace(".", ""));
-      return valInt % stepInt / 10 ** decCount;
-    }
-    var ZodNumber = class _ZodNumber extends ZodType {
-      constructor() {
-        super(...arguments);
-        this.min = this.gte;
-        this.max = this.lte;
-        this.step = this.multipleOf;
-      }
-      _parse(input) {
-        if (this._def.coerce) {
-          input.data = Number(input.data);
-        }
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.number) {
-          const ctx2 = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx2, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.number,
-            received: ctx2.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        let ctx = void 0;
-        const status = new parseUtil_js_1.ParseStatus();
-        for (const check of this._def.checks) {
-          if (check.kind === "int") {
-            if (!util_js_1.util.isInteger(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.invalid_type,
-                expected: "integer",
-                received: "float",
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "min") {
-            const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
-            if (tooSmall) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_small,
-                minimum: check.value,
-                type: "number",
-                inclusive: check.inclusive,
-                exact: false,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "max") {
-            const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
-            if (tooBig) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_big,
-                maximum: check.value,
-                type: "number",
-                inclusive: check.inclusive,
-                exact: false,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "multipleOf") {
-            if (floatSafeRemainder(input.data, check.value) !== 0) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.not_multiple_of,
-                multipleOf: check.value,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "finite") {
-            if (!Number.isFinite(input.data)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.not_finite,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else {
-            util_js_1.util.assertNever(check);
-          }
-        }
-        return { status: status.value, value: input.data };
-      }
-      gte(value, message) {
-        return this.setLimit("min", value, true, errorUtil_js_1.errorUtil.toString(message));
-      }
-      gt(value, message) {
-        return this.setLimit("min", value, false, errorUtil_js_1.errorUtil.toString(message));
-      }
-      lte(value, message) {
-        return this.setLimit("max", value, true, errorUtil_js_1.errorUtil.toString(message));
-      }
-      lt(value, message) {
-        return this.setLimit("max", value, false, errorUtil_js_1.errorUtil.toString(message));
-      }
-      setLimit(kind, value, inclusive, message) {
-        return new _ZodNumber({
-          ...this._def,
-          checks: [
-            ...this._def.checks,
-            {
-              kind,
-              value,
-              inclusive,
-              message: errorUtil_js_1.errorUtil.toString(message)
-            }
-          ]
-        });
-      }
-      _addCheck(check) {
-        return new _ZodNumber({
-          ...this._def,
-          checks: [...this._def.checks, check]
-        });
-      }
-      int(message) {
-        return this._addCheck({
-          kind: "int",
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      positive(message) {
-        return this._addCheck({
-          kind: "min",
-          value: 0,
-          inclusive: false,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      negative(message) {
-        return this._addCheck({
-          kind: "max",
-          value: 0,
-          inclusive: false,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      nonpositive(message) {
-        return this._addCheck({
-          kind: "max",
-          value: 0,
-          inclusive: true,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      nonnegative(message) {
-        return this._addCheck({
-          kind: "min",
-          value: 0,
-          inclusive: true,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      multipleOf(value, message) {
-        return this._addCheck({
-          kind: "multipleOf",
-          value,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      finite(message) {
-        return this._addCheck({
-          kind: "finite",
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      safe(message) {
-        return this._addCheck({
-          kind: "min",
-          inclusive: true,
-          value: Number.MIN_SAFE_INTEGER,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        })._addCheck({
-          kind: "max",
-          inclusive: true,
-          value: Number.MAX_SAFE_INTEGER,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      get minValue() {
-        let min = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "min") {
-            if (min === null || ch.value > min)
-              min = ch.value;
-          }
-        }
-        return min;
-      }
-      get maxValue() {
-        let max = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "max") {
-            if (max === null || ch.value < max)
-              max = ch.value;
-          }
-        }
-        return max;
-      }
-      get isInt() {
-        return !!this._def.checks.find((ch) => ch.kind === "int" || ch.kind === "multipleOf" && util_js_1.util.isInteger(ch.value));
-      }
-      get isFinite() {
-        let max = null;
-        let min = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "finite" || ch.kind === "int" || ch.kind === "multipleOf") {
-            return true;
-          } else if (ch.kind === "min") {
-            if (min === null || ch.value > min)
-              min = ch.value;
-          } else if (ch.kind === "max") {
-            if (max === null || ch.value < max)
-              max = ch.value;
-          }
-        }
-        return Number.isFinite(min) && Number.isFinite(max);
-      }
-    };
-    exports2.ZodNumber = ZodNumber;
-    ZodNumber.create = (params) => {
-      return new ZodNumber({
-        checks: [],
-        typeName: ZodFirstPartyTypeKind.ZodNumber,
-        coerce: params?.coerce || false,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodBigInt = class _ZodBigInt extends ZodType {
-      constructor() {
-        super(...arguments);
-        this.min = this.gte;
-        this.max = this.lte;
-      }
-      _parse(input) {
-        if (this._def.coerce) {
-          try {
-            input.data = BigInt(input.data);
-          } catch {
-            return this._getInvalidInput(input);
-          }
-        }
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.bigint) {
-          return this._getInvalidInput(input);
-        }
-        let ctx = void 0;
-        const status = new parseUtil_js_1.ParseStatus();
-        for (const check of this._def.checks) {
-          if (check.kind === "min") {
-            const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
-            if (tooSmall) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_small,
-                type: "bigint",
-                minimum: check.value,
-                inclusive: check.inclusive,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "max") {
-            const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
-            if (tooBig) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_big,
-                type: "bigint",
-                maximum: check.value,
-                inclusive: check.inclusive,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "multipleOf") {
-            if (input.data % check.value !== BigInt(0)) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.not_multiple_of,
-                multipleOf: check.value,
-                message: check.message
-              });
-              status.dirty();
-            }
-          } else {
-            util_js_1.util.assertNever(check);
-          }
-        }
-        return { status: status.value, value: input.data };
-      }
-      _getInvalidInput(input) {
-        const ctx = this._getOrReturnCtx(input);
-        (0, parseUtil_js_1.addIssueToContext)(ctx, {
-          code: ZodError_js_1.ZodIssueCode.invalid_type,
-          expected: util_js_1.ZodParsedType.bigint,
-          received: ctx.parsedType
-        });
-        return parseUtil_js_1.INVALID;
-      }
-      gte(value, message) {
-        return this.setLimit("min", value, true, errorUtil_js_1.errorUtil.toString(message));
-      }
-      gt(value, message) {
-        return this.setLimit("min", value, false, errorUtil_js_1.errorUtil.toString(message));
-      }
-      lte(value, message) {
-        return this.setLimit("max", value, true, errorUtil_js_1.errorUtil.toString(message));
-      }
-      lt(value, message) {
-        return this.setLimit("max", value, false, errorUtil_js_1.errorUtil.toString(message));
-      }
-      setLimit(kind, value, inclusive, message) {
-        return new _ZodBigInt({
-          ...this._def,
-          checks: [
-            ...this._def.checks,
-            {
-              kind,
-              value,
-              inclusive,
-              message: errorUtil_js_1.errorUtil.toString(message)
-            }
-          ]
-        });
-      }
-      _addCheck(check) {
-        return new _ZodBigInt({
-          ...this._def,
-          checks: [...this._def.checks, check]
-        });
-      }
-      positive(message) {
-        return this._addCheck({
-          kind: "min",
-          value: BigInt(0),
-          inclusive: false,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      negative(message) {
-        return this._addCheck({
-          kind: "max",
-          value: BigInt(0),
-          inclusive: false,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      nonpositive(message) {
-        return this._addCheck({
-          kind: "max",
-          value: BigInt(0),
-          inclusive: true,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      nonnegative(message) {
-        return this._addCheck({
-          kind: "min",
-          value: BigInt(0),
-          inclusive: true,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      multipleOf(value, message) {
-        return this._addCheck({
-          kind: "multipleOf",
-          value,
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      get minValue() {
-        let min = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "min") {
-            if (min === null || ch.value > min)
-              min = ch.value;
-          }
-        }
-        return min;
-      }
-      get maxValue() {
-        let max = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "max") {
-            if (max === null || ch.value < max)
-              max = ch.value;
-          }
-        }
-        return max;
-      }
-    };
-    exports2.ZodBigInt = ZodBigInt;
-    ZodBigInt.create = (params) => {
-      return new ZodBigInt({
-        checks: [],
-        typeName: ZodFirstPartyTypeKind.ZodBigInt,
-        coerce: params?.coerce ?? false,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodBoolean = class extends ZodType {
-      _parse(input) {
-        if (this._def.coerce) {
-          input.data = Boolean(input.data);
-        }
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.boolean) {
-          const ctx = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.boolean,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-    };
-    exports2.ZodBoolean = ZodBoolean;
-    ZodBoolean.create = (params) => {
-      return new ZodBoolean({
-        typeName: ZodFirstPartyTypeKind.ZodBoolean,
-        coerce: params?.coerce || false,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodDate = class _ZodDate extends ZodType {
-      _parse(input) {
-        if (this._def.coerce) {
-          input.data = new Date(input.data);
-        }
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.date) {
-          const ctx2 = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx2, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.date,
-            received: ctx2.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        if (Number.isNaN(input.data.getTime())) {
-          const ctx2 = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx2, {
-            code: ZodError_js_1.ZodIssueCode.invalid_date
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const status = new parseUtil_js_1.ParseStatus();
-        let ctx = void 0;
-        for (const check of this._def.checks) {
-          if (check.kind === "min") {
-            if (input.data.getTime() < check.value) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_small,
-                message: check.message,
-                inclusive: true,
-                exact: false,
-                minimum: check.value,
-                type: "date"
-              });
-              status.dirty();
-            }
-          } else if (check.kind === "max") {
-            if (input.data.getTime() > check.value) {
-              ctx = this._getOrReturnCtx(input, ctx);
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.too_big,
-                message: check.message,
-                inclusive: true,
-                exact: false,
-                maximum: check.value,
-                type: "date"
-              });
-              status.dirty();
-            }
-          } else {
-            util_js_1.util.assertNever(check);
-          }
-        }
-        return {
-          status: status.value,
-          value: new Date(input.data.getTime())
-        };
-      }
-      _addCheck(check) {
-        return new _ZodDate({
-          ...this._def,
-          checks: [...this._def.checks, check]
-        });
-      }
-      min(minDate, message) {
-        return this._addCheck({
-          kind: "min",
-          value: minDate.getTime(),
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      max(maxDate, message) {
-        return this._addCheck({
-          kind: "max",
-          value: maxDate.getTime(),
-          message: errorUtil_js_1.errorUtil.toString(message)
-        });
-      }
-      get minDate() {
-        let min = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "min") {
-            if (min === null || ch.value > min)
-              min = ch.value;
-          }
-        }
-        return min != null ? new Date(min) : null;
-      }
-      get maxDate() {
-        let max = null;
-        for (const ch of this._def.checks) {
-          if (ch.kind === "max") {
-            if (max === null || ch.value < max)
-              max = ch.value;
-          }
-        }
-        return max != null ? new Date(max) : null;
-      }
-    };
-    exports2.ZodDate = ZodDate;
-    ZodDate.create = (params) => {
-      return new ZodDate({
-        checks: [],
-        coerce: params?.coerce || false,
-        typeName: ZodFirstPartyTypeKind.ZodDate,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodSymbol = class extends ZodType {
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.symbol) {
-          const ctx = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.symbol,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-    };
-    exports2.ZodSymbol = ZodSymbol;
-    ZodSymbol.create = (params) => {
-      return new ZodSymbol({
-        typeName: ZodFirstPartyTypeKind.ZodSymbol,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodUndefined = class extends ZodType {
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.undefined) {
-          const ctx = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.undefined,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-    };
-    exports2.ZodUndefined = ZodUndefined;
-    ZodUndefined.create = (params) => {
-      return new ZodUndefined({
-        typeName: ZodFirstPartyTypeKind.ZodUndefined,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodNull = class extends ZodType {
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.null) {
-          const ctx = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.null,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-    };
-    exports2.ZodNull = ZodNull;
-    ZodNull.create = (params) => {
-      return new ZodNull({
-        typeName: ZodFirstPartyTypeKind.ZodNull,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodAny = class extends ZodType {
-      constructor() {
-        super(...arguments);
-        this._any = true;
-      }
-      _parse(input) {
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-    };
-    exports2.ZodAny = ZodAny;
-    ZodAny.create = (params) => {
-      return new ZodAny({
-        typeName: ZodFirstPartyTypeKind.ZodAny,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodUnknown = class extends ZodType {
-      constructor() {
-        super(...arguments);
-        this._unknown = true;
-      }
-      _parse(input) {
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-    };
-    exports2.ZodUnknown = ZodUnknown;
-    ZodUnknown.create = (params) => {
-      return new ZodUnknown({
-        typeName: ZodFirstPartyTypeKind.ZodUnknown,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodNever = class extends ZodType {
-      _parse(input) {
-        const ctx = this._getOrReturnCtx(input);
-        (0, parseUtil_js_1.addIssueToContext)(ctx, {
-          code: ZodError_js_1.ZodIssueCode.invalid_type,
-          expected: util_js_1.ZodParsedType.never,
-          received: ctx.parsedType
-        });
-        return parseUtil_js_1.INVALID;
-      }
-    };
-    exports2.ZodNever = ZodNever;
-    ZodNever.create = (params) => {
-      return new ZodNever({
-        typeName: ZodFirstPartyTypeKind.ZodNever,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodVoid = class extends ZodType {
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.undefined) {
-          const ctx = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.void,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-    };
-    exports2.ZodVoid = ZodVoid;
-    ZodVoid.create = (params) => {
-      return new ZodVoid({
-        typeName: ZodFirstPartyTypeKind.ZodVoid,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodArray = class _ZodArray extends ZodType {
-      _parse(input) {
-        const { ctx, status } = this._processInputParams(input);
-        const def = this._def;
-        if (ctx.parsedType !== util_js_1.ZodParsedType.array) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.array,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        if (def.exactLength !== null) {
-          const tooBig = ctx.data.length > def.exactLength.value;
-          const tooSmall = ctx.data.length < def.exactLength.value;
-          if (tooBig || tooSmall) {
-            (0, parseUtil_js_1.addIssueToContext)(ctx, {
-              code: tooBig ? ZodError_js_1.ZodIssueCode.too_big : ZodError_js_1.ZodIssueCode.too_small,
-              minimum: tooSmall ? def.exactLength.value : void 0,
-              maximum: tooBig ? def.exactLength.value : void 0,
-              type: "array",
-              inclusive: true,
-              exact: true,
-              message: def.exactLength.message
-            });
-            status.dirty();
-          }
-        }
-        if (def.minLength !== null) {
-          if (ctx.data.length < def.minLength.value) {
-            (0, parseUtil_js_1.addIssueToContext)(ctx, {
-              code: ZodError_js_1.ZodIssueCode.too_small,
-              minimum: def.minLength.value,
-              type: "array",
-              inclusive: true,
-              exact: false,
-              message: def.minLength.message
-            });
-            status.dirty();
-          }
-        }
-        if (def.maxLength !== null) {
-          if (ctx.data.length > def.maxLength.value) {
-            (0, parseUtil_js_1.addIssueToContext)(ctx, {
-              code: ZodError_js_1.ZodIssueCode.too_big,
-              maximum: def.maxLength.value,
-              type: "array",
-              inclusive: true,
-              exact: false,
-              message: def.maxLength.message
-            });
-            status.dirty();
-          }
-        }
-        if (ctx.common.async) {
-          return Promise.all([...ctx.data].map((item, i) => {
-            return def.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i));
-          })).then((result2) => {
-            return parseUtil_js_1.ParseStatus.mergeArray(status, result2);
-          });
-        }
-        const result = [...ctx.data].map((item, i) => {
-          return def.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i));
-        });
-        return parseUtil_js_1.ParseStatus.mergeArray(status, result);
-      }
-      get element() {
-        return this._def.type;
-      }
-      min(minLength, message) {
-        return new _ZodArray({
-          ...this._def,
-          minLength: { value: minLength, message: errorUtil_js_1.errorUtil.toString(message) }
-        });
-      }
-      max(maxLength, message) {
-        return new _ZodArray({
-          ...this._def,
-          maxLength: { value: maxLength, message: errorUtil_js_1.errorUtil.toString(message) }
-        });
-      }
-      length(len, message) {
-        return new _ZodArray({
-          ...this._def,
-          exactLength: { value: len, message: errorUtil_js_1.errorUtil.toString(message) }
-        });
-      }
-      nonempty(message) {
-        return this.min(1, message);
-      }
-    };
-    exports2.ZodArray = ZodArray;
-    ZodArray.create = (schema, params) => {
-      return new ZodArray({
-        type: schema,
-        minLength: null,
-        maxLength: null,
-        exactLength: null,
-        typeName: ZodFirstPartyTypeKind.ZodArray,
-        ...processCreateParams(params)
-      });
-    };
-    function deepPartialify(schema) {
-      if (schema instanceof ZodObject) {
-        const newShape = {};
-        for (const key in schema.shape) {
-          const fieldSchema = schema.shape[key];
-          newShape[key] = ZodOptional.create(deepPartialify(fieldSchema));
-        }
-        return new ZodObject({
-          ...schema._def,
-          shape: () => newShape
-        });
-      } else if (schema instanceof ZodArray) {
-        return new ZodArray({
-          ...schema._def,
-          type: deepPartialify(schema.element)
-        });
-      } else if (schema instanceof ZodOptional) {
-        return ZodOptional.create(deepPartialify(schema.unwrap()));
-      } else if (schema instanceof ZodNullable) {
-        return ZodNullable.create(deepPartialify(schema.unwrap()));
-      } else if (schema instanceof ZodTuple) {
-        return ZodTuple.create(schema.items.map((item) => deepPartialify(item)));
-      } else {
-        return schema;
-      }
-    }
-    var ZodObject = class _ZodObject extends ZodType {
-      constructor() {
-        super(...arguments);
-        this._cached = null;
-        this.nonstrict = this.passthrough;
-        this.augment = this.extend;
-      }
-      _getCached() {
-        if (this._cached !== null)
-          return this._cached;
-        const shape = this._def.shape();
-        const keys = util_js_1.util.objectKeys(shape);
-        this._cached = { shape, keys };
-        return this._cached;
-      }
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.object) {
-          const ctx2 = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx2, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.object,
-            received: ctx2.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const { status, ctx } = this._processInputParams(input);
-        const { shape, keys: shapeKeys } = this._getCached();
-        const extraKeys = [];
-        if (!(this._def.catchall instanceof ZodNever && this._def.unknownKeys === "strip")) {
-          for (const key in ctx.data) {
-            if (!shapeKeys.includes(key)) {
-              extraKeys.push(key);
-            }
-          }
-        }
-        const pairs = [];
-        for (const key of shapeKeys) {
-          const keyValidator = shape[key];
-          const value = ctx.data[key];
-          pairs.push({
-            key: { status: "valid", value: key },
-            value: keyValidator._parse(new ParseInputLazyPath(ctx, value, ctx.path, key)),
-            alwaysSet: key in ctx.data
-          });
-        }
-        if (this._def.catchall instanceof ZodNever) {
-          const unknownKeys = this._def.unknownKeys;
-          if (unknownKeys === "passthrough") {
-            for (const key of extraKeys) {
-              pairs.push({
-                key: { status: "valid", value: key },
-                value: { status: "valid", value: ctx.data[key] }
-              });
-            }
-          } else if (unknownKeys === "strict") {
-            if (extraKeys.length > 0) {
-              (0, parseUtil_js_1.addIssueToContext)(ctx, {
-                code: ZodError_js_1.ZodIssueCode.unrecognized_keys,
-                keys: extraKeys
-              });
-              status.dirty();
-            }
-          } else if (unknownKeys === "strip") {
-          } else {
-            throw new Error(`Internal ZodObject error: invalid unknownKeys value.`);
-          }
-        } else {
-          const catchall = this._def.catchall;
-          for (const key of extraKeys) {
-            const value = ctx.data[key];
-            pairs.push({
-              key: { status: "valid", value: key },
-              value: catchall._parse(
-                new ParseInputLazyPath(ctx, value, ctx.path, key)
-                //, ctx.child(key), value, getParsedType(value)
-              ),
-              alwaysSet: key in ctx.data
-            });
-          }
-        }
-        if (ctx.common.async) {
-          return Promise.resolve().then(async () => {
-            const syncPairs = [];
-            for (const pair of pairs) {
-              const key = await pair.key;
-              const value = await pair.value;
-              syncPairs.push({
-                key,
-                value,
-                alwaysSet: pair.alwaysSet
-              });
-            }
-            return syncPairs;
-          }).then((syncPairs) => {
-            return parseUtil_js_1.ParseStatus.mergeObjectSync(status, syncPairs);
-          });
-        } else {
-          return parseUtil_js_1.ParseStatus.mergeObjectSync(status, pairs);
-        }
-      }
-      get shape() {
-        return this._def.shape();
-      }
-      strict(message) {
-        errorUtil_js_1.errorUtil.errToObj;
-        return new _ZodObject({
-          ...this._def,
-          unknownKeys: "strict",
-          ...message !== void 0 ? {
-            errorMap: (issue, ctx) => {
-              const defaultError = this._def.errorMap?.(issue, ctx).message ?? ctx.defaultError;
-              if (issue.code === "unrecognized_keys")
-                return {
-                  message: errorUtil_js_1.errorUtil.errToObj(message).message ?? defaultError
-                };
-              return {
-                message: defaultError
-              };
-            }
-          } : {}
-        });
-      }
-      strip() {
-        return new _ZodObject({
-          ...this._def,
-          unknownKeys: "strip"
-        });
-      }
-      passthrough() {
-        return new _ZodObject({
-          ...this._def,
-          unknownKeys: "passthrough"
-        });
-      }
-      // const AugmentFactory =
-      //   <Def extends ZodObjectDef>(def: Def) =>
-      //   <Augmentation extends ZodRawShape>(
-      //     augmentation: Augmentation
-      //   ): ZodObject<
-      //     extendShape<ReturnType<Def["shape"]>, Augmentation>,
-      //     Def["unknownKeys"],
-      //     Def["catchall"]
-      //   > => {
-      //     return new ZodObject({
-      //       ...def,
-      //       shape: () => ({
-      //         ...def.shape(),
-      //         ...augmentation,
-      //       }),
-      //     }) as any;
-      //   };
-      extend(augmentation) {
-        return new _ZodObject({
-          ...this._def,
-          shape: () => ({
-            ...this._def.shape(),
-            ...augmentation
-          })
-        });
-      }
-      /**
-       * Prior to zod@1.0.12 there was a bug in the
-       * inferred type of merged objects. Please
-       * upgrade if you are experiencing issues.
-       */
-      merge(merging) {
-        const merged = new _ZodObject({
-          unknownKeys: merging._def.unknownKeys,
-          catchall: merging._def.catchall,
-          shape: () => ({
-            ...this._def.shape(),
-            ...merging._def.shape()
-          }),
-          typeName: ZodFirstPartyTypeKind.ZodObject
-        });
-        return merged;
-      }
-      // merge<
-      //   Incoming extends AnyZodObject,
-      //   Augmentation extends Incoming["shape"],
-      //   NewOutput extends {
-      //     [k in keyof Augmentation | keyof Output]: k extends keyof Augmentation
-      //       ? Augmentation[k]["_output"]
-      //       : k extends keyof Output
-      //       ? Output[k]
-      //       : never;
-      //   },
-      //   NewInput extends {
-      //     [k in keyof Augmentation | keyof Input]: k extends keyof Augmentation
-      //       ? Augmentation[k]["_input"]
-      //       : k extends keyof Input
-      //       ? Input[k]
-      //       : never;
-      //   }
-      // >(
-      //   merging: Incoming
-      // ): ZodObject<
-      //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
-      //   Incoming["_def"]["unknownKeys"],
-      //   Incoming["_def"]["catchall"],
-      //   NewOutput,
-      //   NewInput
-      // > {
-      //   const merged: any = new ZodObject({
-      //     unknownKeys: merging._def.unknownKeys,
-      //     catchall: merging._def.catchall,
-      //     shape: () =>
-      //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
-      //     typeName: ZodFirstPartyTypeKind.ZodObject,
-      //   }) as any;
-      //   return merged;
-      // }
-      setKey(key, schema) {
-        return this.augment({ [key]: schema });
-      }
-      // merge<Incoming extends AnyZodObject>(
-      //   merging: Incoming
-      // ): //ZodObject<T & Incoming["_shape"], UnknownKeys, Catchall> = (merging) => {
-      // ZodObject<
-      //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
-      //   Incoming["_def"]["unknownKeys"],
-      //   Incoming["_def"]["catchall"]
-      // > {
-      //   // const mergedShape = objectUtil.mergeShapes(
-      //   //   this._def.shape(),
-      //   //   merging._def.shape()
-      //   // );
-      //   const merged: any = new ZodObject({
-      //     unknownKeys: merging._def.unknownKeys,
-      //     catchall: merging._def.catchall,
-      //     shape: () =>
-      //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
-      //     typeName: ZodFirstPartyTypeKind.ZodObject,
-      //   }) as any;
-      //   return merged;
-      // }
-      catchall(index) {
-        return new _ZodObject({
-          ...this._def,
-          catchall: index
-        });
-      }
-      pick(mask) {
-        const shape = {};
-        for (const key of util_js_1.util.objectKeys(mask)) {
-          if (mask[key] && this.shape[key]) {
-            shape[key] = this.shape[key];
-          }
-        }
-        return new _ZodObject({
-          ...this._def,
-          shape: () => shape
-        });
-      }
-      omit(mask) {
-        const shape = {};
-        for (const key of util_js_1.util.objectKeys(this.shape)) {
-          if (!mask[key]) {
-            shape[key] = this.shape[key];
-          }
-        }
-        return new _ZodObject({
-          ...this._def,
-          shape: () => shape
-        });
-      }
-      /**
-       * @deprecated
-       */
-      deepPartial() {
-        return deepPartialify(this);
-      }
-      partial(mask) {
-        const newShape = {};
-        for (const key of util_js_1.util.objectKeys(this.shape)) {
-          const fieldSchema = this.shape[key];
-          if (mask && !mask[key]) {
-            newShape[key] = fieldSchema;
-          } else {
-            newShape[key] = fieldSchema.optional();
-          }
-        }
-        return new _ZodObject({
-          ...this._def,
-          shape: () => newShape
-        });
-      }
-      required(mask) {
-        const newShape = {};
-        for (const key of util_js_1.util.objectKeys(this.shape)) {
-          if (mask && !mask[key]) {
-            newShape[key] = this.shape[key];
-          } else {
-            const fieldSchema = this.shape[key];
-            let newField = fieldSchema;
-            while (newField instanceof ZodOptional) {
-              newField = newField._def.innerType;
-            }
-            newShape[key] = newField;
-          }
-        }
-        return new _ZodObject({
-          ...this._def,
-          shape: () => newShape
-        });
-      }
-      keyof() {
-        return createZodEnum(util_js_1.util.objectKeys(this.shape));
-      }
-    };
-    exports2.ZodObject = ZodObject;
-    ZodObject.create = (shape, params) => {
-      return new ZodObject({
-        shape: () => shape,
-        unknownKeys: "strip",
-        catchall: ZodNever.create(),
-        typeName: ZodFirstPartyTypeKind.ZodObject,
-        ...processCreateParams(params)
-      });
-    };
-    ZodObject.strictCreate = (shape, params) => {
-      return new ZodObject({
-        shape: () => shape,
-        unknownKeys: "strict",
-        catchall: ZodNever.create(),
-        typeName: ZodFirstPartyTypeKind.ZodObject,
-        ...processCreateParams(params)
-      });
-    };
-    ZodObject.lazycreate = (shape, params) => {
-      return new ZodObject({
-        shape,
-        unknownKeys: "strip",
-        catchall: ZodNever.create(),
-        typeName: ZodFirstPartyTypeKind.ZodObject,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodUnion = class extends ZodType {
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        const options = this._def.options;
-        function handleResults(results) {
-          for (const result of results) {
-            if (result.result.status === "valid") {
-              return result.result;
-            }
-          }
-          for (const result of results) {
-            if (result.result.status === "dirty") {
-              ctx.common.issues.push(...result.ctx.common.issues);
-              return result.result;
-            }
-          }
-          const unionErrors = results.map((result) => new ZodError_js_1.ZodError(result.ctx.common.issues));
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_union,
-            unionErrors
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        if (ctx.common.async) {
-          return Promise.all(options.map(async (option) => {
-            const childCtx = {
-              ...ctx,
-              common: {
-                ...ctx.common,
-                issues: []
-              },
-              parent: null
-            };
-            return {
-              result: await option._parseAsync({
-                data: ctx.data,
-                path: ctx.path,
-                parent: childCtx
-              }),
-              ctx: childCtx
-            };
-          })).then(handleResults);
-        } else {
-          let dirty = void 0;
-          const issues = [];
-          for (const option of options) {
-            const childCtx = {
-              ...ctx,
-              common: {
-                ...ctx.common,
-                issues: []
-              },
-              parent: null
-            };
-            const result = option._parseSync({
-              data: ctx.data,
-              path: ctx.path,
-              parent: childCtx
-            });
-            if (result.status === "valid") {
-              return result;
-            } else if (result.status === "dirty" && !dirty) {
-              dirty = { result, ctx: childCtx };
-            }
-            if (childCtx.common.issues.length) {
-              issues.push(childCtx.common.issues);
-            }
-          }
-          if (dirty) {
-            ctx.common.issues.push(...dirty.ctx.common.issues);
-            return dirty.result;
-          }
-          const unionErrors = issues.map((issues2) => new ZodError_js_1.ZodError(issues2));
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_union,
-            unionErrors
-          });
-          return parseUtil_js_1.INVALID;
-        }
-      }
-      get options() {
-        return this._def.options;
-      }
-    };
-    exports2.ZodUnion = ZodUnion;
-    ZodUnion.create = (types, params) => {
-      return new ZodUnion({
-        options: types,
-        typeName: ZodFirstPartyTypeKind.ZodUnion,
-        ...processCreateParams(params)
-      });
-    };
-    var getDiscriminator = (type) => {
-      if (type instanceof ZodLazy) {
-        return getDiscriminator(type.schema);
-      } else if (type instanceof ZodEffects) {
-        return getDiscriminator(type.innerType());
-      } else if (type instanceof ZodLiteral) {
-        return [type.value];
-      } else if (type instanceof ZodEnum) {
-        return type.options;
-      } else if (type instanceof ZodNativeEnum) {
-        return util_js_1.util.objectValues(type.enum);
-      } else if (type instanceof ZodDefault) {
-        return getDiscriminator(type._def.innerType);
-      } else if (type instanceof ZodUndefined) {
-        return [void 0];
-      } else if (type instanceof ZodNull) {
-        return [null];
-      } else if (type instanceof ZodOptional) {
-        return [void 0, ...getDiscriminator(type.unwrap())];
-      } else if (type instanceof ZodNullable) {
-        return [null, ...getDiscriminator(type.unwrap())];
-      } else if (type instanceof ZodBranded) {
-        return getDiscriminator(type.unwrap());
-      } else if (type instanceof ZodReadonly) {
-        return getDiscriminator(type.unwrap());
-      } else if (type instanceof ZodCatch) {
-        return getDiscriminator(type._def.innerType);
-      } else {
-        return [];
-      }
-    };
-    var ZodDiscriminatedUnion = class _ZodDiscriminatedUnion extends ZodType {
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.object) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.object,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const discriminator = this.discriminator;
-        const discriminatorValue = ctx.data[discriminator];
-        const option = this.optionsMap.get(discriminatorValue);
-        if (!option) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_union_discriminator,
-            options: Array.from(this.optionsMap.keys()),
-            path: [discriminator]
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        if (ctx.common.async) {
-          return option._parseAsync({
-            data: ctx.data,
-            path: ctx.path,
-            parent: ctx
-          });
-        } else {
-          return option._parseSync({
-            data: ctx.data,
-            path: ctx.path,
-            parent: ctx
-          });
-        }
-      }
-      get discriminator() {
-        return this._def.discriminator;
-      }
-      get options() {
-        return this._def.options;
-      }
-      get optionsMap() {
-        return this._def.optionsMap;
-      }
-      /**
-       * The constructor of the discriminated union schema. Its behaviour is very similar to that of the normal z.union() constructor.
-       * However, it only allows a union of objects, all of which need to share a discriminator property. This property must
-       * have a different value for each object in the union.
-       * @param discriminator the name of the discriminator property
-       * @param types an array of object schemas
-       * @param params
-       */
-      static create(discriminator, options, params) {
-        const optionsMap = /* @__PURE__ */ new Map();
-        for (const type of options) {
-          const discriminatorValues = getDiscriminator(type.shape[discriminator]);
-          if (!discriminatorValues.length) {
-            throw new Error(`A discriminator value for key \`${discriminator}\` could not be extracted from all schema options`);
-          }
-          for (const value of discriminatorValues) {
-            if (optionsMap.has(value)) {
-              throw new Error(`Discriminator property ${String(discriminator)} has duplicate value ${String(value)}`);
-            }
-            optionsMap.set(value, type);
-          }
-        }
-        return new _ZodDiscriminatedUnion({
-          typeName: ZodFirstPartyTypeKind.ZodDiscriminatedUnion,
-          discriminator,
-          options,
-          optionsMap,
-          ...processCreateParams(params)
-        });
-      }
-    };
-    exports2.ZodDiscriminatedUnion = ZodDiscriminatedUnion;
-    function mergeValues(a, b) {
-      const aType = (0, util_js_1.getParsedType)(a);
-      const bType = (0, util_js_1.getParsedType)(b);
-      if (a === b) {
-        return { valid: true, data: a };
-      } else if (aType === util_js_1.ZodParsedType.object && bType === util_js_1.ZodParsedType.object) {
-        const bKeys = util_js_1.util.objectKeys(b);
-        const sharedKeys = util_js_1.util.objectKeys(a).filter((key) => bKeys.indexOf(key) !== -1);
-        const newObj = { ...a, ...b };
-        for (const key of sharedKeys) {
-          const sharedValue = mergeValues(a[key], b[key]);
-          if (!sharedValue.valid) {
-            return { valid: false };
-          }
-          newObj[key] = sharedValue.data;
-        }
-        return { valid: true, data: newObj };
-      } else if (aType === util_js_1.ZodParsedType.array && bType === util_js_1.ZodParsedType.array) {
-        if (a.length !== b.length) {
-          return { valid: false };
-        }
-        const newArray = [];
-        for (let index = 0; index < a.length; index++) {
-          const itemA = a[index];
-          const itemB = b[index];
-          const sharedValue = mergeValues(itemA, itemB);
-          if (!sharedValue.valid) {
-            return { valid: false };
-          }
-          newArray.push(sharedValue.data);
-        }
-        return { valid: true, data: newArray };
-      } else if (aType === util_js_1.ZodParsedType.date && bType === util_js_1.ZodParsedType.date && +a === +b) {
-        return { valid: true, data: a };
-      } else {
-        return { valid: false };
-      }
-    }
-    var ZodIntersection = class extends ZodType {
-      _parse(input) {
-        const { status, ctx } = this._processInputParams(input);
-        const handleParsed = (parsedLeft, parsedRight) => {
-          if ((0, parseUtil_js_1.isAborted)(parsedLeft) || (0, parseUtil_js_1.isAborted)(parsedRight)) {
-            return parseUtil_js_1.INVALID;
-          }
-          const merged = mergeValues(parsedLeft.value, parsedRight.value);
-          if (!merged.valid) {
-            (0, parseUtil_js_1.addIssueToContext)(ctx, {
-              code: ZodError_js_1.ZodIssueCode.invalid_intersection_types
-            });
-            return parseUtil_js_1.INVALID;
-          }
-          if ((0, parseUtil_js_1.isDirty)(parsedLeft) || (0, parseUtil_js_1.isDirty)(parsedRight)) {
-            status.dirty();
-          }
-          return { status: status.value, value: merged.data };
-        };
-        if (ctx.common.async) {
-          return Promise.all([
-            this._def.left._parseAsync({
-              data: ctx.data,
-              path: ctx.path,
-              parent: ctx
-            }),
-            this._def.right._parseAsync({
-              data: ctx.data,
-              path: ctx.path,
-              parent: ctx
-            })
-          ]).then(([left, right]) => handleParsed(left, right));
-        } else {
-          return handleParsed(this._def.left._parseSync({
-            data: ctx.data,
-            path: ctx.path,
-            parent: ctx
-          }), this._def.right._parseSync({
-            data: ctx.data,
-            path: ctx.path,
-            parent: ctx
-          }));
-        }
-      }
-    };
-    exports2.ZodIntersection = ZodIntersection;
-    ZodIntersection.create = (left, right, params) => {
-      return new ZodIntersection({
-        left,
-        right,
-        typeName: ZodFirstPartyTypeKind.ZodIntersection,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodTuple = class _ZodTuple extends ZodType {
-      _parse(input) {
-        const { status, ctx } = this._processInputParams(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.array) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.array,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        if (ctx.data.length < this._def.items.length) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.too_small,
-            minimum: this._def.items.length,
-            inclusive: true,
-            exact: false,
-            type: "array"
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const rest = this._def.rest;
-        if (!rest && ctx.data.length > this._def.items.length) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.too_big,
-            maximum: this._def.items.length,
-            inclusive: true,
-            exact: false,
-            type: "array"
-          });
-          status.dirty();
-        }
-        const items = [...ctx.data].map((item, itemIndex) => {
-          const schema = this._def.items[itemIndex] || this._def.rest;
-          if (!schema)
-            return null;
-          return schema._parse(new ParseInputLazyPath(ctx, item, ctx.path, itemIndex));
-        }).filter((x) => !!x);
-        if (ctx.common.async) {
-          return Promise.all(items).then((results) => {
-            return parseUtil_js_1.ParseStatus.mergeArray(status, results);
-          });
-        } else {
-          return parseUtil_js_1.ParseStatus.mergeArray(status, items);
-        }
-      }
-      get items() {
-        return this._def.items;
-      }
-      rest(rest) {
-        return new _ZodTuple({
-          ...this._def,
-          rest
-        });
-      }
-    };
-    exports2.ZodTuple = ZodTuple;
-    ZodTuple.create = (schemas, params) => {
-      if (!Array.isArray(schemas)) {
-        throw new Error("You must pass an array of schemas to z.tuple([ ... ])");
-      }
-      return new ZodTuple({
-        items: schemas,
-        typeName: ZodFirstPartyTypeKind.ZodTuple,
-        rest: null,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodRecord = class _ZodRecord extends ZodType {
-      get keySchema() {
-        return this._def.keyType;
-      }
-      get valueSchema() {
-        return this._def.valueType;
-      }
-      _parse(input) {
-        const { status, ctx } = this._processInputParams(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.object) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.object,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const pairs = [];
-        const keyType = this._def.keyType;
-        const valueType = this._def.valueType;
-        for (const key in ctx.data) {
-          pairs.push({
-            key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, key)),
-            value: valueType._parse(new ParseInputLazyPath(ctx, ctx.data[key], ctx.path, key)),
-            alwaysSet: key in ctx.data
-          });
-        }
-        if (ctx.common.async) {
-          return parseUtil_js_1.ParseStatus.mergeObjectAsync(status, pairs);
-        } else {
-          return parseUtil_js_1.ParseStatus.mergeObjectSync(status, pairs);
-        }
-      }
-      get element() {
-        return this._def.valueType;
-      }
-      static create(first, second, third) {
-        if (second instanceof ZodType) {
-          return new _ZodRecord({
-            keyType: first,
-            valueType: second,
-            typeName: ZodFirstPartyTypeKind.ZodRecord,
-            ...processCreateParams(third)
-          });
-        }
-        return new _ZodRecord({
-          keyType: ZodString.create(),
-          valueType: first,
-          typeName: ZodFirstPartyTypeKind.ZodRecord,
-          ...processCreateParams(second)
-        });
-      }
-    };
-    exports2.ZodRecord = ZodRecord;
-    var ZodMap = class extends ZodType {
-      get keySchema() {
-        return this._def.keyType;
-      }
-      get valueSchema() {
-        return this._def.valueType;
-      }
-      _parse(input) {
-        const { status, ctx } = this._processInputParams(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.map) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.map,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const keyType = this._def.keyType;
-        const valueType = this._def.valueType;
-        const pairs = [...ctx.data.entries()].map(([key, value], index) => {
-          return {
-            key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, [index, "key"])),
-            value: valueType._parse(new ParseInputLazyPath(ctx, value, ctx.path, [index, "value"]))
-          };
-        });
-        if (ctx.common.async) {
-          const finalMap = /* @__PURE__ */ new Map();
-          return Promise.resolve().then(async () => {
-            for (const pair of pairs) {
-              const key = await pair.key;
-              const value = await pair.value;
-              if (key.status === "aborted" || value.status === "aborted") {
-                return parseUtil_js_1.INVALID;
-              }
-              if (key.status === "dirty" || value.status === "dirty") {
-                status.dirty();
-              }
-              finalMap.set(key.value, value.value);
-            }
-            return { status: status.value, value: finalMap };
-          });
-        } else {
-          const finalMap = /* @__PURE__ */ new Map();
-          for (const pair of pairs) {
-            const key = pair.key;
-            const value = pair.value;
-            if (key.status === "aborted" || value.status === "aborted") {
-              return parseUtil_js_1.INVALID;
-            }
-            if (key.status === "dirty" || value.status === "dirty") {
-              status.dirty();
-            }
-            finalMap.set(key.value, value.value);
-          }
-          return { status: status.value, value: finalMap };
-        }
-      }
-    };
-    exports2.ZodMap = ZodMap;
-    ZodMap.create = (keyType, valueType, params) => {
-      return new ZodMap({
-        valueType,
-        keyType,
-        typeName: ZodFirstPartyTypeKind.ZodMap,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodSet = class _ZodSet extends ZodType {
-      _parse(input) {
-        const { status, ctx } = this._processInputParams(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.set) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.set,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const def = this._def;
-        if (def.minSize !== null) {
-          if (ctx.data.size < def.minSize.value) {
-            (0, parseUtil_js_1.addIssueToContext)(ctx, {
-              code: ZodError_js_1.ZodIssueCode.too_small,
-              minimum: def.minSize.value,
-              type: "set",
-              inclusive: true,
-              exact: false,
-              message: def.minSize.message
-            });
-            status.dirty();
-          }
-        }
-        if (def.maxSize !== null) {
-          if (ctx.data.size > def.maxSize.value) {
-            (0, parseUtil_js_1.addIssueToContext)(ctx, {
-              code: ZodError_js_1.ZodIssueCode.too_big,
-              maximum: def.maxSize.value,
-              type: "set",
-              inclusive: true,
-              exact: false,
-              message: def.maxSize.message
-            });
-            status.dirty();
-          }
-        }
-        const valueType = this._def.valueType;
-        function finalizeSet(elements2) {
-          const parsedSet = /* @__PURE__ */ new Set();
-          for (const element of elements2) {
-            if (element.status === "aborted")
-              return parseUtil_js_1.INVALID;
-            if (element.status === "dirty")
-              status.dirty();
-            parsedSet.add(element.value);
-          }
-          return { status: status.value, value: parsedSet };
-        }
-        const elements = [...ctx.data.values()].map((item, i) => valueType._parse(new ParseInputLazyPath(ctx, item, ctx.path, i)));
-        if (ctx.common.async) {
-          return Promise.all(elements).then((elements2) => finalizeSet(elements2));
-        } else {
-          return finalizeSet(elements);
-        }
-      }
-      min(minSize, message) {
-        return new _ZodSet({
-          ...this._def,
-          minSize: { value: minSize, message: errorUtil_js_1.errorUtil.toString(message) }
-        });
-      }
-      max(maxSize, message) {
-        return new _ZodSet({
-          ...this._def,
-          maxSize: { value: maxSize, message: errorUtil_js_1.errorUtil.toString(message) }
-        });
-      }
-      size(size, message) {
-        return this.min(size, message).max(size, message);
-      }
-      nonempty(message) {
-        return this.min(1, message);
-      }
-    };
-    exports2.ZodSet = ZodSet;
-    ZodSet.create = (valueType, params) => {
-      return new ZodSet({
-        valueType,
-        minSize: null,
-        maxSize: null,
-        typeName: ZodFirstPartyTypeKind.ZodSet,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodFunction = class _ZodFunction extends ZodType {
-      constructor() {
-        super(...arguments);
-        this.validate = this.implement;
-      }
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.function) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.function,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        function makeArgsIssue(args, error) {
-          return (0, parseUtil_js_1.makeIssue)({
-            data: args,
-            path: ctx.path,
-            errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, (0, errors_js_1.getErrorMap)(), errors_js_1.defaultErrorMap].filter((x) => !!x),
-            issueData: {
-              code: ZodError_js_1.ZodIssueCode.invalid_arguments,
-              argumentsError: error
-            }
-          });
-        }
-        function makeReturnsIssue(returns, error) {
-          return (0, parseUtil_js_1.makeIssue)({
-            data: returns,
-            path: ctx.path,
-            errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, (0, errors_js_1.getErrorMap)(), errors_js_1.defaultErrorMap].filter((x) => !!x),
-            issueData: {
-              code: ZodError_js_1.ZodIssueCode.invalid_return_type,
-              returnTypeError: error
-            }
-          });
-        }
-        const params = { errorMap: ctx.common.contextualErrorMap };
-        const fn = ctx.data;
-        if (this._def.returns instanceof ZodPromise) {
-          const me = this;
-          return (0, parseUtil_js_1.OK)(async function(...args) {
-            const error = new ZodError_js_1.ZodError([]);
-            const parsedArgs = await me._def.args.parseAsync(args, params).catch((e) => {
-              error.addIssue(makeArgsIssue(args, e));
-              throw error;
-            });
-            const result = await Reflect.apply(fn, this, parsedArgs);
-            const parsedReturns = await me._def.returns._def.type.parseAsync(result, params).catch((e) => {
-              error.addIssue(makeReturnsIssue(result, e));
-              throw error;
-            });
-            return parsedReturns;
-          });
-        } else {
-          const me = this;
-          return (0, parseUtil_js_1.OK)(function(...args) {
-            const parsedArgs = me._def.args.safeParse(args, params);
-            if (!parsedArgs.success) {
-              throw new ZodError_js_1.ZodError([makeArgsIssue(args, parsedArgs.error)]);
-            }
-            const result = Reflect.apply(fn, this, parsedArgs.data);
-            const parsedReturns = me._def.returns.safeParse(result, params);
-            if (!parsedReturns.success) {
-              throw new ZodError_js_1.ZodError([makeReturnsIssue(result, parsedReturns.error)]);
-            }
-            return parsedReturns.data;
-          });
-        }
-      }
-      parameters() {
-        return this._def.args;
-      }
-      returnType() {
-        return this._def.returns;
-      }
-      args(...items) {
-        return new _ZodFunction({
-          ...this._def,
-          args: ZodTuple.create(items).rest(ZodUnknown.create())
-        });
-      }
-      returns(returnType) {
-        return new _ZodFunction({
-          ...this._def,
-          returns: returnType
-        });
-      }
-      implement(func) {
-        const validatedFunc = this.parse(func);
-        return validatedFunc;
-      }
-      strictImplement(func) {
-        const validatedFunc = this.parse(func);
-        return validatedFunc;
-      }
-      static create(args, returns, params) {
-        return new _ZodFunction({
-          args: args ? args : ZodTuple.create([]).rest(ZodUnknown.create()),
-          returns: returns || ZodUnknown.create(),
-          typeName: ZodFirstPartyTypeKind.ZodFunction,
-          ...processCreateParams(params)
-        });
-      }
-    };
-    exports2.ZodFunction = ZodFunction;
-    var ZodLazy = class extends ZodType {
-      get schema() {
-        return this._def.getter();
-      }
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        const lazySchema = this._def.getter();
-        return lazySchema._parse({ data: ctx.data, path: ctx.path, parent: ctx });
-      }
-    };
-    exports2.ZodLazy = ZodLazy;
-    ZodLazy.create = (getter, params) => {
-      return new ZodLazy({
-        getter,
-        typeName: ZodFirstPartyTypeKind.ZodLazy,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodLiteral = class extends ZodType {
-      _parse(input) {
-        if (input.data !== this._def.value) {
-          const ctx = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            received: ctx.data,
-            code: ZodError_js_1.ZodIssueCode.invalid_literal,
-            expected: this._def.value
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return { status: "valid", value: input.data };
-      }
-      get value() {
-        return this._def.value;
-      }
-    };
-    exports2.ZodLiteral = ZodLiteral;
-    ZodLiteral.create = (value, params) => {
-      return new ZodLiteral({
-        value,
-        typeName: ZodFirstPartyTypeKind.ZodLiteral,
-        ...processCreateParams(params)
-      });
-    };
-    function createZodEnum(values, params) {
-      return new ZodEnum({
-        values,
-        typeName: ZodFirstPartyTypeKind.ZodEnum,
-        ...processCreateParams(params)
-      });
-    }
-    var ZodEnum = class _ZodEnum extends ZodType {
-      _parse(input) {
-        if (typeof input.data !== "string") {
-          const ctx = this._getOrReturnCtx(input);
-          const expectedValues = this._def.values;
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            expected: util_js_1.util.joinValues(expectedValues),
-            received: ctx.parsedType,
-            code: ZodError_js_1.ZodIssueCode.invalid_type
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        if (!this._cache) {
-          this._cache = new Set(this._def.values);
-        }
-        if (!this._cache.has(input.data)) {
-          const ctx = this._getOrReturnCtx(input);
-          const expectedValues = this._def.values;
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            received: ctx.data,
-            code: ZodError_js_1.ZodIssueCode.invalid_enum_value,
-            options: expectedValues
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-      get options() {
-        return this._def.values;
-      }
-      get enum() {
-        const enumValues = {};
-        for (const val of this._def.values) {
-          enumValues[val] = val;
-        }
-        return enumValues;
-      }
-      get Values() {
-        const enumValues = {};
-        for (const val of this._def.values) {
-          enumValues[val] = val;
-        }
-        return enumValues;
-      }
-      get Enum() {
-        const enumValues = {};
-        for (const val of this._def.values) {
-          enumValues[val] = val;
-        }
-        return enumValues;
-      }
-      extract(values, newDef = this._def) {
-        return _ZodEnum.create(values, {
-          ...this._def,
-          ...newDef
-        });
-      }
-      exclude(values, newDef = this._def) {
-        return _ZodEnum.create(this.options.filter((opt) => !values.includes(opt)), {
-          ...this._def,
-          ...newDef
-        });
-      }
-    };
-    exports2.ZodEnum = ZodEnum;
-    ZodEnum.create = createZodEnum;
-    var ZodNativeEnum = class extends ZodType {
-      _parse(input) {
-        const nativeEnumValues = util_js_1.util.getValidEnumValues(this._def.values);
-        const ctx = this._getOrReturnCtx(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.string && ctx.parsedType !== util_js_1.ZodParsedType.number) {
-          const expectedValues = util_js_1.util.objectValues(nativeEnumValues);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            expected: util_js_1.util.joinValues(expectedValues),
-            received: ctx.parsedType,
-            code: ZodError_js_1.ZodIssueCode.invalid_type
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        if (!this._cache) {
-          this._cache = new Set(util_js_1.util.getValidEnumValues(this._def.values));
-        }
-        if (!this._cache.has(input.data)) {
-          const expectedValues = util_js_1.util.objectValues(nativeEnumValues);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            received: ctx.data,
-            code: ZodError_js_1.ZodIssueCode.invalid_enum_value,
-            options: expectedValues
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return (0, parseUtil_js_1.OK)(input.data);
-      }
-      get enum() {
-        return this._def.values;
-      }
-    };
-    exports2.ZodNativeEnum = ZodNativeEnum;
-    ZodNativeEnum.create = (values, params) => {
-      return new ZodNativeEnum({
-        values,
-        typeName: ZodFirstPartyTypeKind.ZodNativeEnum,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodPromise = class extends ZodType {
-      unwrap() {
-        return this._def.type;
-      }
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        if (ctx.parsedType !== util_js_1.ZodParsedType.promise && ctx.common.async === false) {
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.promise,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        const promisified = ctx.parsedType === util_js_1.ZodParsedType.promise ? ctx.data : Promise.resolve(ctx.data);
-        return (0, parseUtil_js_1.OK)(promisified.then((data) => {
-          return this._def.type.parseAsync(data, {
-            path: ctx.path,
-            errorMap: ctx.common.contextualErrorMap
-          });
-        }));
-      }
-    };
-    exports2.ZodPromise = ZodPromise;
-    ZodPromise.create = (schema, params) => {
-      return new ZodPromise({
-        type: schema,
-        typeName: ZodFirstPartyTypeKind.ZodPromise,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodEffects = class extends ZodType {
-      innerType() {
-        return this._def.schema;
-      }
-      sourceType() {
-        return this._def.schema._def.typeName === ZodFirstPartyTypeKind.ZodEffects ? this._def.schema.sourceType() : this._def.schema;
-      }
-      _parse(input) {
-        const { status, ctx } = this._processInputParams(input);
-        const effect = this._def.effect || null;
-        const checkCtx = {
-          addIssue: (arg) => {
-            (0, parseUtil_js_1.addIssueToContext)(ctx, arg);
-            if (arg.fatal) {
-              status.abort();
-            } else {
-              status.dirty();
-            }
-          },
-          get path() {
-            return ctx.path;
-          }
-        };
-        checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
-        if (effect.type === "preprocess") {
-          const processed = effect.transform(ctx.data, checkCtx);
-          if (ctx.common.async) {
-            return Promise.resolve(processed).then(async (processed2) => {
-              if (status.value === "aborted")
-                return parseUtil_js_1.INVALID;
-              const result = await this._def.schema._parseAsync({
-                data: processed2,
-                path: ctx.path,
-                parent: ctx
-              });
-              if (result.status === "aborted")
-                return parseUtil_js_1.INVALID;
-              if (result.status === "dirty")
-                return (0, parseUtil_js_1.DIRTY)(result.value);
-              if (status.value === "dirty")
-                return (0, parseUtil_js_1.DIRTY)(result.value);
-              return result;
-            });
-          } else {
-            if (status.value === "aborted")
-              return parseUtil_js_1.INVALID;
-            const result = this._def.schema._parseSync({
-              data: processed,
-              path: ctx.path,
-              parent: ctx
-            });
-            if (result.status === "aborted")
-              return parseUtil_js_1.INVALID;
-            if (result.status === "dirty")
-              return (0, parseUtil_js_1.DIRTY)(result.value);
-            if (status.value === "dirty")
-              return (0, parseUtil_js_1.DIRTY)(result.value);
-            return result;
-          }
-        }
-        if (effect.type === "refinement") {
-          const executeRefinement = (acc) => {
-            const result = effect.refinement(acc, checkCtx);
-            if (ctx.common.async) {
-              return Promise.resolve(result);
-            }
-            if (result instanceof Promise) {
-              throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
-            }
-            return acc;
-          };
-          if (ctx.common.async === false) {
-            const inner = this._def.schema._parseSync({
-              data: ctx.data,
-              path: ctx.path,
-              parent: ctx
-            });
-            if (inner.status === "aborted")
-              return parseUtil_js_1.INVALID;
-            if (inner.status === "dirty")
-              status.dirty();
-            executeRefinement(inner.value);
-            return { status: status.value, value: inner.value };
-          } else {
-            return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((inner) => {
-              if (inner.status === "aborted")
-                return parseUtil_js_1.INVALID;
-              if (inner.status === "dirty")
-                status.dirty();
-              return executeRefinement(inner.value).then(() => {
-                return { status: status.value, value: inner.value };
-              });
-            });
-          }
-        }
-        if (effect.type === "transform") {
-          if (ctx.common.async === false) {
-            const base = this._def.schema._parseSync({
-              data: ctx.data,
-              path: ctx.path,
-              parent: ctx
-            });
-            if (!(0, parseUtil_js_1.isValid)(base))
-              return parseUtil_js_1.INVALID;
-            const result = effect.transform(base.value, checkCtx);
-            if (result instanceof Promise) {
-              throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
-            }
-            return { status: status.value, value: result };
-          } else {
-            return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base) => {
-              if (!(0, parseUtil_js_1.isValid)(base))
-                return parseUtil_js_1.INVALID;
-              return Promise.resolve(effect.transform(base.value, checkCtx)).then((result) => ({
-                status: status.value,
-                value: result
-              }));
-            });
-          }
-        }
-        util_js_1.util.assertNever(effect);
-      }
-    };
-    exports2.ZodEffects = ZodEffects;
-    exports2.ZodTransformer = ZodEffects;
-    ZodEffects.create = (schema, effect, params) => {
-      return new ZodEffects({
-        schema,
-        typeName: ZodFirstPartyTypeKind.ZodEffects,
-        effect,
-        ...processCreateParams(params)
-      });
-    };
-    ZodEffects.createWithPreprocess = (preprocess, schema, params) => {
-      return new ZodEffects({
-        schema,
-        effect: { type: "preprocess", transform: preprocess },
-        typeName: ZodFirstPartyTypeKind.ZodEffects,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodOptional = class extends ZodType {
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType === util_js_1.ZodParsedType.undefined) {
-          return (0, parseUtil_js_1.OK)(void 0);
-        }
-        return this._def.innerType._parse(input);
-      }
-      unwrap() {
-        return this._def.innerType;
-      }
-    };
-    exports2.ZodOptional = ZodOptional;
-    ZodOptional.create = (type, params) => {
-      return new ZodOptional({
-        innerType: type,
-        typeName: ZodFirstPartyTypeKind.ZodOptional,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodNullable = class extends ZodType {
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType === util_js_1.ZodParsedType.null) {
-          return (0, parseUtil_js_1.OK)(null);
-        }
-        return this._def.innerType._parse(input);
-      }
-      unwrap() {
-        return this._def.innerType;
-      }
-    };
-    exports2.ZodNullable = ZodNullable;
-    ZodNullable.create = (type, params) => {
-      return new ZodNullable({
-        innerType: type,
-        typeName: ZodFirstPartyTypeKind.ZodNullable,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodDefault = class extends ZodType {
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        let data = ctx.data;
-        if (ctx.parsedType === util_js_1.ZodParsedType.undefined) {
-          data = this._def.defaultValue();
-        }
-        return this._def.innerType._parse({
-          data,
-          path: ctx.path,
-          parent: ctx
-        });
-      }
-      removeDefault() {
-        return this._def.innerType;
-      }
-    };
-    exports2.ZodDefault = ZodDefault;
-    ZodDefault.create = (type, params) => {
-      return new ZodDefault({
-        innerType: type,
-        typeName: ZodFirstPartyTypeKind.ZodDefault,
-        defaultValue: typeof params.default === "function" ? params.default : () => params.default,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodCatch = class extends ZodType {
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        const newCtx = {
-          ...ctx,
-          common: {
-            ...ctx.common,
-            issues: []
-          }
-        };
-        const result = this._def.innerType._parse({
-          data: newCtx.data,
-          path: newCtx.path,
-          parent: {
-            ...newCtx
-          }
-        });
-        if ((0, parseUtil_js_1.isAsync)(result)) {
-          return result.then((result2) => {
-            return {
-              status: "valid",
-              value: result2.status === "valid" ? result2.value : this._def.catchValue({
-                get error() {
-                  return new ZodError_js_1.ZodError(newCtx.common.issues);
-                },
-                input: newCtx.data
-              })
-            };
-          });
-        } else {
-          return {
-            status: "valid",
-            value: result.status === "valid" ? result.value : this._def.catchValue({
-              get error() {
-                return new ZodError_js_1.ZodError(newCtx.common.issues);
-              },
-              input: newCtx.data
-            })
-          };
-        }
-      }
-      removeCatch() {
-        return this._def.innerType;
-      }
-    };
-    exports2.ZodCatch = ZodCatch;
-    ZodCatch.create = (type, params) => {
-      return new ZodCatch({
-        innerType: type,
-        typeName: ZodFirstPartyTypeKind.ZodCatch,
-        catchValue: typeof params.catch === "function" ? params.catch : () => params.catch,
-        ...processCreateParams(params)
-      });
-    };
-    var ZodNaN = class extends ZodType {
-      _parse(input) {
-        const parsedType = this._getType(input);
-        if (parsedType !== util_js_1.ZodParsedType.nan) {
-          const ctx = this._getOrReturnCtx(input);
-          (0, parseUtil_js_1.addIssueToContext)(ctx, {
-            code: ZodError_js_1.ZodIssueCode.invalid_type,
-            expected: util_js_1.ZodParsedType.nan,
-            received: ctx.parsedType
-          });
-          return parseUtil_js_1.INVALID;
-        }
-        return { status: "valid", value: input.data };
-      }
-    };
-    exports2.ZodNaN = ZodNaN;
-    ZodNaN.create = (params) => {
-      return new ZodNaN({
-        typeName: ZodFirstPartyTypeKind.ZodNaN,
-        ...processCreateParams(params)
-      });
-    };
-    exports2.BRAND = /* @__PURE__ */ Symbol("zod_brand");
-    var ZodBranded = class extends ZodType {
-      _parse(input) {
-        const { ctx } = this._processInputParams(input);
-        const data = ctx.data;
-        return this._def.type._parse({
-          data,
-          path: ctx.path,
-          parent: ctx
-        });
-      }
-      unwrap() {
-        return this._def.type;
-      }
-    };
-    exports2.ZodBranded = ZodBranded;
-    var ZodPipeline = class _ZodPipeline extends ZodType {
-      _parse(input) {
-        const { status, ctx } = this._processInputParams(input);
-        if (ctx.common.async) {
-          const handleAsync = async () => {
-            const inResult = await this._def.in._parseAsync({
-              data: ctx.data,
-              path: ctx.path,
-              parent: ctx
-            });
-            if (inResult.status === "aborted")
-              return parseUtil_js_1.INVALID;
-            if (inResult.status === "dirty") {
-              status.dirty();
-              return (0, parseUtil_js_1.DIRTY)(inResult.value);
-            } else {
-              return this._def.out._parseAsync({
-                data: inResult.value,
-                path: ctx.path,
-                parent: ctx
-              });
-            }
-          };
-          return handleAsync();
-        } else {
-          const inResult = this._def.in._parseSync({
-            data: ctx.data,
-            path: ctx.path,
-            parent: ctx
-          });
-          if (inResult.status === "aborted")
-            return parseUtil_js_1.INVALID;
-          if (inResult.status === "dirty") {
-            status.dirty();
-            return {
-              status: "dirty",
-              value: inResult.value
-            };
-          } else {
-            return this._def.out._parseSync({
-              data: inResult.value,
-              path: ctx.path,
-              parent: ctx
-            });
-          }
-        }
-      }
-      static create(a, b) {
-        return new _ZodPipeline({
-          in: a,
-          out: b,
-          typeName: ZodFirstPartyTypeKind.ZodPipeline
-        });
-      }
-    };
-    exports2.ZodPipeline = ZodPipeline;
-    var ZodReadonly = class extends ZodType {
-      _parse(input) {
-        const result = this._def.innerType._parse(input);
-        const freeze = (data) => {
-          if ((0, parseUtil_js_1.isValid)(data)) {
-            data.value = Object.freeze(data.value);
-          }
-          return data;
-        };
-        return (0, parseUtil_js_1.isAsync)(result) ? result.then((data) => freeze(data)) : freeze(result);
-      }
-      unwrap() {
-        return this._def.innerType;
-      }
-    };
-    exports2.ZodReadonly = ZodReadonly;
-    ZodReadonly.create = (type, params) => {
-      return new ZodReadonly({
-        innerType: type,
-        typeName: ZodFirstPartyTypeKind.ZodReadonly,
-        ...processCreateParams(params)
-      });
-    };
-    function cleanParams(params, data) {
-      const p = typeof params === "function" ? params(data) : typeof params === "string" ? { message: params } : params;
-      const p2 = typeof p === "string" ? { message: p } : p;
-      return p2;
-    }
-    function custom(check, _params = {}, fatal) {
-      if (check)
-        return ZodAny.create().superRefine((data, ctx) => {
-          const r = check(data);
-          if (r instanceof Promise) {
-            return r.then((r2) => {
-              if (!r2) {
-                const params = cleanParams(_params, data);
-                const _fatal = params.fatal ?? fatal ?? true;
-                ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
-              }
-            });
-          }
-          if (!r) {
-            const params = cleanParams(_params, data);
-            const _fatal = params.fatal ?? fatal ?? true;
-            ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
-          }
-          return;
-        });
-      return ZodAny.create();
-    }
-    exports2.late = {
-      object: ZodObject.lazycreate
-    };
-    var ZodFirstPartyTypeKind;
-    (function(ZodFirstPartyTypeKind2) {
-      ZodFirstPartyTypeKind2["ZodString"] = "ZodString";
-      ZodFirstPartyTypeKind2["ZodNumber"] = "ZodNumber";
-      ZodFirstPartyTypeKind2["ZodNaN"] = "ZodNaN";
-      ZodFirstPartyTypeKind2["ZodBigInt"] = "ZodBigInt";
-      ZodFirstPartyTypeKind2["ZodBoolean"] = "ZodBoolean";
-      ZodFirstPartyTypeKind2["ZodDate"] = "ZodDate";
-      ZodFirstPartyTypeKind2["ZodSymbol"] = "ZodSymbol";
-      ZodFirstPartyTypeKind2["ZodUndefined"] = "ZodUndefined";
-      ZodFirstPartyTypeKind2["ZodNull"] = "ZodNull";
-      ZodFirstPartyTypeKind2["ZodAny"] = "ZodAny";
-      ZodFirstPartyTypeKind2["ZodUnknown"] = "ZodUnknown";
-      ZodFirstPartyTypeKind2["ZodNever"] = "ZodNever";
-      ZodFirstPartyTypeKind2["ZodVoid"] = "ZodVoid";
-      ZodFirstPartyTypeKind2["ZodArray"] = "ZodArray";
-      ZodFirstPartyTypeKind2["ZodObject"] = "ZodObject";
-      ZodFirstPartyTypeKind2["ZodUnion"] = "ZodUnion";
-      ZodFirstPartyTypeKind2["ZodDiscriminatedUnion"] = "ZodDiscriminatedUnion";
-      ZodFirstPartyTypeKind2["ZodIntersection"] = "ZodIntersection";
-      ZodFirstPartyTypeKind2["ZodTuple"] = "ZodTuple";
-      ZodFirstPartyTypeKind2["ZodRecord"] = "ZodRecord";
-      ZodFirstPartyTypeKind2["ZodMap"] = "ZodMap";
-      ZodFirstPartyTypeKind2["ZodSet"] = "ZodSet";
-      ZodFirstPartyTypeKind2["ZodFunction"] = "ZodFunction";
-      ZodFirstPartyTypeKind2["ZodLazy"] = "ZodLazy";
-      ZodFirstPartyTypeKind2["ZodLiteral"] = "ZodLiteral";
-      ZodFirstPartyTypeKind2["ZodEnum"] = "ZodEnum";
-      ZodFirstPartyTypeKind2["ZodEffects"] = "ZodEffects";
-      ZodFirstPartyTypeKind2["ZodNativeEnum"] = "ZodNativeEnum";
-      ZodFirstPartyTypeKind2["ZodOptional"] = "ZodOptional";
-      ZodFirstPartyTypeKind2["ZodNullable"] = "ZodNullable";
-      ZodFirstPartyTypeKind2["ZodDefault"] = "ZodDefault";
-      ZodFirstPartyTypeKind2["ZodCatch"] = "ZodCatch";
-      ZodFirstPartyTypeKind2["ZodPromise"] = "ZodPromise";
-      ZodFirstPartyTypeKind2["ZodBranded"] = "ZodBranded";
-      ZodFirstPartyTypeKind2["ZodPipeline"] = "ZodPipeline";
-      ZodFirstPartyTypeKind2["ZodReadonly"] = "ZodReadonly";
-    })(ZodFirstPartyTypeKind || (exports2.ZodFirstPartyTypeKind = ZodFirstPartyTypeKind = {}));
-    var instanceOfType = (cls, params = {
-      message: `Input not instance of ${cls.name}`
-    }) => custom((data) => data instanceof cls, params);
-    exports2.instanceof = instanceOfType;
-    var stringType = ZodString.create;
-    exports2.string = stringType;
-    var numberType = ZodNumber.create;
-    exports2.number = numberType;
-    var nanType = ZodNaN.create;
-    exports2.nan = nanType;
-    var bigIntType = ZodBigInt.create;
-    exports2.bigint = bigIntType;
-    var booleanType = ZodBoolean.create;
-    exports2.boolean = booleanType;
-    var dateType = ZodDate.create;
-    exports2.date = dateType;
-    var symbolType = ZodSymbol.create;
-    exports2.symbol = symbolType;
-    var undefinedType = ZodUndefined.create;
-    exports2.undefined = undefinedType;
-    var nullType = ZodNull.create;
-    exports2.null = nullType;
-    var anyType = ZodAny.create;
-    exports2.any = anyType;
-    var unknownType = ZodUnknown.create;
-    exports2.unknown = unknownType;
-    var neverType = ZodNever.create;
-    exports2.never = neverType;
-    var voidType = ZodVoid.create;
-    exports2.void = voidType;
-    var arrayType = ZodArray.create;
-    exports2.array = arrayType;
-    var objectType = ZodObject.create;
-    exports2.object = objectType;
-    var strictObjectType = ZodObject.strictCreate;
-    exports2.strictObject = strictObjectType;
-    var unionType = ZodUnion.create;
-    exports2.union = unionType;
-    var discriminatedUnionType = ZodDiscriminatedUnion.create;
-    exports2.discriminatedUnion = discriminatedUnionType;
-    var intersectionType = ZodIntersection.create;
-    exports2.intersection = intersectionType;
-    var tupleType = ZodTuple.create;
-    exports2.tuple = tupleType;
-    var recordType = ZodRecord.create;
-    exports2.record = recordType;
-    var mapType = ZodMap.create;
-    exports2.map = mapType;
-    var setType = ZodSet.create;
-    exports2.set = setType;
-    var functionType = ZodFunction.create;
-    exports2.function = functionType;
-    var lazyType = ZodLazy.create;
-    exports2.lazy = lazyType;
-    var literalType = ZodLiteral.create;
-    exports2.literal = literalType;
-    var enumType = ZodEnum.create;
-    exports2.enum = enumType;
-    var nativeEnumType = ZodNativeEnum.create;
-    exports2.nativeEnum = nativeEnumType;
-    var promiseType = ZodPromise.create;
-    exports2.promise = promiseType;
-    var effectsType = ZodEffects.create;
-    exports2.effect = effectsType;
-    exports2.transformer = effectsType;
-    var optionalType = ZodOptional.create;
-    exports2.optional = optionalType;
-    var nullableType = ZodNullable.create;
-    exports2.nullable = nullableType;
-    var preprocessType = ZodEffects.createWithPreprocess;
-    exports2.preprocess = preprocessType;
-    var pipelineType = ZodPipeline.create;
-    exports2.pipeline = pipelineType;
-    var ostring = () => stringType().optional();
-    exports2.ostring = ostring;
-    var onumber = () => numberType().optional();
-    exports2.onumber = onumber;
-    var oboolean = () => booleanType().optional();
-    exports2.oboolean = oboolean;
-    exports2.coerce = {
-      string: ((arg) => ZodString.create({ ...arg, coerce: true })),
-      number: ((arg) => ZodNumber.create({ ...arg, coerce: true })),
-      boolean: ((arg) => ZodBoolean.create({
-        ...arg,
-        coerce: true
-      })),
-      bigint: ((arg) => ZodBigInt.create({ ...arg, coerce: true })),
-      date: ((arg) => ZodDate.create({ ...arg, coerce: true }))
-    };
-    exports2.NEVER = parseUtil_js_1.INVALID;
-  }
-});
-
-// node_modules/zod/v3/external.cjs
-var require_external = __commonJS({
-  "node_modules/zod/v3/external.cjs"(exports2) {
-    "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
-      if (k2 === void 0) k2 = k;
-      var desc = Object.getOwnPropertyDescriptor(m, k);
-      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-        desc = { enumerable: true, get: function() {
-          return m[k];
-        } };
-      }
-      Object.defineProperty(o, k2, desc);
-    }) : (function(o, m, k, k2) {
-      if (k2 === void 0) k2 = k;
-      o[k2] = m[k];
-    }));
-    var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
-      for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    __exportStar(require_errors(), exports2);
-    __exportStar(require_parseUtil(), exports2);
-    __exportStar(require_typeAliases(), exports2);
-    __exportStar(require_util(), exports2);
-    __exportStar(require_types2(), exports2);
-    __exportStar(require_ZodError(), exports2);
-  }
-});
-
-// node_modules/zod/index.cjs
-var require_zod = __commonJS({
-  "node_modules/zod/index.cjs"(exports2) {
-    "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k, k2) {
-      if (k2 === void 0) k2 = k;
-      var desc = Object.getOwnPropertyDescriptor(m, k);
-      if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-        desc = { enumerable: true, get: function() {
-          return m[k];
-        } };
-      }
-      Object.defineProperty(o, k2, desc);
-    }) : (function(o, m, k, k2) {
-      if (k2 === void 0) k2 = k;
-      o[k2] = m[k];
-    }));
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? (function(o, v) {
-      Object.defineProperty(o, "default", { enumerable: true, value: v });
-    }) : function(o, v) {
-      o["default"] = v;
-    });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
-      if (mod && mod.__esModule) return mod;
-      var result = {};
-      if (mod != null) {
-        for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-      }
-      __setModuleDefault(result, mod);
-      return result;
-    };
-    var __exportStar = exports2 && exports2.__exportStar || function(m, exports3) {
-      for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports3, p)) __createBinding(exports3, m, p);
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.z = void 0;
-    var z = __importStar(require_external());
-    exports2.z = z;
-    __exportStar(require_external(), exports2);
-    exports2.default = z;
-  }
-});
-
-// server/dist/database/connection.js
-var require_connection = __commonJS({
-  "server/dist/database/connection.js"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.db = void 0;
-    var pg_1 = __importDefault2(require("pg"));
-    var dotenv_12 = __importDefault2(require_main());
-    dotenv_12.default.config();
-    var pool = new pg_1.default.Pool({
-      connectionString: process.env.DATABASE_URL,
-      max: 20,
-      idleTimeoutMillis: 3e4,
-      connectionTimeoutMillis: 2e3
-    });
-    pool.on("error", (err) => {
-      console.error("Unexpected error on idle client", err);
-      process.exit(-1);
-    });
-    exports2.db = {
-      query: (text, params) => pool.query(text, params),
-      getClient: () => pool.connect(),
-      pool
-    };
-    exports2.default = exports2.db;
-  }
-});
-
-// server/dist/shared/id.js
-var require_id = __commonJS({
-  "server/dist/shared/id.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.generateId = generateId;
-    exports2.getIdPrefix = getIdPrefix;
-    exports2.isValidId = isValidId;
-    var ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    function randomString(length) {
-      let result = "";
-      const bytes = new Uint8Array(length);
-      if (typeof globalThis.crypto?.getRandomValues === "function") {
-        globalThis.crypto.getRandomValues(bytes);
-      } else {
-        const { randomBytes } = require("crypto");
-        const buf = randomBytes(length);
-        for (let i = 0; i < length; i++)
-          bytes[i] = buf[i];
-      }
-      for (let i = 0; i < length; i++) {
-        result += ALPHABET[bytes[i] % ALPHABET.length];
-      }
-      return result;
-    }
-    var PREFIXES = {
-      users: "usr",
-      email_verifications: "evt",
-      login_attempts: "lat",
-      accounts: "acc",
-      people: "per",
-      categories: "cat",
-      loans: "ln",
-      transactions: "txn",
-      transaction_transfers: "tfr",
-      loan_repayments: "lre"
-    };
-    function generateId(table) {
-      const prefix = PREFIXES[table];
-      return `${prefix}_${randomString(12)}`;
-    }
-    function getIdPrefix(id) {
-      const underscore = id.indexOf("_");
-      if (underscore === -1)
-        return void 0;
-      return id.substring(0, underscore);
-    }
-    function isValidId(id) {
-      const underscore = id.indexOf("_");
-      if (underscore === -1)
-        return false;
-      const prefix = id.substring(0, underscore);
-      const rest = id.substring(underscore + 1);
-      return rest.length === 12 && /^[a-zA-Z0-9]{12}$/.test(rest);
-    }
-  }
-});
-
-// server/dist/database/seed.js
-var require_seed = __commonJS({
-  "server/dist/database/seed.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.seedDefaultCategories = seedDefaultCategories;
-    var connection_1 = require_connection();
-    var id_1 = require_id();
-    var SCHEMA = "finance_tracker";
-    var DEFAULT_INCOME_CATEGORIES = [
-      "Salary",
-      "Bonus",
-      "Freelance",
-      "Business Income",
-      "Gift Received",
-      "Interest",
-      "Other Income"
-    ];
-    var DEFAULT_EXPENSE_CATEGORIES = [
-      "Food",
-      "Transport",
-      "Rent",
-      "Shopping",
-      "Utilities",
-      "Entertainment",
-      "Education",
-      "Medical",
-      "Other Expense"
-    ];
-    async function seedDefaultCategories(userId) {
-      const client = await connection_1.db.getClient();
-      try {
-        await client.query("BEGIN");
-        for (const name of DEFAULT_INCOME_CATEGORIES) {
-          const id = (0, id_1.generateId)("categories");
-          await client.query(`INSERT INTO ${SCHEMA}.categories (id, user_id, name, type)
-         VALUES ($1, $2, $3, 'INCOME')
-         ON CONFLICT (user_id, name, type) DO NOTHING`, [id, userId, name]);
-        }
-        for (const name of DEFAULT_EXPENSE_CATEGORIES) {
-          const id = (0, id_1.generateId)("categories");
-          await client.query(`INSERT INTO ${SCHEMA}.categories (id, user_id, name, type)
-         VALUES ($1, $2, $3, 'EXPENSE')
-         ON CONFLICT (user_id, name, type) DO NOTHING`, [id, userId, name]);
-        }
-        await client.query("COMMIT");
-      } catch (err) {
-        await client.query("ROLLBACK");
-        throw err;
-      } finally {
-        client.release();
-      }
-    }
-  }
-});
-
 // node_modules/jws/lib/data-stream.js
 var require_data_stream = __commonJS({
   "node_modules/jws/lib/data-stream.js"(exports2, module2) {
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var Stream = require("stream");
-    var util = require("util");
+    var util2 = require("util");
     function DataStream(data) {
       this.buffer = null;
       this.writable = true;
       this.readable = true;
       if (!data) {
-        this.buffer = Buffer2.alloc(0);
+        this.buffer = Buffer3.alloc(0);
         return this;
       }
       if (typeof data.pipe === "function") {
-        this.buffer = Buffer2.alloc(0);
+        this.buffer = Buffer3.alloc(0);
         data.pipe(this);
         return this;
       }
@@ -35158,9 +29186,9 @@ var require_data_stream = __commonJS({
       }
       throw new TypeError("Unexpected data type (" + typeof data + ")");
     }
-    util.inherits(DataStream, Stream);
+    util2.inherits(DataStream, Stream);
     DataStream.prototype.write = function write(data) {
-      this.buffer = Buffer2.concat([this.buffer, Buffer2.from(data)]);
+      this.buffer = Buffer3.concat([this.buffer, Buffer3.from(data)]);
       this.emit("data", data);
     };
     DataStream.prototype.end = function end(data) {
@@ -35203,7 +29231,7 @@ var require_param_bytes_for_alg = __commonJS({
 var require_ecdsa_sig_formatter = __commonJS({
   "node_modules/ecdsa-sig-formatter/src/ecdsa-sig-formatter.js"(exports2, module2) {
     "use strict";
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var getParamBytesForAlg = require_param_bytes_for_alg();
     var MAX_OCTET = 128;
     var CLASS_UNIVERSAL = 0;
@@ -35216,10 +29244,10 @@ var require_ecdsa_sig_formatter = __commonJS({
       return base64.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
     }
     function signatureAsBuffer(signature) {
-      if (Buffer2.isBuffer(signature)) {
+      if (Buffer3.isBuffer(signature)) {
         return signature;
       } else if ("string" === typeof signature) {
-        return Buffer2.from(signature, "base64");
+        return Buffer3.from(signature, "base64");
       }
       throw new TypeError("ECDSA signature must be a Base64 string or a Buffer");
     }
@@ -35267,7 +29295,7 @@ var require_ecdsa_sig_formatter = __commonJS({
         throw new Error('Expected to consume entire buffer, but "' + (inputLength - offset) + '" bytes remain');
       }
       var rPadding = paramBytes - rLength, sPadding = paramBytes - sLength;
-      var dst = Buffer2.allocUnsafe(rPadding + rLength + sPadding + sLength);
+      var dst = Buffer3.allocUnsafe(rPadding + rLength + sPadding + sLength);
       for (offset = 0; offset < rPadding; ++offset) {
         dst[offset] = 0;
       }
@@ -35305,7 +29333,7 @@ var require_ecdsa_sig_formatter = __commonJS({
       var sLength = paramBytes - sPadding;
       var rsBytes = 1 + 1 + rLength + 1 + 1 + sLength;
       var shortLength = rsBytes < MAX_OCTET;
-      var dst = Buffer2.allocUnsafe((shortLength ? 2 : 3) + rsBytes);
+      var dst = Buffer3.allocUnsafe((shortLength ? 2 : 3) + rsBytes);
       var offset = 0;
       dst[offset++] = ENCODED_TAG_SEQ;
       if (shortLength) {
@@ -35343,11 +29371,11 @@ var require_ecdsa_sig_formatter = __commonJS({
 var require_buffer_equal_constant_time = __commonJS({
   "node_modules/buffer-equal-constant-time/index.js"(exports2, module2) {
     "use strict";
-    var Buffer2 = require("buffer").Buffer;
+    var Buffer3 = require("buffer").Buffer;
     var SlowBuffer = require("buffer").SlowBuffer;
     module2.exports = bufferEq;
     function bufferEq(a, b) {
-      if (!Buffer2.isBuffer(a) || !Buffer2.isBuffer(b)) {
+      if (!Buffer3.isBuffer(a) || !Buffer3.isBuffer(b)) {
         return false;
       }
       if (a.length !== b.length) {
@@ -35360,14 +29388,14 @@ var require_buffer_equal_constant_time = __commonJS({
       return c === 0;
     }
     bufferEq.install = function() {
-      Buffer2.prototype.equal = SlowBuffer.prototype.equal = function equal(that) {
+      Buffer3.prototype.equal = SlowBuffer.prototype.equal = function equal(that) {
         return bufferEq(this, that);
       };
     };
-    var origBufEqual = Buffer2.prototype.equal;
+    var origBufEqual = Buffer3.prototype.equal;
     var origSlowBufEqual = SlowBuffer.prototype.equal;
     bufferEq.restore = function() {
-      Buffer2.prototype.equal = origBufEqual;
+      Buffer3.prototype.equal = origBufEqual;
       SlowBuffer.prototype.equal = origSlowBufEqual;
     };
   }
@@ -35376,21 +29404,21 @@ var require_buffer_equal_constant_time = __commonJS({
 // node_modules/jwa/index.js
 var require_jwa = __commonJS({
   "node_modules/jwa/index.js"(exports2, module2) {
-    var Buffer2 = require_safe_buffer().Buffer;
-    var crypto = require("crypto");
+    var Buffer3 = require_safe_buffer().Buffer;
+    var crypto2 = require("crypto");
     var formatEcdsa = require_ecdsa_sig_formatter();
-    var util = require("util");
+    var util2 = require("util");
     var MSG_INVALID_ALGORITHM = '"%s" is not a valid algorithm.\n  Supported algorithms are:\n  "HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512" and "none".';
     var MSG_INVALID_SECRET = "secret must be a string or buffer";
     var MSG_INVALID_VERIFIER_KEY = "key must be a string or a buffer";
     var MSG_INVALID_SIGNER_KEY = "key must be a string, a buffer or an object";
-    var supportsKeyObjects = typeof crypto.createPublicKey === "function";
+    var supportsKeyObjects = typeof crypto2.createPublicKey === "function";
     if (supportsKeyObjects) {
       MSG_INVALID_VERIFIER_KEY += " or a KeyObject";
       MSG_INVALID_SECRET += "or a KeyObject";
     }
     function checkIsPublicKey(key) {
-      if (Buffer2.isBuffer(key)) {
+      if (Buffer3.isBuffer(key)) {
         return;
       }
       if (typeof key === "string") {
@@ -35413,7 +29441,7 @@ var require_jwa = __commonJS({
       }
     }
     function checkIsPrivateKey(key) {
-      if (Buffer2.isBuffer(key)) {
+      if (Buffer3.isBuffer(key)) {
         return;
       }
       if (typeof key === "string") {
@@ -35425,7 +29453,7 @@ var require_jwa = __commonJS({
       throw typeError(MSG_INVALID_SIGNER_KEY);
     }
     function checkIsSecretKey(key) {
-      if (Buffer2.isBuffer(key)) {
+      if (Buffer3.isBuffer(key)) {
         return;
       }
       if (typeof key === "string") {
@@ -35459,11 +29487,11 @@ var require_jwa = __commonJS({
     }
     function typeError(template) {
       var args = [].slice.call(arguments, 1);
-      var errMsg = util.format.bind(util, template).apply(null, args);
+      var errMsg = util2.format.bind(util2, template).apply(null, args);
       return new TypeError(errMsg);
     }
     function bufferOrString(obj) {
-      return Buffer2.isBuffer(obj) || typeof obj === "string";
+      return Buffer3.isBuffer(obj) || typeof obj === "string";
     }
     function normalizeInput(thing) {
       if (!bufferOrString(thing))
@@ -35474,17 +29502,17 @@ var require_jwa = __commonJS({
       return function sign(thing, secret) {
         checkIsSecretKey(secret);
         thing = normalizeInput(thing);
-        var hmac = crypto.createHmac("sha" + bits, secret);
+        var hmac = crypto2.createHmac("sha" + bits, secret);
         var sig = (hmac.update(thing), hmac.digest("base64"));
         return fromBase64(sig);
       };
     }
     var bufferEqual;
-    var timingSafeEqual = "timingSafeEqual" in crypto ? function timingSafeEqual2(a, b) {
+    var timingSafeEqual = "timingSafeEqual" in crypto2 ? function timingSafeEqual2(a, b) {
       if (a.byteLength !== b.byteLength) {
         return false;
       }
-      return crypto.timingSafeEqual(a, b);
+      return crypto2.timingSafeEqual(a, b);
     } : function timingSafeEqual2(a, b) {
       if (!bufferEqual) {
         bufferEqual = require_buffer_equal_constant_time();
@@ -35494,14 +29522,14 @@ var require_jwa = __commonJS({
     function createHmacVerifier(bits) {
       return function verify(thing, signature, secret) {
         var computedSig = createHmacSigner(bits)(thing, secret);
-        return timingSafeEqual(Buffer2.from(signature), Buffer2.from(computedSig));
+        return timingSafeEqual(Buffer3.from(signature), Buffer3.from(computedSig));
       };
     }
     function createKeySigner(bits) {
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto.createSign("RSA-SHA" + bits);
+        var signer = crypto2.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign(privateKey, "base64"));
         return fromBase64(sig);
       };
@@ -35511,7 +29539,7 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto.createVerify("RSA-SHA" + bits);
+        var verifier = crypto2.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify(publicKey, signature, "base64");
       };
@@ -35520,11 +29548,11 @@ var require_jwa = __commonJS({
       return function sign(thing, privateKey) {
         checkIsPrivateKey(privateKey);
         thing = normalizeInput(thing);
-        var signer = crypto.createSign("RSA-SHA" + bits);
+        var signer = crypto2.createSign("RSA-SHA" + bits);
         var sig = (signer.update(thing), signer.sign({
           key: privateKey,
-          padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto2.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto2.constants.RSA_PSS_SALTLEN_DIGEST
         }, "base64"));
         return fromBase64(sig);
       };
@@ -35534,12 +29562,12 @@ var require_jwa = __commonJS({
         checkIsPublicKey(publicKey);
         thing = normalizeInput(thing);
         signature = toBase64(signature);
-        var verifier = crypto.createVerify("RSA-SHA" + bits);
+        var verifier = crypto2.createVerify("RSA-SHA" + bits);
         verifier.update(thing);
         return verifier.verify({
           key: publicKey,
-          padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-          saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
+          padding: crypto2.constants.RSA_PKCS1_PSS_PADDING,
+          saltLength: crypto2.constants.RSA_PSS_SALTLEN_DIGEST
         }, signature, "base64");
       };
     }
@@ -35600,11 +29628,11 @@ var require_jwa = __commonJS({
 // node_modules/jws/lib/tostring.js
 var require_tostring = __commonJS({
   "node_modules/jws/lib/tostring.js"(exports2, module2) {
-    var Buffer2 = require("buffer").Buffer;
+    var Buffer3 = require("buffer").Buffer;
     module2.exports = function toString(obj) {
       if (typeof obj === "string")
         return obj;
-      if (typeof obj === "number" || Buffer2.isBuffer(obj))
+      if (typeof obj === "number" || Buffer3.isBuffer(obj))
         return obj.toString();
       return JSON.stringify(obj);
     };
@@ -35614,20 +29642,20 @@ var require_tostring = __commonJS({
 // node_modules/jws/lib/sign-stream.js
 var require_sign_stream = __commonJS({
   "node_modules/jws/lib/sign-stream.js"(exports2, module2) {
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var DataStream = require_data_stream();
     var jwa = require_jwa();
     var Stream = require("stream");
     var toString = require_tostring();
-    var util = require("util");
+    var util2 = require("util");
     function base64url(string, encoding) {
-      return Buffer2.from(string, encoding).toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+      return Buffer3.from(string, encoding).toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
     }
     function jwsSecuredInput(header, payload, encoding) {
       encoding = encoding || "utf8";
       var encodedHeader = base64url(toString(header), "binary");
       var encodedPayload = base64url(toString(payload), encoding);
-      return util.format("%s.%s", encodedHeader, encodedPayload);
+      return util2.format("%s.%s", encodedHeader, encodedPayload);
     }
     function jwsSign(opts) {
       var header = opts.header;
@@ -35637,7 +29665,7 @@ var require_sign_stream = __commonJS({
       var algo = jwa(header.alg);
       var securedInput = jwsSecuredInput(header, payload, encoding);
       var signature = algo.sign(securedInput, secretOrKey);
-      return util.format("%s.%s", securedInput, signature);
+      return util2.format("%s.%s", securedInput, signature);
     }
     function SignStream(opts) {
       var secret = opts.secret;
@@ -35661,7 +29689,7 @@ var require_sign_stream = __commonJS({
           this.sign();
       }.bind(this));
     }
-    util.inherits(SignStream, Stream);
+    util2.inherits(SignStream, Stream);
     SignStream.prototype.sign = function sign() {
       try {
         var signature = jwsSign({
@@ -35689,12 +29717,12 @@ var require_sign_stream = __commonJS({
 // node_modules/jws/lib/verify-stream.js
 var require_verify_stream = __commonJS({
   "node_modules/jws/lib/verify-stream.js"(exports2, module2) {
-    var Buffer2 = require_safe_buffer().Buffer;
+    var Buffer3 = require_safe_buffer().Buffer;
     var DataStream = require_data_stream();
     var jwa = require_jwa();
     var Stream = require("stream");
     var toString = require_tostring();
-    var util = require("util");
+    var util2 = require("util");
     var JWS_REGEX = /^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$/;
     function isObject(thing) {
       return Object.prototype.toString.call(thing) === "[object Object]";
@@ -35710,7 +29738,7 @@ var require_verify_stream = __commonJS({
     }
     function headerFromJWS(jwsSig) {
       var encodedHeader = jwsSig.split(".", 1)[0];
-      return safeJsonParse(Buffer2.from(encodedHeader, "base64").toString("binary"));
+      return safeJsonParse(Buffer3.from(encodedHeader, "base64").toString("binary"));
     }
     function securedInputFromJWS(jwsSig) {
       return jwsSig.split(".", 2).join(".");
@@ -35721,7 +29749,7 @@ var require_verify_stream = __commonJS({
     function payloadFromJWS(jwsSig, encoding) {
       encoding = encoding || "utf8";
       var payload = jwsSig.split(".")[1];
-      return Buffer2.from(payload, "base64").toString(encoding);
+      return Buffer3.from(payload, "base64").toString(encoding);
     }
     function isValidJws(string) {
       return JWS_REGEX.test(string) && !!headerFromJWS(string);
@@ -35778,7 +29806,7 @@ var require_verify_stream = __commonJS({
           this.verify();
       }.bind(this));
     }
-    util.inherits(VerifyStream, Stream);
+    util2.inherits(VerifyStream, Stream);
     VerifyStream.prototype.verify = function verify() {
       try {
         var valid = jwsVerify(this.signature.buffer, this.algorithm, this.key.buffer);
@@ -35838,9 +29866,9 @@ var require_jws = __commonJS({
 var require_decode = __commonJS({
   "node_modules/jsonwebtoken/decode.js"(exports2, module2) {
     var jws = require_jws();
-    module2.exports = function(jwt, options) {
+    module2.exports = function(jwt2, options) {
       options = options || {};
-      var decoded = jws.decode(jwt, options);
+      var decoded = jws.decode(jwt2, options);
       if (!decoded) {
         return null;
       }
@@ -36071,7 +30099,7 @@ var require_parse_options = __commonJS({
     "use strict";
     var looseOption = Object.freeze({ loose: true });
     var emptyOpts = Object.freeze({});
-    var parseOptions = (options) => {
+    var parseOptions2 = (options) => {
       if (!options) {
         return emptyOpts;
       }
@@ -36080,7 +30108,7 @@ var require_parse_options = __commonJS({
       }
       return options;
     };
-    module2.exports = parseOptions;
+    module2.exports = parseOptions2;
   }
 });
 
@@ -36116,7 +30144,7 @@ var require_semver = __commonJS({
     var debug = require_debug6();
     var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants3();
     var { safeRe: re, t } = require_re();
-    var parseOptions = require_parse_options();
+    var parseOptions2 = require_parse_options();
     var { compareIdentifiers } = require_identifiers();
     var isPrereleaseIdentifier = (prerelease, identifier) => {
       const identifiers = identifier.split(".");
@@ -36132,7 +30160,7 @@ var require_semver = __commonJS({
     };
     var SemVer = class _SemVer {
       constructor(version, options) {
-        options = parseOptions(options);
+        options = parseOptions2(options);
         if (version instanceof _SemVer) {
           if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
             return version;
@@ -36741,7 +30769,7 @@ var require_coerce = __commonJS({
     var SemVer = require_semver();
     var parse = require_parse2();
     var { safeRe: re, t } = require_re();
-    var coerce = (version, options) => {
+    var coerce2 = (version, options) => {
       if (version instanceof SemVer) {
         return version;
       }
@@ -36776,7 +30804,7 @@ var require_coerce = __commonJS({
       const build = options.includePrerelease && match[6] ? `+${match[6]}` : "";
       return parse(`${major}.${minor}.${patch}${prerelease}${build}`, options);
     };
-    module2.exports = coerce;
+    module2.exports = coerce2;
   }
 });
 
@@ -36866,7 +30894,7 @@ var require_range2 = __commonJS({
     var SPACE_CHARACTERS = /\s+/g;
     var Range = class _Range {
       constructor(range, options) {
-        options = parseOptions(options);
+        options = parseOptions2(options);
         if (range instanceof _Range) {
           if (range.loose === !!options.loose && range.includePrerelease === !!options.includePrerelease) {
             return range;
@@ -37006,7 +31034,7 @@ var require_range2 = __commonJS({
     module2.exports = Range;
     var LRU = require_lrucache();
     var cache = new LRU();
-    var parseOptions = require_parse_options();
+    var parseOptions2 = require_parse_options();
     var Comparator = require_comparator();
     var debug = require_debug6();
     var SemVer = require_semver();
@@ -37254,7 +31282,7 @@ var require_comparator = __commonJS({
         return ANY;
       }
       constructor(comp, options) {
-        options = parseOptions(options);
+        options = parseOptions2(options);
         if (comp instanceof _Comparator) {
           if (comp.loose === !!options.loose) {
             return comp;
@@ -37322,7 +31350,7 @@ var require_comparator = __commonJS({
           }
           return new Range(this.value, options).test(comp.semver);
         }
-        options = parseOptions(options);
+        options = parseOptions2(options);
         if (options.includePrerelease && (this.value === "<0.0.0-0" || comp.value === "<0.0.0-0")) {
           return false;
         }
@@ -37348,7 +31376,7 @@ var require_comparator = __commonJS({
       }
     };
     module2.exports = Comparator;
-    var parseOptions = require_parse_options();
+    var parseOptions2 = require_parse_options();
     var { safeRe: re, t } = require_re();
     var cmp = require_cmp();
     var debug = require_debug6();
@@ -37862,7 +31890,7 @@ var require_semver2 = __commonJS({
     var gte = require_gte();
     var lte = require_lte();
     var cmp = require_cmp();
-    var coerce = require_coerce();
+    var coerce2 = require_coerce();
     var truncate = require_truncate();
     var Comparator = require_comparator();
     var Range = require_range2();
@@ -37901,7 +31929,7 @@ var require_semver2 = __commonJS({
       gte,
       lte,
       cmp,
-      coerce,
+      coerce: coerce2,
       truncate,
       Comparator,
       Range,
@@ -38882,230 +32910,6 @@ var require_jsonwebtoken = __commonJS({
   }
 });
 
-// server/dist/shared/token.js
-var require_token = __commonJS({
-  "server/dist/shared/token.js"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.signToken = signToken;
-    exports2.verifyToken = verifyToken;
-    exports2.setTokenCookie = setTokenCookie;
-    exports2.clearTokenCookie = clearTokenCookie;
-    exports2.getTokenFromCookie = getTokenFromCookie;
-    var jsonwebtoken_1 = __importDefault2(require_jsonwebtoken());
-    var cookie_1 = __importDefault2(require_cookie());
-    var JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || "dev-secret-change-in-production";
-    var JWT_EXPIRY = "7d";
-    var COOKIE_NAME = "token";
-    function signToken(userId) {
-      return jsonwebtoken_1.default.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
-    }
-    function verifyToken(token) {
-      try {
-        return jsonwebtoken_1.default.verify(token, JWT_SECRET);
-      } catch {
-        return null;
-      }
-    }
-    function setTokenCookie(res, token) {
-      const isProduction2 = process.env.NODE_ENV === "production";
-      const cookieStr = cookie_1.default.serialize(COOKIE_NAME, token, {
-        httpOnly: true,
-        secure: isProduction2,
-        sameSite: isProduction2 ? "strict" : "lax",
-        maxAge: 7 * 24 * 60 * 60,
-        // 7 days in seconds
-        path: "/"
-      });
-      res.setHeader("Set-Cookie", cookieStr);
-    }
-    function clearTokenCookie(res) {
-      const isProduction2 = process.env.NODE_ENV === "production";
-      const cookieStr = cookie_1.default.serialize(COOKIE_NAME, "", {
-        httpOnly: true,
-        secure: isProduction2,
-        sameSite: isProduction2 ? "strict" : "lax",
-        maxAge: 0,
-        path: "/"
-      });
-      res.setHeader("Set-Cookie", cookieStr);
-    }
-    function getTokenFromCookie(cookieHeader) {
-      if (!cookieHeader)
-        return null;
-      const parsed = cookie_1.default.parse(cookieHeader);
-      return parsed[COOKIE_NAME] || null;
-    }
-  }
-});
-
-// server/dist/middleware/auth.js
-var require_auth = __commonJS({
-  "server/dist/middleware/auth.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.requireAuth = requireAuth;
-    exports2.getUserId = getUserId;
-    var token_1 = require_token();
-    function requireAuth(req, res, next) {
-      const token = (0, token_1.getTokenFromCookie)(req.headers.cookie);
-      if (!token) {
-        res.status(401).json({
-          success: false,
-          error: {
-            code: "UNAUTHORIZED",
-            message: "You must be logged in to access this resource"
-          }
-        });
-        return;
-      }
-      const payload = (0, token_1.verifyToken)(token);
-      if (!payload) {
-        res.status(401).json({
-          success: false,
-          error: {
-            code: "UNAUTHORIZED",
-            message: "Your session has expired. Please log in again."
-          }
-        });
-        return;
-      }
-      req.userId = payload.userId;
-      next();
-    }
-    function getUserId(req) {
-      const userId = req.userId;
-      if (!userId) {
-        throw new Error("Not authenticated");
-      }
-      return userId;
-    }
-  }
-});
-
-// server/dist/middleware/validation.js
-var require_validation = __commonJS({
-  "server/dist/middleware/validation.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.validateBody = validateBody;
-    exports2.validateQuery = validateQuery;
-    function validateBody(schema) {
-      return (req, res, next) => {
-        const result = schema.safeParse(req.body);
-        if (!result.success) {
-          const firstError = result.error.errors[0];
-          res.status(400).json({
-            success: false,
-            error: {
-              code: "VALIDATION_ERROR",
-              message: firstError?.message || "Invalid input"
-            }
-          });
-          return;
-        }
-        req.body = result.data;
-        next();
-      };
-    }
-    function validateQuery(schema) {
-      return (req, res, next) => {
-        const result = schema.safeParse(req.query);
-        if (!result.success) {
-          const firstError = result.error.errors[0];
-          res.status(400).json({
-            success: false,
-            error: {
-              code: "VALIDATION_ERROR",
-              message: firstError?.message || "Invalid query parameters"
-            }
-          });
-          return;
-        }
-        req.query = result.data;
-        next();
-      };
-    }
-  }
-});
-
-// server/dist/services/lockout.js
-var require_lockout = __commonJS({
-  "server/dist/services/lockout.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.isAccountLocked = isAccountLocked;
-    exports2.recordFailedLogin = recordFailedLogin;
-    exports2.resetFailedLogins = resetFailedLogins;
-    var connection_1 = require_connection();
-    var id_1 = require_id();
-    var SCHEMA = "finance_tracker";
-    var MAX_ATTEMPTS = parseInt(process.env.MAX_LOGIN_ATTEMPTS || "5", 10);
-    var LOCKOUT_MINUTES = parseInt(process.env.LOCKOUT_DURATION_MINUTES || "10", 10);
-    async function isAccountLocked(email) {
-      const result = await connection_1.db.query(`SELECT is_locked, locked_until
-     FROM ${SCHEMA}.users
-     WHERE email = $1`, [email]);
-      if (result.rows.length === 0) {
-        return { locked: false };
-      }
-      const user = result.rows[0];
-      if (!user.is_locked || !user.locked_until) {
-        return { locked: false };
-      }
-      const lockExpiry = new Date(user.locked_until);
-      const now = /* @__PURE__ */ new Date();
-      if (now >= lockExpiry) {
-        await connection_1.db.query(`UPDATE ${SCHEMA}.users
-       SET is_locked = FALSE, locked_until = NULL, failed_login_attempts = 0
-       WHERE email = $1`, [email]);
-        return { locked: false };
-      }
-      const remainingSeconds = Math.ceil((lockExpiry.getTime() - now.getTime()) / 1e3);
-      return { locked: true, remainingSeconds };
-    }
-    async function recordFailedLogin(email, ipAddress) {
-      const id = (0, id_1.generateId)("login_attempts");
-      await connection_1.db.query(`INSERT INTO ${SCHEMA}.login_attempts (id, email, ip_address, success)
-     VALUES ($1, $2, $3, FALSE)`, [id, email, ipAddress || null]);
-      const result = await connection_1.db.query(`UPDATE ${SCHEMA}.users
-     SET failed_login_attempts = failed_login_attempts + 1,
-         last_failed_login = NOW(),
-         updated_at = NOW()
-     WHERE email = $1
-     RETURNING failed_login_attempts`, [email]);
-      if (result.rows.length === 0) {
-        return { locked: false, attemptsRemaining: MAX_ATTEMPTS };
-      }
-      const attempts = result.rows[0].failed_login_attempts;
-      const attemptsRemaining = MAX_ATTEMPTS - attempts;
-      if (attempts >= MAX_ATTEMPTS) {
-        const lockUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1e3);
-        await connection_1.db.query(`UPDATE ${SCHEMA}.users
-       SET is_locked = TRUE, locked_until = $1, updated_at = NOW()
-       WHERE email = $2`, [lockUntil, email]);
-        return { locked: true, attemptsRemaining: 0, lockDurationMinutes: LOCKOUT_MINUTES };
-      }
-      return { locked: false, attemptsRemaining };
-    }
-    async function resetFailedLogins(email) {
-      await connection_1.db.query(`UPDATE ${SCHEMA}.users
-     SET failed_login_attempts = 0,
-         is_locked = FALSE,
-         locked_until = NULL,
-         last_failed_login = NULL,
-         updated_at = NOW()
-     WHERE email = $1`, [email]);
-      const id = (0, id_1.generateId)("login_attempts");
-      await connection_1.db.query(`INSERT INTO ${SCHEMA}.login_attempts (id, email, success)
-     VALUES ($1, $2, TRUE)`, [id, email]);
-    }
-  }
-});
-
 // node_modules/nodemailer/lib/punycode/index.js
 var require_punycode = __commonJS({
   "node_modules/nodemailer/lib/punycode/index.js"(exports2, module2) {
@@ -39456,27 +33260,27 @@ var require_cookies = __commonJS({
        */
       set(cookieStr, url) {
         const urlparts = urllib.parse(url || "");
-        const cookie = this.parse(cookieStr);
+        const cookie2 = this.parse(cookieStr);
         let domain;
-        if (cookie.domain) {
-          domain = cookie.domain.replace(/^\./, "");
+        if (cookie2.domain) {
+          domain = cookie2.domain.replace(/^\./, "");
           if (
             // can't be valid if the requested domain is shorter than current hostname
             urlparts.hostname.length < domain.length || // prefix domains with dot to be sure that partial matches are not used
             ("." + urlparts.hostname).substr(-domain.length + 1) !== "." + domain
           ) {
-            cookie.domain = urlparts.hostname;
+            cookie2.domain = urlparts.hostname;
           }
         } else {
-          cookie.domain = urlparts.hostname;
+          cookie2.domain = urlparts.hostname;
         }
-        if (!cookie.path) {
-          cookie.path = this.getPath(urlparts.pathname);
+        if (!cookie2.path) {
+          cookie2.path = this.getPath(urlparts.pathname);
         }
-        if (!cookie.expires) {
-          cookie.expires = new Date(Date.now() + (Number(this.options.sessionTimeout || SESSION_TIMEOUT) || SESSION_TIMEOUT) * 1e3);
+        if (!cookie2.expires) {
+          cookie2.expires = new Date(Date.now() + (Number(this.options.sessionTimeout || SESSION_TIMEOUT) || SESSION_TIMEOUT) * 1e3);
         }
-        return this.add(cookie);
+        return this.add(cookie2);
       }
       /**
        * Returns cookie string for the 'Cookie:' header.
@@ -39485,7 +33289,7 @@ var require_cookies = __commonJS({
        * @returns {String} Cookie header or empty string if no matches were found
        */
       get(url) {
-        return this.list(url).map((cookie) => cookie.name + "=" + cookie.value).join("; ");
+        return this.list(url).map((cookie2) => cookie2.name + "=" + cookie2.value).join("; ");
       }
       /**
        * Lists all valied cookie objects for the specified URL
@@ -39496,13 +33300,13 @@ var require_cookies = __commonJS({
       list(url) {
         const result = [];
         for (let i = this.cookies.length - 1; i >= 0; i--) {
-          const cookie = this.cookies[i];
-          if (this.isExpired(cookie)) {
+          const cookie2 = this.cookies[i];
+          if (this.isExpired(cookie2)) {
             this.cookies.splice(i, 1);
             continue;
           }
-          if (this.match(cookie, url)) {
-            result.unshift(cookie);
+          if (this.match(cookie2, url)) {
+            result.unshift(cookie2);
           }
         }
         return result;
@@ -39514,7 +33318,7 @@ var require_cookies = __commonJS({
        * @returns {Object} Cookie object
        */
       parse(cookieStr) {
-        const cookie = {};
+        const cookie2 = {};
         (cookieStr || "").toString().split(";").forEach((cookiePart) => {
           const valueParts = cookiePart.split("=");
           const key = valueParts.shift().trim().toLowerCase();
@@ -39527,36 +33331,36 @@ var require_cookies = __commonJS({
             case "expires":
               value = new Date(value);
               if (value.toString() !== "Invalid Date") {
-                cookie.expires = value;
+                cookie2.expires = value;
               }
               break;
             case "path":
-              cookie.path = value;
+              cookie2.path = value;
               break;
             case "domain":
               domain = value.toLowerCase();
               if (domain.length && domain.charAt(0) !== ".") {
                 domain = "." + domain;
               }
-              cookie.domain = domain;
+              cookie2.domain = domain;
               break;
             case "max-age":
-              cookie.expires = new Date(Date.now() + (Number(value) || 0) * 1e3);
+              cookie2.expires = new Date(Date.now() + (Number(value) || 0) * 1e3);
               break;
             case "secure":
-              cookie.secure = true;
+              cookie2.secure = true;
               break;
             case "httponly":
-              cookie.httponly = true;
+              cookie2.httponly = true;
               break;
             default:
-              if (!cookie.name) {
-                cookie.name = key;
-                cookie.value = value;
+              if (!cookie2.name) {
+                cookie2.name = key;
+                cookie2.value = value;
               }
           }
         });
-        return cookie;
+        return cookie2;
       }
       /**
        * Checks if a cookie object is valid for a specified URL
@@ -39565,16 +33369,16 @@ var require_cookies = __commonJS({
        * @param {String} url URL to check for
        * @returns {Boolean} true if cookie is valid for specifiec URL
        */
-      match(cookie, url) {
+      match(cookie2, url) {
         const urlparts = urllib.parse(url || "");
-        if (urlparts.hostname !== cookie.domain && (cookie.domain.charAt(0) !== "." || ("." + urlparts.hostname).substr(-cookie.domain.length) !== cookie.domain)) {
+        if (urlparts.hostname !== cookie2.domain && (cookie2.domain.charAt(0) !== "." || ("." + urlparts.hostname).substr(-cookie2.domain.length) !== cookie2.domain)) {
           return false;
         }
-        const path = this.getPath(urlparts.pathname);
-        if (path.substr(0, cookie.path.length) !== cookie.path) {
+        const path2 = this.getPath(urlparts.pathname);
+        if (path2.substr(0, cookie2.path.length) !== cookie2.path) {
           return false;
         }
-        if (cookie.secure && urlparts.protocol !== "https:") {
+        if (cookie2.secure && urlparts.protocol !== "https:") {
           return false;
         }
         return true;
@@ -39584,22 +33388,22 @@ var require_cookies = __commonJS({
        *
        * @param {Object} cookie Cookie value to be stored
        */
-      add(cookie) {
-        if (!cookie || !cookie.name) {
+      add(cookie2) {
+        if (!cookie2 || !cookie2.name) {
           return false;
         }
         for (let i = 0, len = this.cookies.length; i < len; i++) {
-          if (this.compare(this.cookies[i], cookie)) {
-            if (this.isExpired(cookie)) {
+          if (this.compare(this.cookies[i], cookie2)) {
+            if (this.isExpired(cookie2)) {
               this.cookies.splice(i, 1);
               return false;
             }
-            this.cookies[i] = cookie;
+            this.cookies[i] = cookie2;
             return true;
           }
         }
-        if (!this.isExpired(cookie)) {
-          this.cookies.push(cookie);
+        if (!this.isExpired(cookie2)) {
+          this.cookies.push(cookie2);
         }
         return true;
       }
@@ -39619,8 +33423,8 @@ var require_cookies = __commonJS({
        * @param {Object} cookie Cookie object to check against
        * @returns {Boolean} True, if the cookie is expired
        */
-      isExpired(cookie) {
-        return cookie.expires && cookie.expires < /* @__PURE__ */ new Date() || !cookie.value;
+      isExpired(cookie2) {
+        return cookie2.expires && cookie2.expires < /* @__PURE__ */ new Date() || !cookie2.value;
       }
       /**
        * Returns normalized cookie path for an URL path argument
@@ -39629,16 +33433,16 @@ var require_cookies = __commonJS({
        * @returns {String} Normalized path
        */
       getPath(pathname) {
-        let path = (pathname || "/").split("/");
-        path.pop();
-        path = path.join("/").trim();
-        if (path.charAt(0) !== "/") {
-          path = "/" + path;
+        let path2 = (pathname || "/").split("/");
+        path2.pop();
+        path2 = path2.join("/").trim();
+        if (path2.charAt(0) !== "/") {
+          path2 = "/" + path2;
         }
-        if (path.substr(-1) !== "/") {
-          path += "/";
+        if (path2.substr(-1) !== "/") {
+          path2 += "/";
         }
-        return path;
+        return path2;
       }
     };
     module2.exports = Cookies;
@@ -39699,7 +33503,7 @@ var require_package2 = __commonJS({
 });
 
 // node_modules/nodemailer/lib/errors.js
-var require_errors2 = __commonJS({
+var require_errors = __commonJS({
   "node_modules/nodemailer/lib/errors.js"(exports2, module2) {
     "use strict";
     var ERROR_CODES = {
@@ -39768,7 +33572,7 @@ var require_fetch = __commonJS({
     var Cookies = require_cookies();
     var packageData = require_package2();
     var net = require("net");
-    var errors = require_errors2();
+    var errors = require_errors();
     var { isProtoKey } = require_objects();
     var MAX_REDIRECTS = 5;
     var TLS_OPTION_KEYS = [
@@ -39832,8 +33636,8 @@ var require_fetch = __commonJS({
         return fetchRes;
       }
       if (options.cookie) {
-        [].concat(options.cookie || []).forEach((cookie) => {
-          options.cookies.set(cookie, url);
+        [].concat(options.cookie || []).forEach((cookie2) => {
+          options.cookies.set(cookie2, url);
         });
         options.cookie = false;
       }
@@ -39974,8 +33778,8 @@ var require_fetch = __commonJS({
             break;
         }
         if (res.headers["set-cookie"]) {
-          [].concat(res.headers["set-cookie"] || []).forEach((cookie) => {
-            options.cookies.set(cookie, url);
+          [].concat(res.headers["set-cookie"] || []).forEach((cookie2) => {
+            options.cookies.set(cookie2, url);
           });
         }
         if ([301, 302, 303, 307, 308].includes(res.statusCode) && res.headers.location) {
@@ -40083,10 +33887,10 @@ var require_shared = __commonJS({
   "node_modules/nodemailer/lib/shared/index.js"(exports2, module2) {
     "use strict";
     var urllib = require_url();
-    var util = require("util");
+    var util2 = require("util");
     var fs = require("fs");
     var nmfetch = require_fetch();
-    var errors = require_errors2();
+    var errors = require_errors();
     var objects = require_objects();
     var dns = require("dns");
     var net = require("net");
@@ -40614,7 +34418,7 @@ var require_shared = __commonJS({
             prefix = "[#" + entry.cid + "] " + prefix;
           }
         }
-        message = util.format(message, ...args);
+        message = util2.format(message, ...args);
         message.split(/\r?\n/).forEach((line) => {
           console.log("[%s] %s %s", (/* @__PURE__ */ new Date()).toISOString().substr(0, 19).replace(/T/, " "), levelNames.get(level), prefix + line);
         });
@@ -40632,7 +34436,7 @@ var require_shared = __commonJS({
 var require_mime_types2 = __commonJS({
   "node_modules/nodemailer/lib/mime-funcs/mime-types.js"(exports2, module2) {
     "use strict";
-    var path = require("path");
+    var path2 = require("path");
     var defaultMimeType = "application/octet-stream";
     var defaultExtension = "bin";
     var mimeTypes = /* @__PURE__ */ new Map([
@@ -42699,7 +36503,7 @@ var require_mime_types2 = __commonJS({
         if (!filename) {
           return defaultMimeType;
         }
-        const parsed = path.parse(filename);
+        const parsed = path2.parse(filename);
         const extension = (parsed.ext.substr(1) || parsed.name || "").split("?").shift().trim().toLowerCase();
         const value = extensions.has(extension) ? extensions.get(extension) : defaultMimeType;
         if (Array.isArray(value)) {
@@ -43974,7 +37778,7 @@ var require_le_unix = __commonJS({
 var require_mime_node = __commonJS({
   "node_modules/nodemailer/lib/mime-node/index.js"(exports2, module2) {
     "use strict";
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     var fs = require("fs");
     var punycode = require_punycode();
     var { PassThrough } = require("stream");
@@ -43984,7 +37788,7 @@ var require_mime_node = __commonJS({
     var base64 = require_base64();
     var addressparser = require_addressparser();
     var nmfetch = require_fetch();
-    var errors = require_errors2();
+    var errors = require_errors();
     var LastNewline = require_last_newline();
     var LeWindows = require_le_windows();
     var LeUnix = require_le_unix();
@@ -43997,7 +37801,7 @@ var require_mime_node = __commonJS({
       constructor(contentType, options) {
         this.nodeCounter = 0;
         options = options || {};
-        this.baseBoundary = options.baseBoundary || crypto.randomBytes(8).toString("hex");
+        this.baseBoundary = options.baseBoundary || crypto2.randomBytes(8).toString("hex");
         this.boundaryPrefix = options.boundaryPrefix || "--_NmP";
         this.disableFileAccess = !!options.disableFileAccess;
         this.disableUrlAccess = !!options.disableUrlAccess;
@@ -45021,8 +38825,8 @@ var require_mime_node = __commonJS({
       _generateMessageId() {
         return "<" + [2, 2, 2, 6].reduce(
           // crux to generate UUID-like random strings
-          (prev, len) => prev + "-" + crypto.randomBytes(len).toString("hex"),
-          crypto.randomBytes(4).toString("hex")
+          (prev, len) => prev + "-" + crypto2.randomBytes(len).toString("hex"),
+          crypto2.randomBytes(4).toString("hex")
         ) + "@" + // try to use the domain of the FROM address or fallback to server hostname
         (this.getEnvelope().from || this.hostname || "localhost").split("@").pop() + ">";
       }
@@ -45652,14 +39456,14 @@ var require_relaxed_body = __commonJS({
   "node_modules/nodemailer/lib/dkim/relaxed-body.js"(exports2, module2) {
     "use strict";
     var { Transform } = require("stream");
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     var RelaxedBody = class extends Transform {
       constructor(options) {
         super();
         options = options || {};
         this.chunkBuffer = [];
         this.chunkBufferLen = 0;
-        this.bodyHash = crypto.createHash(options.hashAlgo || "sha256");
+        this.bodyHash = crypto2.createHash(options.hashAlgo || "sha256");
         this.remainder = "";
         this.byteLength = 0;
         this.debug = options.debug;
@@ -45762,7 +39566,7 @@ var require_sign3 = __commonJS({
     "use strict";
     var punycode = require_punycode();
     var mimeFuncs = require_mime_funcs();
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     module2.exports = (headers, hashAlgo, bodyHash, options) => {
       options = options || {};
       const defaultFieldNames = "From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive";
@@ -45770,7 +39574,7 @@ var require_sign3 = __commonJS({
       const canonicalizedHeaderData = relaxedHeaders(headers, fieldNames, options.skipFields);
       const dkimHeader = generateDKIMHeader(options.domainName, options.keySelector, canonicalizedHeaderData.fieldNames, hashAlgo, bodyHash);
       canonicalizedHeaderData.headers += "dkim-signature:" + relaxedHeaderLine(dkimHeader);
-      const signer = crypto.createSign(("rsa-" + hashAlgo).toUpperCase());
+      const signer = crypto2.createSign(("rsa-" + hashAlgo).toUpperCase());
       signer.update(canonicalizedHeaderData.headers);
       let signature;
       try {
@@ -45839,8 +39643,8 @@ var require_dkim = __commonJS({
     var sign = require_sign3();
     var { PassThrough } = require("stream");
     var fs = require("fs");
-    var path = require("path");
-    var crypto = require("crypto");
+    var path2 = require("path");
+    var crypto2 = require("crypto");
     var { copyOwnKeys } = require_objects();
     var DKIM_ALGO = "sha256";
     var MAX_MESSAGE_SIZE = 2 * 1024 * 1024;
@@ -45854,7 +39658,7 @@ var require_dkim = __commonJS({
         this.chunks = [];
         this.chunklen = 0;
         this.readPos = 0;
-        this.cachePath = this.cacheDir ? path.join(this.cacheDir, "message." + Date.now() + "-" + crypto.randomBytes(14).toString("hex")) : false;
+        this.cachePath = this.cacheDir ? path2.join(this.cacheDir, "message." + Date.now() + "-" + crypto2.randomBytes(14).toString("hex")) : false;
         this.cache = false;
         this.headers = false;
         this.bodyHash = false;
@@ -46034,7 +39838,7 @@ var require_http_proxy_client = __commonJS({
     var net = require("net");
     var tls = require("tls");
     var urllib = require_url();
-    var errors = require_errors2();
+    var errors = require_errors();
     var MAX_RESPONSE_HEADER_BYTES = 64 * 1024;
     function httpProxyClient(proxyUrl, destinationPort, destinationHost, tlsOptions, callback) {
       if (typeof tlsOptions === "function") {
@@ -46402,16 +40206,16 @@ var require_mailer = __commonJS({
     var MailComposer = require_mail_composer();
     var DKIM = require_dkim();
     var httpProxyClient = require_http_proxy_client();
-    var errors = require_errors2();
-    var util = require("util");
+    var errors = require_errors();
+    var util2 = require("util");
     var urllib = require_url();
     var packageData = require_package2();
     var MailMessage = require_mail_message();
     var net = require("net");
     var dns = require("dns");
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     var Mail = class extends EventEmitter {
-      constructor(transporter, options, defaults) {
+      constructor(transporter2, options, defaults) {
         super();
         this.options = options || {};
         this._defaults = defaults || {};
@@ -46425,7 +40229,7 @@ var require_mailer = __commonJS({
         };
         this.meta = /* @__PURE__ */ new Map();
         this.dkim = this.options.dkim ? new DKIM(this.options.dkim) : false;
-        this.transporter = transporter;
+        this.transporter = transporter2;
         this.transporter.mailer = this;
         this.logger = shared.getLogger(this.options, {
           component: this.options.component || "mail"
@@ -46592,7 +40396,7 @@ var require_mailer = __commonJS({
         return promise;
       }
       getVersionString() {
-        return util.format(
+        return util2.format(
           "%s (%s; +%s; %s/%s)",
           packageData.name,
           packageData.version,
@@ -46752,7 +40556,7 @@ var require_mailer = __commonJS({
             html = (html || "").toString().replace(
               /(<img\b[^<>]{0,1024} src\s{0,20}=[\s"']{0,20})(data:([^;]+);[^"'>\s]+)/gi,
               (match, prefix, dataUri, mimeType) => {
-                const cid = crypto.randomBytes(10).toString("hex") + "@localhost";
+                const cid = crypto2.randomBytes(10).toString("hex") + "@localhost";
                 if (!mail.data.attachments) {
                   mail.data.attachments = [];
                 }
@@ -46879,7 +40683,7 @@ var require_smtp_connection = __commonJS({
     var net = require("net");
     var tls = require("tls");
     var os = require("os");
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     var DataStream = require_data_stream2();
     var { PassThrough } = require("stream");
     var shared = require_shared();
@@ -46899,7 +40703,7 @@ var require_smtp_connection = __commonJS({
     var SMTPConnection = class extends EventEmitter {
       constructor(options) {
         super(options);
-        this.id = crypto.randomBytes(8).toString("base64").replace(/\W/g, "");
+        this.id = crypto2.randomBytes(8).toString("base64").replace(/\W/g, "");
         this.stage = "init";
         this.options = options || {};
         this.secureConnection = !!this.options.secure;
@@ -48084,7 +41888,7 @@ var require_smtp_connection = __commonJS({
           );
         }
         const base64decoded = Buffer.from(challengeMatch[1], "base64").toString("ascii");
-        const hmacMD5 = crypto.createHmac("md5", this._auth.credentials.pass);
+        const hmacMD5 = crypto2.createHmac("md5", this._auth.credentials.pass);
         hmacMD5.update(base64decoded);
         const prepended = this._auth.credentials.user + " " + hmacMD5.digest("hex");
         this._responseActions.push((str2) => {
@@ -48377,9 +42181,9 @@ var require_xoauth2 = __commonJS({
     "use strict";
     var { Stream } = require("stream");
     var nmfetch = require_fetch();
-    var crypto = require("crypto");
+    var crypto2 = require("crypto");
     var shared = require_shared();
-    var errors = require_errors2();
+    var errors = require_errors();
     var XOAuth2 = class extends Stream {
       constructor(options, logger) {
         super();
@@ -48723,7 +42527,7 @@ var require_xoauth2 = __commonJS({
        */
       jwtSignRS256(payload) {
         payload = ['{"alg":"RS256","typ":"JWT"}', JSON.stringify(payload)].map((val) => this.toBase64URL(val)).join(".");
-        const signature = crypto.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
+        const signature = crypto2.createSign("RSA-SHA256").update(payload).sign(this.options.privateKey);
         return payload + "." + this.toBase64URL(signature);
       }
     };
@@ -48738,13 +42542,13 @@ var require_pool_resource = __commonJS({
     var SMTPConnection = require_smtp_connection();
     var assign = require_shared().assign;
     var XOAuth2 = require_xoauth2();
-    var errors = require_errors2();
+    var errors = require_errors();
     var EventEmitter = require("events");
     var PoolResource = class extends EventEmitter {
-      constructor(pool) {
+      constructor(pool2) {
         super();
-        this.pool = pool;
-        this.options = pool.options;
+        this.pool = pool2;
+        this.options = pool2.options;
         this.logger = this.pool.logger;
         if (this.options.auth) {
           switch ((this.options.auth.type || "").toString().toUpperCase()) {
@@ -49549,7 +43353,7 @@ var require_smtp_pool = __commonJS({
     var SMTPConnection = require_smtp_connection();
     var wellKnown = require_well_known();
     var shared = require_shared();
-    var errors = require_errors2();
+    var errors = require_errors();
     var packageData = require_package2();
     var SMTPPool = class extends EventEmitter {
       constructor(options) {
@@ -50088,7 +43892,7 @@ var require_smtp_transport = __commonJS({
     var wellKnown = require_well_known();
     var shared = require_shared();
     var XOAuth2 = require_xoauth2();
-    var errors = require_errors2();
+    var errors = require_errors();
     var packageData = require_package2();
     var SMTPTransport = class extends EventEmitter {
       constructor(options) {
@@ -50455,7 +44259,7 @@ var require_sendmail_transport = __commonJS({
     var { spawn } = require("child_process");
     var packageData = require_package2();
     var shared = require_shared();
-    var errors = require_errors2();
+    var errors = require_errors();
     var LeWindows = require_le_windows();
     var LeUnix = require_le_unix();
     var SendmailTransport = class {
@@ -50821,7 +44625,7 @@ var require_ses_transport = __commonJS({
     var EventEmitter = require("events");
     var packageData = require_package2();
     var shared = require_shared();
-    var errors = require_errors2();
+    var errors = require_errors();
     var LeWindows = require_le_windows();
     var MimeNode = require_mime_node();
     function tagSesError(err) {
@@ -51045,7 +44849,7 @@ var require_nodemailer = __commonJS({
     var StreamTransport = require_stream_transport();
     var JSONTransport = require_json_transport();
     var SESTransport = require_ses_transport();
-    var errors = require_errors2();
+    var errors = require_errors();
     var nmfetch = require_fetch();
     var packageData = require_package2();
     var ETHEREAL_API = (process.env.ETHEREAL_API || "https://api.nodemailer.com").replace(/\/+$/, "");
@@ -51053,27 +44857,27 @@ var require_nodemailer = __commonJS({
     var ETHEREAL_API_KEY = (process.env.ETHEREAL_API_KEY || "").replace(/\s*/g, "") || null;
     var ETHEREAL_CACHE = ["true", "yes", "y", "1"].includes((process.env.ETHEREAL_CACHE || "yes").toString().trim().toLowerCase());
     var testAccount = false;
-    module2.exports.createTransport = function(transporter, defaults) {
+    module2.exports.createTransport = function(transporter2, defaults) {
       let options;
       if (
         // provided transporter is a configuration object, not transporter plugin
-        typeof transporter === "object" && typeof transporter.send !== "function" || // provided transporter looks like a connection url
-        typeof transporter === "string" && /^(smtps?|direct):/i.test(transporter)
+        typeof transporter2 === "object" && typeof transporter2.send !== "function" || // provided transporter looks like a connection url
+        typeof transporter2 === "string" && /^(smtps?|direct):/i.test(transporter2)
       ) {
-        const urlConfig = typeof transporter === "string" ? transporter : transporter.url;
+        const urlConfig = typeof transporter2 === "string" ? transporter2 : transporter2.url;
         if (urlConfig) {
           options = shared.parseConnectionUrl(urlConfig);
         } else {
-          options = transporter;
+          options = transporter2;
         }
         if (options.pool) {
-          transporter = new SMTPPool(options);
+          transporter2 = new SMTPPool(options);
         } else if (options.sendmail) {
-          transporter = new SendmailTransport(options);
+          transporter2 = new SendmailTransport(options);
         } else if (options.streamTransport) {
-          transporter = new StreamTransport(options);
+          transporter2 = new StreamTransport(options);
         } else if (options.jsonTransport) {
-          transporter = new JSONTransport(options);
+          transporter2 = new JSONTransport(options);
         } else if (options.SES) {
           if (options.SES.ses && options.SES.aws) {
             const error = new Error(
@@ -51082,12 +44886,12 @@ var require_nodemailer = __commonJS({
             error.code = errors.ECONFIG;
             throw error;
           }
-          transporter = new SESTransport(options);
+          transporter2 = new SESTransport(options);
         } else {
-          transporter = new SMTPTransport(options);
+          transporter2 = new SMTPTransport(options);
         }
       }
-      return new Mailer(transporter, options, defaults);
+      return new Mailer(transporter2, options, defaults);
     };
     module2.exports.createTestAccount = function(apiUrl, callback) {
       let promise;
@@ -51173,42 +44977,5994 @@ var require_nodemailer = __commonJS({
   }
 });
 
-// server/dist/services/email.js
-var require_email = __commonJS({
-  "server/dist/services/email.js"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.sendEmail = sendEmail;
-    exports2.sendVerificationCode = sendVerificationCode;
-    exports2.sendTransactionReceipt = sendTransactionReceipt;
-    exports2.generateVerificationCode = generateVerificationCode;
-    var nodemailer_1 = __importDefault2(require_nodemailer());
-    var crypto_1 = __importDefault2(require("crypto"));
-    var dotenv_12 = __importDefault2(require_main());
-    dotenv_12.default.config();
-    var transporter = nodemailer_1.default.createTransport({
-      host: process.env.SMTP_HOST || "smtp.ethereal.email",
-      port: parseInt(process.env.SMTP_PORT || "587"),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+// server/src/app.ts
+var app_exports = {};
+__export(app_exports, {
+  default: () => app_default
+});
+module.exports = __toCommonJS(app_exports);
+var import_express9 = __toESM(require_express2());
+var import_cookie_parser = __toESM(require_cookie_parser());
+var import_compression = __toESM(require_compression());
+
+// node_modules/helmet/index.mjs
+var dangerouslyDisableDefaultSrc = /* @__PURE__ */ Symbol("dangerouslyDisableDefaultSrc");
+var DEFAULT_DIRECTIVES = {
+  "default-src": ["'self'"],
+  "base-uri": ["'self'"],
+  "font-src": ["'self'", "https:", "data:"],
+  "form-action": ["'self'"],
+  "frame-ancestors": ["'self'"],
+  "img-src": ["'self'", "data:"],
+  "object-src": ["'none'"],
+  "script-src": ["'self'"],
+  "script-src-attr": ["'none'"],
+  "style-src": ["'self'", "https:", "'unsafe-inline'"],
+  "upgrade-insecure-requests": []
+};
+var SHOULD_BE_QUOTED = /* @__PURE__ */ new Set(["none", "self", "strict-dynamic", "report-sample", "inline-speculation-rules", "unsafe-inline", "unsafe-eval", "unsafe-hashes", "wasm-unsafe-eval"]);
+var getDefaultDirectives = () => Object.assign({}, DEFAULT_DIRECTIVES);
+var dashify = (str) => str.replace(/[A-Z]/g, (capitalLetter) => "-" + capitalLetter.toLowerCase());
+var isDirectiveValueInvalid = (directiveValue) => /;|,/.test(directiveValue);
+var shouldDirectiveValueEntryBeQuoted = (directiveValueEntry) => SHOULD_BE_QUOTED.has(directiveValueEntry) || directiveValueEntry.startsWith("nonce-") || directiveValueEntry.startsWith("sha256-") || directiveValueEntry.startsWith("sha384-") || directiveValueEntry.startsWith("sha512-");
+var warnIfDirectiveValueEntryShouldBeQuoted = (value) => {
+  if (shouldDirectiveValueEntryBeQuoted(value)) {
+    console.warn(`Content-Security-Policy got directive value \`${value}\` which should be single-quoted and changed to \`'${value}'\`. This will be an error in future versions of Helmet.`);
+  }
+};
+var has = (obj, key) => Object.prototype.hasOwnProperty.call(obj, key);
+function normalizeDirectives(options) {
+  const defaultDirectives = getDefaultDirectives();
+  const { useDefaults = true, directives: rawDirectives = defaultDirectives } = options;
+  const result = /* @__PURE__ */ new Map();
+  const directiveNamesSeen = /* @__PURE__ */ new Set();
+  const directivesExplicitlyDisabled = /* @__PURE__ */ new Set();
+  for (const rawDirectiveName in rawDirectives) {
+    if (!has(rawDirectives, rawDirectiveName)) {
+      continue;
+    }
+    if (rawDirectiveName.length === 0 || /[^a-zA-Z0-9-]/.test(rawDirectiveName)) {
+      throw new Error(`Content-Security-Policy received an invalid directive name ${JSON.stringify(rawDirectiveName)}`);
+    }
+    const directiveName = dashify(rawDirectiveName);
+    if (directiveNamesSeen.has(directiveName)) {
+      throw new Error(`Content-Security-Policy received a duplicate directive ${JSON.stringify(directiveName)}`);
+    }
+    directiveNamesSeen.add(directiveName);
+    const rawDirectiveValue = rawDirectives[rawDirectiveName];
+    let directiveValue;
+    if (rawDirectiveValue === null) {
+      if (directiveName === "default-src") {
+        throw new Error("Content-Security-Policy needs a default-src but it was set to `null`. If you really want to disable it, set it to `contentSecurityPolicy.dangerouslyDisableDefaultSrc`.");
+      }
+      directivesExplicitlyDisabled.add(directiveName);
+      continue;
+    } else if (typeof rawDirectiveValue === "string") {
+      directiveValue = [rawDirectiveValue];
+    } else if (!rawDirectiveValue) {
+      throw new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
+    } else if (rawDirectiveValue === dangerouslyDisableDefaultSrc) {
+      if (directiveName === "default-src") {
+        directivesExplicitlyDisabled.add("default-src");
+        continue;
+      } else {
+        throw new Error(`Content-Security-Policy: tried to disable ${JSON.stringify(directiveName)} as if it were default-src; simply omit the key`);
+      }
+    } else {
+      directiveValue = rawDirectiveValue;
+    }
+    for (const element of directiveValue) {
+      if (typeof element === "string") {
+        if (isDirectiveValueInvalid(element)) {
+          throw new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
+        }
+        warnIfDirectiveValueEntryShouldBeQuoted(element);
+      }
+    }
+    result.set(directiveName, directiveValue);
+  }
+  if (useDefaults) {
+    Object.entries(defaultDirectives).forEach(([defaultDirectiveName, defaultDirectiveValue]) => {
+      if (!result.has(defaultDirectiveName) && !directivesExplicitlyDisabled.has(defaultDirectiveName)) {
+        result.set(defaultDirectiveName, defaultDirectiveValue);
       }
     });
-    transporter.verify().then(() => {
-      console.log("\u2705 Email server connected");
-    }).catch((err) => {
-      console.warn("\u26A0\uFE0F  Email server not available:", err.message);
-      console.warn("   Emails will be logged to console instead.");
+  }
+  if (!result.size) {
+    throw new Error("Content-Security-Policy has no directives. Either set some or disable the header");
+  }
+  if (!result.has("default-src") && !directivesExplicitlyDisabled.has("default-src")) {
+    throw new Error("Content-Security-Policy needs a default-src but none was provided. If you really want to disable it, set it to `contentSecurityPolicy.dangerouslyDisableDefaultSrc`.");
+  }
+  return result;
+}
+function getHeaderValue(req, res, normalizedDirectives) {
+  let err;
+  const result = [];
+  normalizedDirectives.forEach((rawDirectiveValue, directiveName) => {
+    let directiveValue = "";
+    for (const element of rawDirectiveValue) {
+      if (typeof element === "function") {
+        const newElement = element(req, res);
+        warnIfDirectiveValueEntryShouldBeQuoted(newElement);
+        directiveValue += " " + newElement;
+      } else {
+        directiveValue += " " + element;
+      }
+    }
+    if (!directiveValue) {
+      result.push(directiveName);
+    } else if (isDirectiveValueInvalid(directiveValue)) {
+      err = new Error(`Content-Security-Policy received an invalid directive value for ${JSON.stringify(directiveName)}`);
+    } else {
+      result.push(`${directiveName}${directiveValue}`);
+    }
+  });
+  return err ? err : result.join(";");
+}
+var contentSecurityPolicy = function contentSecurityPolicy2(options = {}) {
+  const headerName = options.reportOnly ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy";
+  const normalizedDirectives = normalizeDirectives(options);
+  return function contentSecurityPolicyMiddleware(req, res, next) {
+    const result = getHeaderValue(req, res, normalizedDirectives);
+    if (result instanceof Error) {
+      next(result);
+    } else {
+      res.setHeader(headerName, result);
+      next();
+    }
+  };
+};
+contentSecurityPolicy.getDefaultDirectives = getDefaultDirectives;
+contentSecurityPolicy.dangerouslyDisableDefaultSrc = dangerouslyDisableDefaultSrc;
+var ALLOWED_POLICIES$2 = /* @__PURE__ */ new Set(["require-corp", "credentialless", "unsafe-none"]);
+function getHeaderValueFromOptions$6({ policy = "require-corp" }) {
+  if (ALLOWED_POLICIES$2.has(policy)) {
+    return policy;
+  } else {
+    throw new Error(`Cross-Origin-Embedder-Policy does not support the ${JSON.stringify(policy)} policy`);
+  }
+}
+function crossOriginEmbedderPolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$6(options);
+  return function crossOriginEmbedderPolicyMiddleware(_req, res, next) {
+    res.setHeader("Cross-Origin-Embedder-Policy", headerValue);
+    next();
+  };
+}
+var ALLOWED_POLICIES$1 = /* @__PURE__ */ new Set(["same-origin", "same-origin-allow-popups", "unsafe-none"]);
+function getHeaderValueFromOptions$5({ policy = "same-origin" }) {
+  if (ALLOWED_POLICIES$1.has(policy)) {
+    return policy;
+  } else {
+    throw new Error(`Cross-Origin-Opener-Policy does not support the ${JSON.stringify(policy)} policy`);
+  }
+}
+function crossOriginOpenerPolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$5(options);
+  return function crossOriginOpenerPolicyMiddleware(_req, res, next) {
+    res.setHeader("Cross-Origin-Opener-Policy", headerValue);
+    next();
+  };
+}
+var ALLOWED_POLICIES = /* @__PURE__ */ new Set(["same-origin", "same-site", "cross-origin"]);
+function getHeaderValueFromOptions$4({ policy = "same-origin" }) {
+  if (ALLOWED_POLICIES.has(policy)) {
+    return policy;
+  } else {
+    throw new Error(`Cross-Origin-Resource-Policy does not support the ${JSON.stringify(policy)} policy`);
+  }
+}
+function crossOriginResourcePolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$4(options);
+  return function crossOriginResourcePolicyMiddleware(_req, res, next) {
+    res.setHeader("Cross-Origin-Resource-Policy", headerValue);
+    next();
+  };
+}
+function originAgentCluster() {
+  return function originAgentClusterMiddleware(_req, res, next) {
+    res.setHeader("Origin-Agent-Cluster", "?1");
+    next();
+  };
+}
+var ALLOWED_TOKENS = /* @__PURE__ */ new Set(["no-referrer", "no-referrer-when-downgrade", "same-origin", "origin", "strict-origin", "origin-when-cross-origin", "strict-origin-when-cross-origin", "unsafe-url", ""]);
+function getHeaderValueFromOptions$3({ policy = ["no-referrer"] }) {
+  const tokens = typeof policy === "string" ? [policy] : policy;
+  if (tokens.length === 0) {
+    throw new Error("Referrer-Policy received no policy tokens");
+  }
+  const tokensSeen = /* @__PURE__ */ new Set();
+  tokens.forEach((token) => {
+    if (!ALLOWED_TOKENS.has(token)) {
+      throw new Error(`Referrer-Policy received an unexpected policy token ${JSON.stringify(token)}`);
+    } else if (tokensSeen.has(token)) {
+      throw new Error(`Referrer-Policy received a duplicate policy token ${JSON.stringify(token)}`);
+    }
+    tokensSeen.add(token);
+  });
+  return tokens.join(",");
+}
+function referrerPolicy(options = {}) {
+  const headerValue = getHeaderValueFromOptions$3(options);
+  return function referrerPolicyMiddleware(_req, res, next) {
+    res.setHeader("Referrer-Policy", headerValue);
+    next();
+  };
+}
+var DEFAULT_MAX_AGE = 180 * 24 * 60 * 60;
+function parseMaxAge(value = DEFAULT_MAX_AGE) {
+  if (value >= 0 && Number.isFinite(value)) {
+    return Math.floor(value);
+  } else {
+    throw new Error(`Strict-Transport-Security: ${JSON.stringify(value)} is not a valid value for maxAge. Please choose a positive integer.`);
+  }
+}
+function getHeaderValueFromOptions$2(options) {
+  if ("maxage" in options) {
+    throw new Error("Strict-Transport-Security received an unsupported property, `maxage`. Did you mean to pass `maxAge`?");
+  }
+  if ("includeSubdomains" in options) {
+    console.warn('Strict-Transport-Security middleware should use `includeSubDomains` instead of `includeSubdomains`. (The correct one has an uppercase "D".)');
+  }
+  const directives = [`max-age=${parseMaxAge(options.maxAge)}`];
+  if (options.includeSubDomains === void 0 || options.includeSubDomains) {
+    directives.push("includeSubDomains");
+  }
+  if (options.preload) {
+    directives.push("preload");
+  }
+  return directives.join("; ");
+}
+function strictTransportSecurity(options = {}) {
+  const headerValue = getHeaderValueFromOptions$2(options);
+  return function strictTransportSecurityMiddleware(_req, res, next) {
+    res.setHeader("Strict-Transport-Security", headerValue);
+    next();
+  };
+}
+function xContentTypeOptions() {
+  return function xContentTypeOptionsMiddleware(_req, res, next) {
+    res.setHeader("X-Content-Type-Options", "nosniff");
+    next();
+  };
+}
+function xDnsPrefetchControl(options = {}) {
+  const headerValue = options.allow ? "on" : "off";
+  return function xDnsPrefetchControlMiddleware(_req, res, next) {
+    res.setHeader("X-DNS-Prefetch-Control", headerValue);
+    next();
+  };
+}
+function xDownloadOptions() {
+  return function xDownloadOptionsMiddleware(_req, res, next) {
+    res.setHeader("X-Download-Options", "noopen");
+    next();
+  };
+}
+function getHeaderValueFromOptions$1({ action = "sameorigin" }) {
+  const normalizedAction = typeof action === "string" ? action.toUpperCase() : action;
+  switch (normalizedAction) {
+    case "SAME-ORIGIN":
+      return "SAMEORIGIN";
+    case "DENY":
+    case "SAMEORIGIN":
+      return normalizedAction;
+    default:
+      throw new Error(`X-Frame-Options received an invalid action ${JSON.stringify(action)}`);
+  }
+}
+function xFrameOptions(options = {}) {
+  const headerValue = getHeaderValueFromOptions$1(options);
+  return function xFrameOptionsMiddleware(_req, res, next) {
+    res.setHeader("X-Frame-Options", headerValue);
+    next();
+  };
+}
+var ALLOWED_PERMITTED_POLICIES = /* @__PURE__ */ new Set(["none", "master-only", "by-content-type", "all"]);
+function getHeaderValueFromOptions({ permittedPolicies = "none" }) {
+  if (ALLOWED_PERMITTED_POLICIES.has(permittedPolicies)) {
+    return permittedPolicies;
+  } else {
+    throw new Error(`X-Permitted-Cross-Domain-Policies does not support ${JSON.stringify(permittedPolicies)}`);
+  }
+}
+function xPermittedCrossDomainPolicies(options = {}) {
+  const headerValue = getHeaderValueFromOptions(options);
+  return function xPermittedCrossDomainPoliciesMiddleware(_req, res, next) {
+    res.setHeader("X-Permitted-Cross-Domain-Policies", headerValue);
+    next();
+  };
+}
+function xPoweredBy() {
+  return function xPoweredByMiddleware(_req, res, next) {
+    res.removeHeader("X-Powered-By");
+    next();
+  };
+}
+function xXssProtection() {
+  return function xXssProtectionMiddleware(_req, res, next) {
+    res.setHeader("X-XSS-Protection", "0");
+    next();
+  };
+}
+function getMiddlewareFunctionsFromOptions(options) {
+  var _a, _b, _c, _d, _e, _f, _g, _h;
+  const result = [];
+  switch (options.contentSecurityPolicy) {
+    case void 0:
+    case true:
+      result.push(contentSecurityPolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(contentSecurityPolicy(options.contentSecurityPolicy));
+      break;
+  }
+  switch (options.crossOriginEmbedderPolicy) {
+    case void 0:
+    case false:
+      break;
+    case true:
+      result.push(crossOriginEmbedderPolicy());
+      break;
+    default:
+      result.push(crossOriginEmbedderPolicy(options.crossOriginEmbedderPolicy));
+      break;
+  }
+  switch (options.crossOriginOpenerPolicy) {
+    case void 0:
+    case true:
+      result.push(crossOriginOpenerPolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(crossOriginOpenerPolicy(options.crossOriginOpenerPolicy));
+      break;
+  }
+  switch (options.crossOriginResourcePolicy) {
+    case void 0:
+    case true:
+      result.push(crossOriginResourcePolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(crossOriginResourcePolicy(options.crossOriginResourcePolicy));
+      break;
+  }
+  switch (options.originAgentCluster) {
+    case void 0:
+    case true:
+      result.push(originAgentCluster());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("Origin-Agent-Cluster does not take options. Remove the property to silence this warning.");
+      result.push(originAgentCluster());
+      break;
+  }
+  switch (options.referrerPolicy) {
+    case void 0:
+    case true:
+      result.push(referrerPolicy());
+      break;
+    case false:
+      break;
+    default:
+      result.push(referrerPolicy(options.referrerPolicy));
+      break;
+  }
+  if ("strictTransportSecurity" in options && "hsts" in options) {
+    throw new Error("Strict-Transport-Security option was specified twice. Remove `hsts` to silence this warning.");
+  }
+  const strictTransportSecurityOption = (_a = options.strictTransportSecurity) !== null && _a !== void 0 ? _a : options.hsts;
+  switch (strictTransportSecurityOption) {
+    case void 0:
+    case true:
+      result.push(strictTransportSecurity());
+      break;
+    case false:
+      break;
+    default:
+      result.push(strictTransportSecurity(strictTransportSecurityOption));
+      break;
+  }
+  if ("xContentTypeOptions" in options && "noSniff" in options) {
+    throw new Error("X-Content-Type-Options option was specified twice. Remove `noSniff` to silence this warning.");
+  }
+  const xContentTypeOptionsOption = (_b = options.xContentTypeOptions) !== null && _b !== void 0 ? _b : options.noSniff;
+  switch (xContentTypeOptionsOption) {
+    case void 0:
+    case true:
+      result.push(xContentTypeOptions());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-Content-Type-Options does not take options. Remove the property to silence this warning.");
+      result.push(xContentTypeOptions());
+      break;
+  }
+  if ("xDnsPrefetchControl" in options && "dnsPrefetchControl" in options) {
+    throw new Error("X-DNS-Prefetch-Control option was specified twice. Remove `dnsPrefetchControl` to silence this warning.");
+  }
+  const xDnsPrefetchControlOption = (_c = options.xDnsPrefetchControl) !== null && _c !== void 0 ? _c : options.dnsPrefetchControl;
+  switch (xDnsPrefetchControlOption) {
+    case void 0:
+    case true:
+      result.push(xDnsPrefetchControl());
+      break;
+    case false:
+      break;
+    default:
+      result.push(xDnsPrefetchControl(xDnsPrefetchControlOption));
+      break;
+  }
+  if ("xDownloadOptions" in options && "ieNoOpen" in options) {
+    throw new Error("X-Download-Options option was specified twice. Remove `ieNoOpen` to silence this warning.");
+  }
+  const xDownloadOptionsOption = (_d = options.xDownloadOptions) !== null && _d !== void 0 ? _d : options.ieNoOpen;
+  switch (xDownloadOptionsOption) {
+    case void 0:
+    case true:
+      result.push(xDownloadOptions());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-Download-Options does not take options. Remove the property to silence this warning.");
+      result.push(xDownloadOptions());
+      break;
+  }
+  if ("xFrameOptions" in options && "frameguard" in options) {
+    throw new Error("X-Frame-Options option was specified twice. Remove `frameguard` to silence this warning.");
+  }
+  const xFrameOptionsOption = (_e = options.xFrameOptions) !== null && _e !== void 0 ? _e : options.frameguard;
+  switch (xFrameOptionsOption) {
+    case void 0:
+    case true:
+      result.push(xFrameOptions());
+      break;
+    case false:
+      break;
+    default:
+      result.push(xFrameOptions(xFrameOptionsOption));
+      break;
+  }
+  if ("xPermittedCrossDomainPolicies" in options && "permittedCrossDomainPolicies" in options) {
+    throw new Error("X-Permitted-Cross-Domain-Policies option was specified twice. Remove `permittedCrossDomainPolicies` to silence this warning.");
+  }
+  const xPermittedCrossDomainPoliciesOption = (_f = options.xPermittedCrossDomainPolicies) !== null && _f !== void 0 ? _f : options.permittedCrossDomainPolicies;
+  switch (xPermittedCrossDomainPoliciesOption) {
+    case void 0:
+    case true:
+      result.push(xPermittedCrossDomainPolicies());
+      break;
+    case false:
+      break;
+    default:
+      result.push(xPermittedCrossDomainPolicies(xPermittedCrossDomainPoliciesOption));
+      break;
+  }
+  if ("xPoweredBy" in options && "hidePoweredBy" in options) {
+    throw new Error("X-Powered-By option was specified twice. Remove `hidePoweredBy` to silence this warning.");
+  }
+  const xPoweredByOption = (_g = options.xPoweredBy) !== null && _g !== void 0 ? _g : options.hidePoweredBy;
+  switch (xPoweredByOption) {
+    case void 0:
+    case true:
+      result.push(xPoweredBy());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-Powered-By does not take options. Remove the property to silence this warning.");
+      result.push(xPoweredBy());
+      break;
+  }
+  if ("xXssProtection" in options && "xssFilter" in options) {
+    throw new Error("X-XSS-Protection option was specified twice. Remove `xssFilter` to silence this warning.");
+  }
+  const xXssProtectionOption = (_h = options.xXssProtection) !== null && _h !== void 0 ? _h : options.xssFilter;
+  switch (xXssProtectionOption) {
+    case void 0:
+    case true:
+      result.push(xXssProtection());
+      break;
+    case false:
+      break;
+    default:
+      console.warn("X-XSS-Protection does not take options. Remove the property to silence this warning.");
+      result.push(xXssProtection());
+      break;
+  }
+  return result;
+}
+var helmet = Object.assign(
+  function helmet2(options = {}) {
+    var _a;
+    if (((_a = options.constructor) === null || _a === void 0 ? void 0 : _a.name) === "IncomingMessage") {
+      throw new Error("It appears you have done something like `app.use(helmet)`, but it should be `app.use(helmet())`.");
+    }
+    const middlewareFunctions = getMiddlewareFunctionsFromOptions(options);
+    return function helmetMiddleware(req, res, next) {
+      let middlewareIndex = 0;
+      (function internalNext(err) {
+        if (err) {
+          next(err);
+          return;
+        }
+        const middlewareFunction = middlewareFunctions[middlewareIndex];
+        if (middlewareFunction) {
+          middlewareIndex++;
+          middlewareFunction(req, res, internalNext);
+        } else {
+          next();
+        }
+      })();
+    };
+  },
+  {
+    contentSecurityPolicy,
+    crossOriginEmbedderPolicy,
+    crossOriginOpenerPolicy,
+    crossOriginResourcePolicy,
+    originAgentCluster,
+    referrerPolicy,
+    strictTransportSecurity,
+    xContentTypeOptions,
+    xDnsPrefetchControl,
+    xDownloadOptions,
+    xFrameOptions,
+    xPermittedCrossDomainPolicies,
+    xPoweredBy,
+    xXssProtection,
+    // Legacy aliases
+    dnsPrefetchControl: xDnsPrefetchControl,
+    xssFilter: xXssProtection,
+    permittedCrossDomainPolicies: xPermittedCrossDomainPolicies,
+    ieNoOpen: xDownloadOptions,
+    noSniff: xContentTypeOptions,
+    frameguard: xFrameOptions,
+    hidePoweredBy: xPoweredBy,
+    hsts: strictTransportSecurity
+  }
+);
+
+// server/src/app.ts
+var import_cors = __toESM(require_lib3());
+var import_path = __toESM(require("path"));
+var import_dotenv3 = __toESM(require_main());
+
+// node_modules/express-rate-limit/dist/index.mjs
+var import_node_net = require("node:net");
+var import_ip_address = __toESM(require_ip_address(), 1);
+var import_node_net2 = require("node:net");
+var import_debug = __toESM(require_src6(), 1);
+var import_node_buffer = require("node:buffer");
+var import_node_crypto = require("node:crypto");
+var import_node_net3 = require("node:net");
+var ipv4CompatibleSubnet = new import_ip_address.Address6("::/96");
+function ipKeyGenerator(ip, ipv6Subnet = 56) {
+  if ((0, import_node_net.isIPv6)(ip)) {
+    const address = new import_ip_address.Address6(ip);
+    if (address.isMapped4() || // The deprecated IPv4-compatible notation keeps its existing behavior.
+    // Its range is shared with addresses that embed no IPv4 address at all
+    // (`::`, `::1`), so here the notation is what tells them apart.
+    address.is4() && address.isInSubnet(ipv4CompatibleSubnet))
+      return address.to4().correctForm();
+    if (ipv6Subnet) {
+      const subnet = new import_ip_address.Address6(`${ip}/${ipv6Subnet}`);
+      return subnet.networkForm();
+    }
+  }
+  return ip;
+}
+var MemoryStore = class {
+  constructor(validations2) {
+    this.validations = validations2;
+    this.previous = /* @__PURE__ */ new Map();
+    this.current = /* @__PURE__ */ new Map();
+    this.localKeys = true;
+  }
+  /**
+   * Method that initializes the store.
+   *
+   * @param options {Options} - The options used to setup the middleware.
+   */
+  init(options) {
+    this.windowMs = options.windowMs;
+    this.validations?.windowMs(this.windowMs);
+    if (this.interval) clearInterval(this.interval);
+    this.interval = setInterval(() => {
+      this.clearExpired();
+    }, this.windowMs);
+    this.interval.unref?.();
+  }
+  /**
+   * Method to fetch a client's hit count and reset time.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo | undefined} - The number of hits and reset time for that client.
+   *
+   * @public
+   */
+  async get(key) {
+    return this.current.get(key) ?? this.previous.get(key);
+  }
+  /**
+   * Method to increment a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @returns {ClientRateLimitInfo} - The number of hits and reset time for that client.
+   *
+   * @public
+   */
+  async increment(key) {
+    const client = this.getClient(key);
+    const now = Date.now();
+    if (client.resetTime.getTime() <= now) {
+      this.resetClient(client, now);
+    }
+    client.totalHits++;
+    return client;
+  }
+  /**
+   * Method to decrement a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @public
+   */
+  async decrement(key) {
+    const client = this.getClient(key);
+    if (client.totalHits > 0) client.totalHits--;
+  }
+  /**
+   * Method to reset a client's hit counter.
+   *
+   * @param key {string} - The identifier for a client.
+   *
+   * @public
+   */
+  async resetKey(key) {
+    this.current.delete(key);
+    this.previous.delete(key);
+  }
+  /**
+   * Method to reset everyone's hit counter.
+   *
+   * @public
+   */
+  async resetAll() {
+    this.current.clear();
+    this.previous.clear();
+  }
+  /**
+   * Method to stop the timer (if currently running) and prevent any memory
+   * leaks.
+   *
+   * @public
+   */
+  shutdown() {
+    clearInterval(this.interval);
+    void this.resetAll();
+  }
+  /**
+   * Recycles a client by setting its hit count to zero, and reset time to
+   * `windowMs` milliseconds from now.
+   *
+   * NOT to be confused with `#resetKey()`, which removes a client from both the
+   * `current` and `previous` maps.
+   *
+   * @param client {Client} - The client to recycle.
+   * @param now {number} - The current time, to which the `windowMs` is added to get the `resetTime` for the client.
+   *
+   * @return {Client} - The modified client that was passed in, to allow for chaining.
+   */
+  resetClient(client, now = Date.now()) {
+    client.totalHits = 0;
+    client.resetTime.setTime(now + this.windowMs);
+    return client;
+  }
+  /**
+   * Retrieves or creates a client, given a key. Also ensures that the client being
+   * returned is in the `current` map.
+   *
+   * @param key {string} - The key under which the client is (or is to be) stored.
+   *
+   * @returns {Client} - The requested client.
+   */
+  getClient(key) {
+    if (this.current.has(key)) return this.current.get(key);
+    let client;
+    if (this.previous.has(key)) {
+      client = this.previous.get(key);
+      this.previous.delete(key);
+    } else {
+      client = { totalHits: 0, resetTime: /* @__PURE__ */ new Date() };
+      this.resetClient(client);
+    }
+    this.current.set(key, client);
+    return client;
+  }
+  /**
+   * Move current clients to previous, create a new map for current.
+   *
+   * This function is called every `windowMs`.
+   */
+  clearExpired() {
+    this.previous = this.current;
+    this.current = /* @__PURE__ */ new Map();
+  }
+};
+var ConsoleLogger = {
+  warn(...args) {
+    console.warn(...args.reverse());
+  },
+  error(...args) {
+    console.error(...args.reverse());
+  }
+};
+var SUPPORTED_DRAFT_VERSIONS = [
+  "draft-6",
+  "draft-7",
+  "draft-8"
+];
+var getResetSeconds = (windowMs, resetTime) => {
+  let resetSeconds;
+  if (resetTime) {
+    const deltaSeconds = Math.ceil((resetTime.getTime() - Date.now()) / 1e3);
+    resetSeconds = Math.max(0, deltaSeconds);
+  } else {
+    resetSeconds = Math.ceil(windowMs / 1e3);
+  }
+  return resetSeconds;
+};
+var getPartitionKey = (key) => {
+  const hash = (0, import_node_crypto.createHash)("sha256");
+  hash.update(key);
+  const partitionKey = hash.digest("hex").slice(0, 12);
+  return import_node_buffer.Buffer.from(partitionKey).toString("base64");
+};
+var setLegacyHeaders = (response, info) => {
+  if (response.headersSent) return;
+  response.setHeader("X-RateLimit-Limit", info.limit.toString());
+  response.setHeader("X-RateLimit-Remaining", info.remaining.toString());
+  if (info.resetTime instanceof Date) {
+    response.setHeader("Date", (/* @__PURE__ */ new Date()).toUTCString());
+    response.setHeader(
+      "X-RateLimit-Reset",
+      Math.ceil(info.resetTime.getTime() / 1e3).toString()
+    );
+  }
+};
+var setDraft6Headers = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
+  response.setHeader("RateLimit-Limit", info.limit.toString());
+  response.setHeader("RateLimit-Remaining", info.remaining.toString());
+  if (typeof resetSeconds === "number")
+    response.setHeader("RateLimit-Reset", resetSeconds.toString());
+};
+var setDraft7Headers = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("RateLimit-Policy", `${info.limit};w=${windowSeconds}`);
+  response.setHeader(
+    "RateLimit",
+    `limit=${info.limit}, remaining=${info.remaining}, reset=${resetSeconds}`
+  );
+};
+var setDraft8Headers = (response, info, windowMs, name, key) => {
+  if (response.headersSent) return;
+  const windowSeconds = Math.ceil(windowMs / 1e3);
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  const partitionKey = getPartitionKey(key);
+  const header = `r=${info.remaining}; t=${resetSeconds}`;
+  const policy = `q=${info.limit}; w=${windowSeconds}; pk=:${partitionKey}:`;
+  response.append("RateLimit", `"${name}"; ${header}`);
+  response.append("RateLimit-Policy", `"${name}"; ${policy}`);
+};
+var setRetryAfterHeader = (response, info, windowMs) => {
+  if (response.headersSent) return;
+  const resetSeconds = getResetSeconds(windowMs, info.resetTime);
+  response.setHeader("Retry-After", resetSeconds.toString());
+};
+var omitUndefinedProperties = (passedOptions) => {
+  const omittedOptions = {};
+  for (const k of Object.keys(passedOptions)) {
+    const key = k;
+    if (passedOptions[key] !== void 0) {
+      omittedOptions[key] = passedOptions[key];
+    }
+  }
+  return omittedOptions;
+};
+var ValidationError = class extends Error {
+  /**
+   * The code must be a string, in snake case and all capital, that starts with
+   * the substring `ERR_ERL_`.
+   *
+   * The message must be a string, starting with an uppercase character,
+   * describing the issue in detail.
+   */
+  constructor(code, message) {
+    const url = `https://express-rate-limit.github.io/${code}/`;
+    super(`${message} See ${url} for more information.`);
+    this.name = this.constructor.name;
+    this.code = code;
+    this.help = url;
+  }
+};
+var ChangeWarning = class extends ValidationError {
+};
+var usedStores = /* @__PURE__ */ new Set();
+var singleCountKeys = /* @__PURE__ */ new WeakMap();
+var validations = {
+  enabled: {
+    default: true
+  },
+  // Should be EnabledValidations type, but that's a circular reference
+  disable() {
+    for (const k of Object.keys(this.enabled)) this.enabled[k] = false;
+  },
+  /**
+   * Checks whether the IP address is valid, and that it does not have a port
+   * number in it.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_invalid_ip_address.
+   *
+   * @param ip {string | undefined} - The IP address provided by Express as request.ip.
+   *
+   * @returns {void}
+   */
+  ip(ip) {
+    if (ip === void 0) {
+      throw new ValidationError(
+        "ERR_ERL_UNDEFINED_IP_ADDRESS",
+        `An undefined 'request.ip' was detected. This might indicate a misconfiguration or the connection being destroyed prematurely.`
+      );
+    }
+    if (!(0, import_node_net3.isIP)(ip)) {
+      throw new ValidationError(
+        "ERR_ERL_INVALID_IP_ADDRESS",
+        `An invalid 'request.ip' (${ip}) was detected. Consider passing a custom 'keyGenerator' function to the rate limiter.`
+      );
+    }
+  },
+  /**
+   * Makes sure the trust proxy setting is not set to `true`.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_permissive_trust_proxy.
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  trustProxy(request) {
+    if (request.app.get("trust proxy") === true) {
+      throw new ValidationError(
+        "ERR_ERL_PERMISSIVE_TRUST_PROXY",
+        `The Express 'trust proxy' setting is true, which allows anyone to trivially bypass IP-based rate limiting.`
+      );
+    }
+  },
+  /**
+   * Makes sure the trust proxy setting is set in case the `X-Forwarded-For`
+   * header is present.
+   *
+   * See https://github.com/express-rate-limit/express-rate-limit/wiki/Error-Codes#err_erl_unset_trust_proxy.
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  xForwardedForHeader(request) {
+    if (request.headers["x-forwarded-for"] && request.app.get("trust proxy") === false) {
+      throw new ValidationError(
+        "ERR_ERL_UNEXPECTED_X_FORWARDED_FOR",
+        `The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users.`
+      );
+    }
+  },
+  /**
+   * Alert the user if the Forwarded header is set (standardized version of X-Forwarded-For - not supported by express as of version 5.1.0)
+   *
+   * @param request {Request} - The Express request object.
+   *
+   * @returns {void}
+   */
+  forwardedHeader(request) {
+    if (request.headers.forwarded && request.ip === request.socket?.remoteAddress) {
+      throw new ValidationError(
+        "ERR_ERL_FORWARDED_HEADER",
+        `The 'Forwarded' header (standardized X-Forwarded-For) is set but currently being ignored. Add a custom keyGenerator to use a value from this header.`
+      );
+    }
+  },
+  /**
+   * Ensures totalHits value from store is a positive integer.
+   *
+   * @param hits {any} - The `totalHits` returned by the store.
+   */
+  positiveHits(hits) {
+    if (typeof hits !== "number" || hits < 1 || hits !== Math.round(hits)) {
+      throw new ValidationError(
+        "ERR_ERL_INVALID_HITS",
+        `The totalHits value returned from the store must be a positive integer, got ${hits}`
+      );
+    }
+  },
+  /**
+   * Ensures a single store instance is not used with multiple express-rate-limit instances
+   */
+  unsharedStore(store) {
+    if (usedStores.has(store)) {
+      const maybeUniquePrefix = store?.localKeys ? "" : " (with a unique prefix)";
+      throw new ValidationError(
+        "ERR_ERL_STORE_REUSE",
+        `A Store instance must not be shared across multiple rate limiters. Create a new instance of ${store.constructor.name}${maybeUniquePrefix} for each limiter instead.`
+      );
+    }
+    usedStores.add(store);
+  },
+  /**
+   * Ensures a given key is incremented only once per request.
+   *
+   * @param request {Request} - The Express request object.
+   * @param store {Store} - The store class.
+   * @param key {string} - The key used to store the client's hit count.
+   *
+   * @returns {void}
+   */
+  singleCount(request, store, key) {
+    let storeKeys = singleCountKeys.get(request);
+    if (!storeKeys) {
+      storeKeys = /* @__PURE__ */ new Map();
+      singleCountKeys.set(request, storeKeys);
+    }
+    const storeKey = store.localKeys ? store : store.constructor.name;
+    let keys = storeKeys.get(storeKey);
+    if (!keys) {
+      keys = [];
+      storeKeys.set(storeKey, keys);
+    }
+    const prefixedKey = `${store.prefix ?? ""}${key}`;
+    if (keys.includes(prefixedKey)) {
+      throw new ValidationError(
+        "ERR_ERL_DOUBLE_COUNT",
+        `The hit count for ${key} was incremented more than once for a single request.`
+      );
+    }
+    keys.push(prefixedKey);
+  },
+  /**
+   * Warns the user that the behaviour for `max: 0` / `limit: 0` is
+   * changing in the next major release.
+   *
+   * @param limit {number} - The maximum number of hits per client.
+   *
+   * @returns {void}
+   */
+  limit(limit) {
+    if (limit === 0) {
+      throw new ChangeWarning(
+        "WRN_ERL_MAX_ZERO",
+        "Setting limit or max to 0 disables rate limiting in express-rate-limit v6 and older, but will cause all requests to be blocked in v7"
+      );
+    }
+  },
+  /**
+   * Warns the user that the `draft_polli_ratelimit_headers` option is deprecated
+   * and will be removed in the next major release.
+   *
+   * @param draft_polli_ratelimit_headers {any | undefined} - The now-deprecated setting that was used to enable standard headers.
+   *
+   * @returns {void}
+   */
+  draftPolliHeaders(draft_polli_ratelimit_headers) {
+    if (draft_polli_ratelimit_headers) {
+      throw new ChangeWarning(
+        "WRN_ERL_DEPRECATED_DRAFT_POLLI_HEADERS",
+        `The draft_polli_ratelimit_headers configuration option is deprecated and has been removed in express-rate-limit v7, please set standardHeaders: 'draft-6' instead.`
+      );
+    }
+  },
+  /**
+   * Warns the user that the `onLimitReached` option is deprecated and
+   * will be removed in the next major release.
+   *
+   * @param onLimitReached {any | undefined} - The maximum number of hits per client.
+   *
+   * @returns {void}
+   */
+  onLimitReached(onLimitReached) {
+    if (onLimitReached) {
+      throw new ChangeWarning(
+        "WRN_ERL_DEPRECATED_ON_LIMIT_REACHED",
+        "The onLimitReached configuration option is deprecated and has been removed in express-rate-limit v7."
+      );
+    }
+  },
+  /**
+   * Warns the user when an invalid/unsupported version of the draft spec is passed.
+   *
+   * @param version {any | undefined} - The version passed by the user.
+   *
+   * @returns {void}
+   */
+  headersDraftVersion(version) {
+    if (typeof version !== "string" || // @ts-expect-error This is fine. If version is not in the array, it will just return false.
+    !SUPPORTED_DRAFT_VERSIONS.includes(version)) {
+      const versionString = SUPPORTED_DRAFT_VERSIONS.join(", ");
+      throw new ValidationError(
+        "ERR_ERL_HEADERS_UNSUPPORTED_DRAFT_VERSION",
+        `standardHeaders: only the following versions of the IETF draft specification are supported: ${versionString}.`
+      );
+    }
+  },
+  /**
+   * Warns the user when the selected headers option requires a reset time but
+   * the store does not provide one.
+   *
+   * @param resetTime {Date | undefined} - The timestamp when the client's hit count will be reset.
+   *
+   * @returns {void}
+   */
+  headersResetTime(resetTime) {
+    if (!resetTime) {
+      throw new ValidationError(
+        "ERR_ERL_HEADERS_NO_RESET",
+        `standardHeaders:  'draft-7' requires a 'resetTime', but the store did not provide one. The 'windowMs' value will be used instead, which may cause clients to wait longer than necessary.`
+      );
+    }
+  },
+  knownOptions(passedOptions) {
+    if (!passedOptions) return;
+    const optionsMap = {
+      windowMs: true,
+      limit: true,
+      message: true,
+      statusCode: true,
+      legacyHeaders: true,
+      standardHeaders: true,
+      identifier: true,
+      requestPropertyName: true,
+      skipFailedRequests: true,
+      skipSuccessfulRequests: true,
+      keyGenerator: true,
+      ipv6Subnet: true,
+      handler: true,
+      skip: true,
+      requestWasSuccessful: true,
+      store: true,
+      validate: true,
+      headers: true,
+      max: true,
+      passOnStoreError: true,
+      logger: true
+    };
+    const validOptions = Object.keys(optionsMap).concat(
+      "draft_polli_ratelimit_headers",
+      // not a valid option anymore, but we have a more specific check for this one, so don't warn for it here
+      // from express-slow-down - https://github.com/express-rate-limit/express-slow-down/blob/main/source/types.ts#L65
+      "delayAfter",
+      "delayMs",
+      "maxDelayMs"
+    );
+    for (const key of Object.keys(passedOptions)) {
+      if (!validOptions.includes(key)) {
+        throw new ValidationError(
+          "ERR_ERL_UNKNOWN_OPTION",
+          `Unexpected configuration option: ${key}`
+          // todo: suggest a valid option with a short levenstein distance?
+        );
+      }
+    }
+  },
+  /**
+   * Checks the options.validate setting to ensure that only recognized
+   * validations are enabled or disabled.
+   *
+   * If any unrecognized values are found, an error is logged that
+   * includes the list of supported validations.
+   */
+  validationsConfig() {
+    const supportedValidations = Object.keys(this).filter(
+      (k) => !["enabled", "disable"].includes(k)
+    );
+    supportedValidations.push("default");
+    for (const key of Object.keys(this.enabled)) {
+      if (!supportedValidations.includes(key)) {
+        throw new ValidationError(
+          "ERR_ERL_UNKNOWN_VALIDATION",
+          `options.validate.${key} is not recognized. Supported validate options are: ${supportedValidations.join(
+            ", "
+          )}.`
+        );
+      }
+    }
+  },
+  /**
+   * Checks to see if the instance was created inside of a request handler,
+   * which would prevent it from working correctly, with the default memory
+   * store (or any other store with localKeys.)
+   */
+  creationStack(store) {
+    const { stack } = new Error(
+      "express-rate-limit validation check (set options.validate.creationStack=false to disable)"
+    );
+    if (stack?.includes("Layer.handle [as handle_request]") || // express v4
+    stack?.includes("Layer.handleRequest")) {
+      if (!store.localKeys) {
+        throw new ValidationError(
+          "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
+          "express-rate-limit instance should *usually* be created at app initialization, not when responding to a request."
+        );
+      }
+      throw new ValidationError(
+        "ERR_ERL_CREATED_IN_REQUEST_HANDLER",
+        "express-rate-limit instance should be created at app initialization, not when responding to a request."
+      );
+    }
+  },
+  ipv6Subnet(ipv6Subnet) {
+    if (ipv6Subnet === false) {
+      return;
+    }
+    if (!Number.isInteger(ipv6Subnet) || ipv6Subnet < 32 || ipv6Subnet > 64) {
+      throw new ValidationError(
+        "ERR_ERL_IPV6_SUBNET",
+        `Unexpected ipv6Subnet value: ${ipv6Subnet}. Expected an integer between 32 and 64 (usually 48-64).`
+      );
+    }
+  },
+  ipv6SubnetOrKeyGenerator(options) {
+    if (options.ipv6Subnet !== void 0 && options.keyGenerator) {
+      throw new ValidationError(
+        "ERR_ERL_IPV6SUBNET_OR_KEYGENERATOR",
+        `Incompatible options: the 'ipv6Subnet' option is ignored when a custom 'keyGenerator' function is also set.`
+      );
+    }
+  },
+  keyGeneratorIpFallback(keyGenerator) {
+    if (!keyGenerator) {
+      return;
+    }
+    const src = keyGenerator.toString();
+    if ((src.includes("req.ip") || src.includes("request.ip")) && !src.includes("ipKeyGenerator")) {
+      throw new ValidationError(
+        "ERR_ERL_KEY_GEN_IPV6",
+        "Custom keyGenerator appears to use request IP without calling the ipKeyGenerator helper function for IPv6 addresses. This could allow IPv6 users to bypass limits."
+      );
+    }
+  },
+  /**
+   * Checks to see if the window duration is greater than 2^32 - 1. This is only
+   * called by the default MemoryStore, since it uses Node's setInterval method.
+   *
+   * See https://nodejs.org/api/timers.html#setintervalcallback-delay-args.
+   */
+  windowMs(windowMs) {
+    const SET_TIMEOUT_MAX = 2 ** 31 - 1;
+    if (typeof windowMs !== "number" || Number.isNaN(windowMs) || windowMs < 1 || windowMs > SET_TIMEOUT_MAX) {
+      throw new ValidationError(
+        "ERR_ERL_WINDOW_MS",
+        `Invalid windowMs value: ${windowMs}${typeof windowMs !== "number" ? ` (${typeof windowMs})` : ""}, must be a number between 1 and ${SET_TIMEOUT_MAX} when using the default MemoryStore`
+      );
+    }
+  }
+};
+function validateLogger(logger) {
+  if (typeof logger !== "object" || typeof logger.error !== "function" || typeof logger.warn !== "function") {
+    throw new TypeError(
+      "Provided logger does not implement the Logger interface"
+    );
+  }
+}
+var getValidations = (_enabled, logger) => {
+  validateLogger(logger);
+  let enabled;
+  if (typeof _enabled === "boolean") {
+    enabled = {
+      default: _enabled
+    };
+  } else {
+    enabled = {
+      default: true,
+      ..._enabled
+    };
+  }
+  const wrappedValidations = { enabled };
+  for (const [name, validation] of Object.entries(validations)) {
+    if (typeof validation === "function")
+      wrappedValidations[name] = (...args) => {
+        if (!(enabled[name] ?? enabled.default)) {
+          return;
+        }
+        enabled[name] = false;
+        try {
+          ;
+          validation.apply(
+            wrappedValidations,
+            args
+          );
+        } catch (error) {
+          if (error instanceof ChangeWarning) logger.warn(error);
+          else logger.error(error);
+        }
+      };
+  }
+  const inspect = /* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom");
+  if (inspect)
+    wrappedValidations[inspect] = () => wrappedValidations.enabled;
+  return wrappedValidations;
+};
+var isLegacyStore = (store) => (
+  // Check that `incr` exists but `increment` does not - store authors might want
+  // to keep both around for backwards compatibility.
+  typeof store.incr === "function" && typeof store.increment !== "function"
+);
+var promisifyStore = (passedStore) => {
+  if (!isLegacyStore(passedStore)) {
+    return passedStore;
+  }
+  const legacyStore = passedStore;
+  class PromisifiedStore {
+    async increment(key) {
+      return new Promise((resolve, reject) => {
+        legacyStore.incr(
+          key,
+          (error, totalHits, resetTime) => {
+            if (error) reject(error);
+            resolve({ totalHits, resetTime });
+          }
+        );
+      });
+    }
+    async decrement(key) {
+      return legacyStore.decrement(key);
+    }
+    async resetKey(key) {
+      return legacyStore.resetKey(key);
+    }
+    /* istanbul ignore next */
+    async resetAll() {
+      if (typeof legacyStore.resetAll === "function")
+        return legacyStore.resetAll();
+    }
+  }
+  return new PromisifiedStore();
+};
+var getOptionsFromConfig = (config) => {
+  const { validations: validations2, ...directlyPassableEntries } = config;
+  return {
+    ...directlyPassableEntries,
+    validate: validations2.enabled
+  };
+};
+var parseOptions = (passedOptions) => {
+  const notUndefinedOptions = omitUndefinedProperties(passedOptions);
+  const logger = passedOptions.logger ?? ConsoleLogger;
+  const validations2 = getValidations(
+    notUndefinedOptions?.validate ?? true,
+    logger
+  );
+  validations2.validationsConfig();
+  validations2.knownOptions(passedOptions);
+  validations2.draftPolliHeaders(
+    // @ts-expect-error see the note above.
+    notUndefinedOptions.draft_polli_ratelimit_headers
+  );
+  validations2.onLimitReached(notUndefinedOptions.onLimitReached);
+  if (notUndefinedOptions.ipv6Subnet !== void 0 && typeof notUndefinedOptions.ipv6Subnet !== "function") {
+    validations2.ipv6Subnet(notUndefinedOptions.ipv6Subnet);
+  }
+  validations2.keyGeneratorIpFallback(notUndefinedOptions.keyGenerator);
+  validations2.ipv6SubnetOrKeyGenerator(notUndefinedOptions);
+  let standardHeaders = notUndefinedOptions.standardHeaders ?? false;
+  if (standardHeaders === true) standardHeaders = "draft-6";
+  const config = {
+    windowMs: 60 * 1e3,
+    limit: passedOptions.max ?? 5,
+    // `max` is deprecated, but support it anyways.
+    message: "Too many requests, please try again later.",
+    statusCode: 429,
+    legacyHeaders: passedOptions.headers ?? true,
+    identifier(request, _response) {
+      let duration = "";
+      const property = config.requestPropertyName;
+      const { limit } = request[property];
+      const seconds = config.windowMs / 1e3;
+      const minutes = config.windowMs / (1e3 * 60);
+      const hours = config.windowMs / (1e3 * 60 * 60);
+      const days = config.windowMs / (1e3 * 60 * 60 * 24);
+      if (seconds < 60) duration = `${seconds}sec`;
+      else if (minutes < 60) duration = `${minutes}min`;
+      else if (hours < 24) duration = `${hours}hr${hours > 1 ? "s" : ""}`;
+      else duration = `${days}day${days > 1 ? "s" : ""}`;
+      return `${limit}-in-${duration}`;
+    },
+    requestPropertyName: "rateLimit",
+    skipFailedRequests: false,
+    skipSuccessfulRequests: false,
+    requestWasSuccessful: (_request, response) => response.statusCode < 400,
+    skip: (_request, _response) => false,
+    async keyGenerator(request, response) {
+      validations2.ip(request.ip);
+      validations2.trustProxy(request);
+      validations2.xForwardedForHeader(request);
+      validations2.forwardedHeader(request);
+      const ip = request.ip;
+      let subnet = 56;
+      if ((0, import_node_net2.isIPv6)(ip)) {
+        subnet = typeof config.ipv6Subnet === "function" ? await config.ipv6Subnet(request, response) : config.ipv6Subnet;
+        if (typeof config.ipv6Subnet === "function")
+          validations2.ipv6Subnet(subnet);
+      }
+      return ipKeyGenerator(ip, subnet);
+    },
+    ipv6Subnet: 56,
+    async handler(request, response, _next, _optionsUsed) {
+      response.status(config.statusCode);
+      const message = typeof config.message === "function" ? await config.message(
+        request,
+        response
+      ) : config.message;
+      if (!response.writableEnded) response.send(message);
+    },
+    passOnStoreError: false,
+    // Allow the default options to be overridden by the passed options.
+    ...notUndefinedOptions,
+    // `standardHeaders` is resolved into a draft version above, use that.
+    standardHeaders,
+    // Note that this field is declared after the user's options are spread in,
+    // so that this field doesn't get overridden with an un-promisified store!
+    store: promisifyStore(
+      notUndefinedOptions.store ?? new MemoryStore(validations2)
+    ),
+    // Print an error to the console if a few known misconfigurations are detected.
+    validations: validations2,
+    logger
+  };
+  if (typeof config.store.increment !== "function" || typeof config.store.decrement !== "function" || typeof config.store.resetKey !== "function" || config.store.resetAll !== void 0 && typeof config.store.resetAll !== "function" || config.store.init !== void 0 && typeof config.store.init !== "function") {
+    throw new TypeError(
+      "An invalid store was passed. Please ensure that the store is a class that implements the `Store` interface."
+    );
+  }
+  return config;
+};
+var handleAsyncErrors = (fn) => async (request, response, next) => {
+  try {
+    await Promise.resolve(fn(request, response, next)).catch(next);
+  } catch (error) {
+    next(error);
+  }
+};
+var rateLimit = (passedOptions) => {
+  const config = parseOptions(passedOptions ?? {});
+  const options = getOptionsFromConfig(config);
+  const debug = (0, import_debug.default)("express-rate-limit");
+  debug("creating new rate limiter with %o", config.store.constructor.name);
+  for (const [key, val] of Object.entries(config))
+    debug("set %s to %o", key, val);
+  config.validations.creationStack(config.store);
+  config.validations.unsharedStore(config.store);
+  if (typeof config.store.init === "function") {
+    debug("executing init for store");
+    try {
+      const storeInit = config.store.init(options);
+      if (storeInit instanceof Promise) {
+        storeInit.catch(
+          (error) => config.logger.error(
+            error,
+            "express-rate-limit: async error during store initialization."
+          )
+        );
+      }
+    } catch (error) {
+      config.logger.error(
+        error,
+        "express-rate-limit: error during store initialization."
+      );
+    }
+  }
+  const middleware = handleAsyncErrors(
+    async (request, response, next) => {
+      const closePromise = config.skipFailedRequests && new Promise((resolve) => response.once("close", resolve));
+      const finishPromise = (config.skipFailedRequests || config.skipSuccessfulRequests) && new Promise((resolve) => response.once("finish", resolve));
+      const errorPromise = config.skipFailedRequests && new Promise((resolve) => response.once("error", resolve));
+      debug("requested %o", request.originalUrl);
+      debug("request from ip %o", request.ip);
+      const skip = await config.skip(request, response);
+      if (skip) {
+        debug("skipping request");
+        next();
+        return;
+      }
+      const augmentedRequest = request;
+      const key = await config.keyGenerator(request, response);
+      debug("computed key %o", key);
+      debug("incrementing count");
+      let totalHits = 0;
+      let resetTime;
+      try {
+        const incrementResult = await config.store.increment(key);
+        totalHits = incrementResult.totalHits;
+        resetTime = incrementResult.resetTime;
+      } catch (error) {
+        if (config.passOnStoreError) {
+          config.logger.error(
+            error,
+            "express-rate-limit: error from store, allowing request without rate-limiting."
+          );
+          next();
+          return;
+        }
+        throw error;
+      }
+      config.validations.positiveHits(totalHits);
+      config.validations.singleCount(request, config.store, key);
+      const retrieveLimit = typeof config.limit === "function" ? config.limit(request, response) : config.limit;
+      const limit = await retrieveLimit;
+      config.validations.limit(limit);
+      const info = {
+        limit,
+        used: totalHits,
+        remaining: Math.max(limit - totalHits, 0),
+        resetTime,
+        key
+      };
+      for (const [key2, val] of Object.entries(info))
+        debug(
+          "set request.%s.%s to be %o",
+          config.requestPropertyName,
+          key2,
+          val
+        );
+      Object.defineProperty(info, "current", {
+        configurable: false,
+        enumerable: false,
+        value: totalHits
+      });
+      augmentedRequest[config.requestPropertyName] = info;
+      if (config.legacyHeaders && !response.headersSent) {
+        debug("set legacy headers");
+        setLegacyHeaders(response, info);
+      }
+      if (config.standardHeaders && !response.headersSent) {
+        switch (config.standardHeaders) {
+          case "draft-6": {
+            debug("set ietf draft 6 headers");
+            setDraft6Headers(response, info, config.windowMs);
+            break;
+          }
+          case "draft-7": {
+            debug("set ietf draft 7 headers");
+            config.validations.headersResetTime(info.resetTime);
+            setDraft7Headers(response, info, config.windowMs);
+            break;
+          }
+          case "draft-8": {
+            const retrieveName = typeof config.identifier === "function" ? config.identifier(request, response) : config.identifier;
+            const name = await retrieveName;
+            debug("set ietf draft 8 headers");
+            debug("set name to %o", name);
+            config.validations.headersResetTime(info.resetTime);
+            setDraft8Headers(response, info, config.windowMs, name, key);
+            break;
+          }
+          default: {
+            config.validations.headersDraftVersion(config.standardHeaders);
+            break;
+          }
+        }
+      }
+      if (config.skipFailedRequests || config.skipSuccessfulRequests) {
+        let decremented = false;
+        const decrementKey = async () => {
+          if (!decremented) {
+            if (resetTime && Date.now() >= resetTime.getTime()) {
+              return;
+            }
+            debug("decrementing count");
+            await config.store.decrement(key);
+            decremented = true;
+          }
+        };
+        if (config.skipFailedRequests) {
+          if (finishPromise) {
+            void finishPromise.then(async () => {
+              const success = await config.requestWasSuccessful(
+                request,
+                response
+              );
+              debug("computed requestWasSuccessful as %o", success);
+              if (!success) await decrementKey();
+            });
+          }
+          if (closePromise) {
+            void closePromise.then(async () => {
+              if (!response.writableEnded) await decrementKey();
+            });
+          }
+          if (errorPromise) {
+            void errorPromise.then(async () => {
+              await decrementKey();
+            });
+          }
+        }
+        if (config.skipSuccessfulRequests) {
+          if (finishPromise) {
+            void finishPromise.then(async () => {
+              const success = await config.requestWasSuccessful(
+                request,
+                response
+              );
+              debug("computed requestWasSuccessful as %o", success);
+              if (success) await decrementKey();
+            });
+          }
+        }
+      }
+      if (totalHits > limit) {
+        debug("limit exceeded");
+        if (config.legacyHeaders || config.standardHeaders) {
+          debug("set retry-after header");
+          setRetryAfterHeader(response, info, config.windowMs);
+        }
+        config.handler(request, response, next, options);
+        return;
+      }
+      next();
+    }
+  );
+  const getThrowFn = () => {
+    throw new Error("The current store does not support the get/getKey method");
+  };
+  middleware.resetKey = config.store.resetKey.bind(config.store);
+  middleware.getKey = typeof config.store.get === "function" ? config.store.get.bind(config.store) : getThrowFn;
+  return middleware;
+};
+var rate_limit_default = rateLimit;
+var SECOND = 1e3;
+var MINUTE = 60 * SECOND;
+var HOUR = 60 * MINUTE;
+var DAY = 24 * HOUR;
+
+// server/src/middleware/rateLimit.ts
+var apiLimiter = rate_limit_default({
+  windowMs: 1 * 60 * 1e3,
+  // 1 minutes
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: "RATE_LIMITED",
+      message: "Too many requests. Please try again later."
+    }
+  }
+});
+var authLimiter = rate_limit_default({
+  windowMs: 15 * 60 * 1e3,
+  // 15 minutes
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: "RATE_LIMITED",
+      message: "Too many authentication attempts. Please try again in 15 minutes."
+    }
+  }
+});
+var sensitiveLimiter = rate_limit_default({
+  windowMs: 15 * 60 * 1e3,
+  // 15 minutes
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: {
+      code: "RATE_LIMITED",
+      message: "Too many attempts. Please try again in 15 minutes."
+    }
+  }
+});
+
+// server/src/routes/auth.ts
+var import_express = __toESM(require_express2());
+var import_bcrypt = __toESM(require("bcrypt"));
+
+// node_modules/zod/v3/external.js
+var external_exports = {};
+__export(external_exports, {
+  BRAND: () => BRAND,
+  DIRTY: () => DIRTY,
+  EMPTY_PATH: () => EMPTY_PATH,
+  INVALID: () => INVALID,
+  NEVER: () => NEVER,
+  OK: () => OK,
+  ParseStatus: () => ParseStatus,
+  Schema: () => ZodType,
+  ZodAny: () => ZodAny,
+  ZodArray: () => ZodArray,
+  ZodBigInt: () => ZodBigInt,
+  ZodBoolean: () => ZodBoolean,
+  ZodBranded: () => ZodBranded,
+  ZodCatch: () => ZodCatch,
+  ZodDate: () => ZodDate,
+  ZodDefault: () => ZodDefault,
+  ZodDiscriminatedUnion: () => ZodDiscriminatedUnion,
+  ZodEffects: () => ZodEffects,
+  ZodEnum: () => ZodEnum,
+  ZodError: () => ZodError,
+  ZodFirstPartyTypeKind: () => ZodFirstPartyTypeKind,
+  ZodFunction: () => ZodFunction,
+  ZodIntersection: () => ZodIntersection,
+  ZodIssueCode: () => ZodIssueCode,
+  ZodLazy: () => ZodLazy,
+  ZodLiteral: () => ZodLiteral,
+  ZodMap: () => ZodMap,
+  ZodNaN: () => ZodNaN,
+  ZodNativeEnum: () => ZodNativeEnum,
+  ZodNever: () => ZodNever,
+  ZodNull: () => ZodNull,
+  ZodNullable: () => ZodNullable,
+  ZodNumber: () => ZodNumber,
+  ZodObject: () => ZodObject,
+  ZodOptional: () => ZodOptional,
+  ZodParsedType: () => ZodParsedType,
+  ZodPipeline: () => ZodPipeline,
+  ZodPromise: () => ZodPromise,
+  ZodReadonly: () => ZodReadonly,
+  ZodRecord: () => ZodRecord,
+  ZodSchema: () => ZodType,
+  ZodSet: () => ZodSet,
+  ZodString: () => ZodString,
+  ZodSymbol: () => ZodSymbol,
+  ZodTransformer: () => ZodEffects,
+  ZodTuple: () => ZodTuple,
+  ZodType: () => ZodType,
+  ZodUndefined: () => ZodUndefined,
+  ZodUnion: () => ZodUnion,
+  ZodUnknown: () => ZodUnknown,
+  ZodVoid: () => ZodVoid,
+  addIssueToContext: () => addIssueToContext,
+  any: () => anyType,
+  array: () => arrayType,
+  bigint: () => bigIntType,
+  boolean: () => booleanType,
+  coerce: () => coerce,
+  custom: () => custom,
+  date: () => dateType,
+  datetimeRegex: () => datetimeRegex,
+  defaultErrorMap: () => en_default,
+  discriminatedUnion: () => discriminatedUnionType,
+  effect: () => effectsType,
+  enum: () => enumType,
+  function: () => functionType,
+  getErrorMap: () => getErrorMap,
+  getParsedType: () => getParsedType,
+  instanceof: () => instanceOfType,
+  intersection: () => intersectionType,
+  isAborted: () => isAborted,
+  isAsync: () => isAsync,
+  isDirty: () => isDirty,
+  isValid: () => isValid,
+  late: () => late,
+  lazy: () => lazyType,
+  literal: () => literalType,
+  makeIssue: () => makeIssue,
+  map: () => mapType,
+  nan: () => nanType,
+  nativeEnum: () => nativeEnumType,
+  never: () => neverType,
+  null: () => nullType,
+  nullable: () => nullableType,
+  number: () => numberType,
+  object: () => objectType,
+  objectUtil: () => objectUtil,
+  oboolean: () => oboolean,
+  onumber: () => onumber,
+  optional: () => optionalType,
+  ostring: () => ostring,
+  pipeline: () => pipelineType,
+  preprocess: () => preprocessType,
+  promise: () => promiseType,
+  quotelessJson: () => quotelessJson,
+  record: () => recordType,
+  set: () => setType,
+  setErrorMap: () => setErrorMap,
+  strictObject: () => strictObjectType,
+  string: () => stringType,
+  symbol: () => symbolType,
+  transformer: () => effectsType,
+  tuple: () => tupleType,
+  undefined: () => undefinedType,
+  union: () => unionType,
+  unknown: () => unknownType,
+  util: () => util,
+  void: () => voidType
+});
+
+// node_modules/zod/v3/helpers/util.js
+var util;
+(function(util2) {
+  util2.assertEqual = (_) => {
+  };
+  function assertIs(_arg) {
+  }
+  util2.assertIs = assertIs;
+  function assertNever(_x) {
+    throw new Error();
+  }
+  util2.assertNever = assertNever;
+  util2.arrayToEnum = (items) => {
+    const obj = {};
+    for (const item of items) {
+      obj[item] = item;
+    }
+    return obj;
+  };
+  util2.getValidEnumValues = (obj) => {
+    const validKeys = util2.objectKeys(obj).filter((k) => typeof obj[obj[k]] !== "number");
+    const filtered = {};
+    for (const k of validKeys) {
+      filtered[k] = obj[k];
+    }
+    return util2.objectValues(filtered);
+  };
+  util2.objectValues = (obj) => {
+    return util2.objectKeys(obj).map(function(e) {
+      return obj[e];
     });
-    var isEmailConfigured = !!process.env.SMTP_USER && process.env.SMTP_USER !== "your-ethereal-user@ethereal.email";
-    function verificationEmailHtml(code, purpose) {
-      const title = purpose === "registration" ? "Verify Your Email" : "Reset Your Password";
-      const body = purpose === "registration" ? "Thank you for signing up! Use the code below to verify your email address." : "You requested a password reset. Use the code below to set a new password.";
-      return `
+  };
+  util2.objectKeys = typeof Object.keys === "function" ? (obj) => Object.keys(obj) : (object) => {
+    const keys = [];
+    for (const key in object) {
+      if (Object.prototype.hasOwnProperty.call(object, key)) {
+        keys.push(key);
+      }
+    }
+    return keys;
+  };
+  util2.find = (arr, checker) => {
+    for (const item of arr) {
+      if (checker(item))
+        return item;
+    }
+    return void 0;
+  };
+  util2.isInteger = typeof Number.isInteger === "function" ? (val) => Number.isInteger(val) : (val) => typeof val === "number" && Number.isFinite(val) && Math.floor(val) === val;
+  function joinValues(array, separator = " | ") {
+    return array.map((val) => typeof val === "string" ? `'${val}'` : val).join(separator);
+  }
+  util2.joinValues = joinValues;
+  util2.jsonStringifyReplacer = (_, value) => {
+    if (typeof value === "bigint") {
+      return value.toString();
+    }
+    return value;
+  };
+})(util || (util = {}));
+var objectUtil;
+(function(objectUtil2) {
+  objectUtil2.mergeShapes = (first, second) => {
+    return {
+      ...first,
+      ...second
+      // second overwrites first
+    };
+  };
+})(objectUtil || (objectUtil = {}));
+var ZodParsedType = util.arrayToEnum([
+  "string",
+  "nan",
+  "number",
+  "integer",
+  "float",
+  "boolean",
+  "date",
+  "bigint",
+  "symbol",
+  "function",
+  "undefined",
+  "null",
+  "array",
+  "object",
+  "unknown",
+  "promise",
+  "void",
+  "never",
+  "map",
+  "set"
+]);
+var getParsedType = (data) => {
+  const t = typeof data;
+  switch (t) {
+    case "undefined":
+      return ZodParsedType.undefined;
+    case "string":
+      return ZodParsedType.string;
+    case "number":
+      return Number.isNaN(data) ? ZodParsedType.nan : ZodParsedType.number;
+    case "boolean":
+      return ZodParsedType.boolean;
+    case "function":
+      return ZodParsedType.function;
+    case "bigint":
+      return ZodParsedType.bigint;
+    case "symbol":
+      return ZodParsedType.symbol;
+    case "object":
+      if (Array.isArray(data)) {
+        return ZodParsedType.array;
+      }
+      if (data === null) {
+        return ZodParsedType.null;
+      }
+      if (data.then && typeof data.then === "function" && data.catch && typeof data.catch === "function") {
+        return ZodParsedType.promise;
+      }
+      if (typeof Map !== "undefined" && data instanceof Map) {
+        return ZodParsedType.map;
+      }
+      if (typeof Set !== "undefined" && data instanceof Set) {
+        return ZodParsedType.set;
+      }
+      if (typeof Date !== "undefined" && data instanceof Date) {
+        return ZodParsedType.date;
+      }
+      return ZodParsedType.object;
+    default:
+      return ZodParsedType.unknown;
+  }
+};
+
+// node_modules/zod/v3/ZodError.js
+var ZodIssueCode = util.arrayToEnum([
+  "invalid_type",
+  "invalid_literal",
+  "custom",
+  "invalid_union",
+  "invalid_union_discriminator",
+  "invalid_enum_value",
+  "unrecognized_keys",
+  "invalid_arguments",
+  "invalid_return_type",
+  "invalid_date",
+  "invalid_string",
+  "too_small",
+  "too_big",
+  "invalid_intersection_types",
+  "not_multiple_of",
+  "not_finite"
+]);
+var quotelessJson = (obj) => {
+  const json = JSON.stringify(obj, null, 2);
+  return json.replace(/"([^"]+)":/g, "$1:");
+};
+var ZodError = class _ZodError extends Error {
+  get errors() {
+    return this.issues;
+  }
+  constructor(issues) {
+    super();
+    this.issues = [];
+    this.addIssue = (sub) => {
+      this.issues = [...this.issues, sub];
+    };
+    this.addIssues = (subs = []) => {
+      this.issues = [...this.issues, ...subs];
+    };
+    const actualProto = new.target.prototype;
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(this, actualProto);
+    } else {
+      this.__proto__ = actualProto;
+    }
+    this.name = "ZodError";
+    this.issues = issues;
+  }
+  format(_mapper) {
+    const mapper = _mapper || function(issue) {
+      return issue.message;
+    };
+    const fieldErrors = { _errors: [] };
+    const processError = (error) => {
+      for (const issue of error.issues) {
+        if (issue.code === "invalid_union") {
+          issue.unionErrors.map(processError);
+        } else if (issue.code === "invalid_return_type") {
+          processError(issue.returnTypeError);
+        } else if (issue.code === "invalid_arguments") {
+          processError(issue.argumentsError);
+        } else if (issue.path.length === 0) {
+          fieldErrors._errors.push(mapper(issue));
+        } else {
+          let curr = fieldErrors;
+          let i = 0;
+          while (i < issue.path.length) {
+            const el = issue.path[i];
+            const terminal = i === issue.path.length - 1;
+            if (!terminal) {
+              curr[el] = curr[el] || { _errors: [] };
+            } else {
+              curr[el] = curr[el] || { _errors: [] };
+              curr[el]._errors.push(mapper(issue));
+            }
+            curr = curr[el];
+            i++;
+          }
+        }
+      }
+    };
+    processError(this);
+    return fieldErrors;
+  }
+  static assert(value) {
+    if (!(value instanceof _ZodError)) {
+      throw new Error(`Not a ZodError: ${value}`);
+    }
+  }
+  toString() {
+    return this.message;
+  }
+  get message() {
+    return JSON.stringify(this.issues, util.jsonStringifyReplacer, 2);
+  }
+  get isEmpty() {
+    return this.issues.length === 0;
+  }
+  flatten(mapper = (issue) => issue.message) {
+    const fieldErrors = {};
+    const formErrors = [];
+    for (const sub of this.issues) {
+      if (sub.path.length > 0) {
+        const firstEl = sub.path[0];
+        fieldErrors[firstEl] = fieldErrors[firstEl] || [];
+        fieldErrors[firstEl].push(mapper(sub));
+      } else {
+        formErrors.push(mapper(sub));
+      }
+    }
+    return { formErrors, fieldErrors };
+  }
+  get formErrors() {
+    return this.flatten();
+  }
+};
+ZodError.create = (issues) => {
+  const error = new ZodError(issues);
+  return error;
+};
+
+// node_modules/zod/v3/locales/en.js
+var errorMap = (issue, _ctx) => {
+  let message;
+  switch (issue.code) {
+    case ZodIssueCode.invalid_type:
+      if (issue.received === ZodParsedType.undefined) {
+        message = "Required";
+      } else {
+        message = `Expected ${issue.expected}, received ${issue.received}`;
+      }
+      break;
+    case ZodIssueCode.invalid_literal:
+      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util.jsonStringifyReplacer)}`;
+      break;
+    case ZodIssueCode.unrecognized_keys:
+      message = `Unrecognized key(s) in object: ${util.joinValues(issue.keys, ", ")}`;
+      break;
+    case ZodIssueCode.invalid_union:
+      message = `Invalid input`;
+      break;
+    case ZodIssueCode.invalid_union_discriminator:
+      message = `Invalid discriminator value. Expected ${util.joinValues(issue.options)}`;
+      break;
+    case ZodIssueCode.invalid_enum_value:
+      message = `Invalid enum value. Expected ${util.joinValues(issue.options)}, received '${issue.received}'`;
+      break;
+    case ZodIssueCode.invalid_arguments:
+      message = `Invalid function arguments`;
+      break;
+    case ZodIssueCode.invalid_return_type:
+      message = `Invalid function return type`;
+      break;
+    case ZodIssueCode.invalid_date:
+      message = `Invalid date`;
+      break;
+    case ZodIssueCode.invalid_string:
+      if (typeof issue.validation === "object") {
+        if ("includes" in issue.validation) {
+          message = `Invalid input: must include "${issue.validation.includes}"`;
+          if (typeof issue.validation.position === "number") {
+            message = `${message} at one or more positions greater than or equal to ${issue.validation.position}`;
+          }
+        } else if ("startsWith" in issue.validation) {
+          message = `Invalid input: must start with "${issue.validation.startsWith}"`;
+        } else if ("endsWith" in issue.validation) {
+          message = `Invalid input: must end with "${issue.validation.endsWith}"`;
+        } else {
+          util.assertNever(issue.validation);
+        }
+      } else if (issue.validation !== "regex") {
+        message = `Invalid ${issue.validation}`;
+      } else {
+        message = "Invalid";
+      }
+      break;
+    case ZodIssueCode.too_small:
+      if (issue.type === "array")
+        message = `Array must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `more than`} ${issue.minimum} element(s)`;
+      else if (issue.type === "string")
+        message = `String must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `over`} ${issue.minimum} character(s)`;
+      else if (issue.type === "number")
+        message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
+      else if (issue.type === "bigint")
+        message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
+      else if (issue.type === "date")
+        message = `Date must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${new Date(Number(issue.minimum))}`;
+      else
+        message = "Invalid input";
+      break;
+    case ZodIssueCode.too_big:
+      if (issue.type === "array")
+        message = `Array must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `less than`} ${issue.maximum} element(s)`;
+      else if (issue.type === "string")
+        message = `String must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `under`} ${issue.maximum} character(s)`;
+      else if (issue.type === "number")
+        message = `Number must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
+      else if (issue.type === "bigint")
+        message = `BigInt must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
+      else if (issue.type === "date")
+        message = `Date must be ${issue.exact ? `exactly` : issue.inclusive ? `smaller than or equal to` : `smaller than`} ${new Date(Number(issue.maximum))}`;
+      else
+        message = "Invalid input";
+      break;
+    case ZodIssueCode.custom:
+      message = `Invalid input`;
+      break;
+    case ZodIssueCode.invalid_intersection_types:
+      message = `Intersection results could not be merged`;
+      break;
+    case ZodIssueCode.not_multiple_of:
+      message = `Number must be a multiple of ${issue.multipleOf}`;
+      break;
+    case ZodIssueCode.not_finite:
+      message = "Number must be finite";
+      break;
+    default:
+      message = _ctx.defaultError;
+      util.assertNever(issue);
+  }
+  return { message };
+};
+var en_default = errorMap;
+
+// node_modules/zod/v3/errors.js
+var overrideErrorMap = en_default;
+function setErrorMap(map) {
+  overrideErrorMap = map;
+}
+function getErrorMap() {
+  return overrideErrorMap;
+}
+
+// node_modules/zod/v3/helpers/parseUtil.js
+var makeIssue = (params) => {
+  const { data, path: path2, errorMaps, issueData } = params;
+  const fullPath = [...path2, ...issueData.path || []];
+  const fullIssue = {
+    ...issueData,
+    path: fullPath
+  };
+  if (issueData.message !== void 0) {
+    return {
+      ...issueData,
+      path: fullPath,
+      message: issueData.message
+    };
+  }
+  let errorMessage = "";
+  const maps = errorMaps.filter((m) => !!m).slice().reverse();
+  for (const map of maps) {
+    errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;
+  }
+  return {
+    ...issueData,
+    path: fullPath,
+    message: errorMessage
+  };
+};
+var EMPTY_PATH = [];
+function addIssueToContext(ctx, issueData) {
+  const overrideMap = getErrorMap();
+  const issue = makeIssue({
+    issueData,
+    data: ctx.data,
+    path: ctx.path,
+    errorMaps: [
+      ctx.common.contextualErrorMap,
+      // contextual error map is first priority
+      ctx.schemaErrorMap,
+      // then schema-bound map if available
+      overrideMap,
+      // then global override map
+      overrideMap === en_default ? void 0 : en_default
+      // then global default map
+    ].filter((x) => !!x)
+  });
+  ctx.common.issues.push(issue);
+}
+var ParseStatus = class _ParseStatus {
+  constructor() {
+    this.value = "valid";
+  }
+  dirty() {
+    if (this.value === "valid")
+      this.value = "dirty";
+  }
+  abort() {
+    if (this.value !== "aborted")
+      this.value = "aborted";
+  }
+  static mergeArray(status, results) {
+    const arrayValue = [];
+    for (const s of results) {
+      if (s.status === "aborted")
+        return INVALID;
+      if (s.status === "dirty")
+        status.dirty();
+      arrayValue.push(s.value);
+    }
+    return { status: status.value, value: arrayValue };
+  }
+  static async mergeObjectAsync(status, pairs) {
+    const syncPairs = [];
+    for (const pair of pairs) {
+      const key = await pair.key;
+      const value = await pair.value;
+      syncPairs.push({
+        key,
+        value
+      });
+    }
+    return _ParseStatus.mergeObjectSync(status, syncPairs);
+  }
+  static mergeObjectSync(status, pairs) {
+    const finalObject = {};
+    for (const pair of pairs) {
+      const { key, value } = pair;
+      if (key.status === "aborted")
+        return INVALID;
+      if (value.status === "aborted")
+        return INVALID;
+      if (key.status === "dirty")
+        status.dirty();
+      if (value.status === "dirty")
+        status.dirty();
+      if (key.value !== "__proto__" && (typeof value.value !== "undefined" || pair.alwaysSet)) {
+        finalObject[key.value] = value.value;
+      }
+    }
+    return { status: status.value, value: finalObject };
+  }
+};
+var INVALID = Object.freeze({
+  status: "aborted"
+});
+var DIRTY = (value) => ({ status: "dirty", value });
+var OK = (value) => ({ status: "valid", value });
+var isAborted = (x) => x.status === "aborted";
+var isDirty = (x) => x.status === "dirty";
+var isValid = (x) => x.status === "valid";
+var isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
+
+// node_modules/zod/v3/helpers/errorUtil.js
+var errorUtil;
+(function(errorUtil2) {
+  errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
+  errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
+})(errorUtil || (errorUtil = {}));
+
+// node_modules/zod/v3/types.js
+var ParseInputLazyPath = class {
+  constructor(parent, value, path2, key) {
+    this._cachedPath = [];
+    this.parent = parent;
+    this.data = value;
+    this._path = path2;
+    this._key = key;
+  }
+  get path() {
+    if (!this._cachedPath.length) {
+      if (Array.isArray(this._key)) {
+        this._cachedPath.push(...this._path, ...this._key);
+      } else {
+        this._cachedPath.push(...this._path, this._key);
+      }
+    }
+    return this._cachedPath;
+  }
+};
+var handleResult = (ctx, result) => {
+  if (isValid(result)) {
+    return { success: true, data: result.value };
+  } else {
+    if (!ctx.common.issues.length) {
+      throw new Error("Validation failed but no issues detected.");
+    }
+    return {
+      success: false,
+      get error() {
+        if (this._error)
+          return this._error;
+        const error = new ZodError(ctx.common.issues);
+        this._error = error;
+        return this._error;
+      }
+    };
+  }
+};
+function processCreateParams(params) {
+  if (!params)
+    return {};
+  const { errorMap: errorMap2, invalid_type_error, required_error, description } = params;
+  if (errorMap2 && (invalid_type_error || required_error)) {
+    throw new Error(`Can't use "invalid_type_error" or "required_error" in conjunction with custom error map.`);
+  }
+  if (errorMap2)
+    return { errorMap: errorMap2, description };
+  const customMap = (iss, ctx) => {
+    const { message } = params;
+    if (iss.code === "invalid_enum_value") {
+      return { message: message ?? ctx.defaultError };
+    }
+    if (typeof ctx.data === "undefined") {
+      return { message: message ?? required_error ?? ctx.defaultError };
+    }
+    if (iss.code !== "invalid_type")
+      return { message: ctx.defaultError };
+    return { message: message ?? invalid_type_error ?? ctx.defaultError };
+  };
+  return { errorMap: customMap, description };
+}
+var ZodType = class {
+  get description() {
+    return this._def.description;
+  }
+  _getType(input) {
+    return getParsedType(input.data);
+  }
+  _getOrReturnCtx(input, ctx) {
+    return ctx || {
+      common: input.parent.common,
+      data: input.data,
+      parsedType: getParsedType(input.data),
+      schemaErrorMap: this._def.errorMap,
+      path: input.path,
+      parent: input.parent
+    };
+  }
+  _processInputParams(input) {
+    return {
+      status: new ParseStatus(),
+      ctx: {
+        common: input.parent.common,
+        data: input.data,
+        parsedType: getParsedType(input.data),
+        schemaErrorMap: this._def.errorMap,
+        path: input.path,
+        parent: input.parent
+      }
+    };
+  }
+  _parseSync(input) {
+    const result = this._parse(input);
+    if (isAsync(result)) {
+      throw new Error("Synchronous parse encountered promise.");
+    }
+    return result;
+  }
+  _parseAsync(input) {
+    const result = this._parse(input);
+    return Promise.resolve(result);
+  }
+  parse(data, params) {
+    const result = this.safeParse(data, params);
+    if (result.success)
+      return result.data;
+    throw result.error;
+  }
+  safeParse(data, params) {
+    const ctx = {
+      common: {
+        issues: [],
+        async: params?.async ?? false,
+        contextualErrorMap: params?.errorMap
+      },
+      path: params?.path || [],
+      schemaErrorMap: this._def.errorMap,
+      parent: null,
+      data,
+      parsedType: getParsedType(data)
+    };
+    const result = this._parseSync({ data, path: ctx.path, parent: ctx });
+    return handleResult(ctx, result);
+  }
+  "~validate"(data) {
+    const ctx = {
+      common: {
+        issues: [],
+        async: !!this["~standard"].async
+      },
+      path: [],
+      schemaErrorMap: this._def.errorMap,
+      parent: null,
+      data,
+      parsedType: getParsedType(data)
+    };
+    if (!this["~standard"].async) {
+      try {
+        const result = this._parseSync({ data, path: [], parent: ctx });
+        return isValid(result) ? {
+          value: result.value
+        } : {
+          issues: ctx.common.issues
+        };
+      } catch (err) {
+        if (err?.message?.toLowerCase()?.includes("encountered")) {
+          this["~standard"].async = true;
+        }
+        ctx.common = {
+          issues: [],
+          async: true
+        };
+      }
+    }
+    return this._parseAsync({ data, path: [], parent: ctx }).then((result) => isValid(result) ? {
+      value: result.value
+    } : {
+      issues: ctx.common.issues
+    });
+  }
+  async parseAsync(data, params) {
+    const result = await this.safeParseAsync(data, params);
+    if (result.success)
+      return result.data;
+    throw result.error;
+  }
+  async safeParseAsync(data, params) {
+    const ctx = {
+      common: {
+        issues: [],
+        contextualErrorMap: params?.errorMap,
+        async: true
+      },
+      path: params?.path || [],
+      schemaErrorMap: this._def.errorMap,
+      parent: null,
+      data,
+      parsedType: getParsedType(data)
+    };
+    const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
+    const result = await (isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult));
+    return handleResult(ctx, result);
+  }
+  refine(check, message) {
+    const getIssueProperties = (val) => {
+      if (typeof message === "string" || typeof message === "undefined") {
+        return { message };
+      } else if (typeof message === "function") {
+        return message(val);
+      } else {
+        return message;
+      }
+    };
+    return this._refinement((val, ctx) => {
+      const result = check(val);
+      const setError = () => ctx.addIssue({
+        code: ZodIssueCode.custom,
+        ...getIssueProperties(val)
+      });
+      if (typeof Promise !== "undefined" && result instanceof Promise) {
+        return result.then((data) => {
+          if (!data) {
+            setError();
+            return false;
+          } else {
+            return true;
+          }
+        });
+      }
+      if (!result) {
+        setError();
+        return false;
+      } else {
+        return true;
+      }
+    });
+  }
+  refinement(check, refinementData) {
+    return this._refinement((val, ctx) => {
+      if (!check(val)) {
+        ctx.addIssue(typeof refinementData === "function" ? refinementData(val, ctx) : refinementData);
+        return false;
+      } else {
+        return true;
+      }
+    });
+  }
+  _refinement(refinement) {
+    return new ZodEffects({
+      schema: this,
+      typeName: ZodFirstPartyTypeKind.ZodEffects,
+      effect: { type: "refinement", refinement }
+    });
+  }
+  superRefine(refinement) {
+    return this._refinement(refinement);
+  }
+  constructor(def) {
+    this.spa = this.safeParseAsync;
+    this._def = def;
+    this.parse = this.parse.bind(this);
+    this.safeParse = this.safeParse.bind(this);
+    this.parseAsync = this.parseAsync.bind(this);
+    this.safeParseAsync = this.safeParseAsync.bind(this);
+    this.spa = this.spa.bind(this);
+    this.refine = this.refine.bind(this);
+    this.refinement = this.refinement.bind(this);
+    this.superRefine = this.superRefine.bind(this);
+    this.optional = this.optional.bind(this);
+    this.nullable = this.nullable.bind(this);
+    this.nullish = this.nullish.bind(this);
+    this.array = this.array.bind(this);
+    this.promise = this.promise.bind(this);
+    this.or = this.or.bind(this);
+    this.and = this.and.bind(this);
+    this.transform = this.transform.bind(this);
+    this.brand = this.brand.bind(this);
+    this.default = this.default.bind(this);
+    this.catch = this.catch.bind(this);
+    this.describe = this.describe.bind(this);
+    this.pipe = this.pipe.bind(this);
+    this.readonly = this.readonly.bind(this);
+    this.isNullable = this.isNullable.bind(this);
+    this.isOptional = this.isOptional.bind(this);
+    this["~standard"] = {
+      version: 1,
+      vendor: "zod",
+      validate: (data) => this["~validate"](data)
+    };
+  }
+  optional() {
+    return ZodOptional.create(this, this._def);
+  }
+  nullable() {
+    return ZodNullable.create(this, this._def);
+  }
+  nullish() {
+    return this.nullable().optional();
+  }
+  array() {
+    return ZodArray.create(this);
+  }
+  promise() {
+    return ZodPromise.create(this, this._def);
+  }
+  or(option) {
+    return ZodUnion.create([this, option], this._def);
+  }
+  and(incoming) {
+    return ZodIntersection.create(this, incoming, this._def);
+  }
+  transform(transform) {
+    return new ZodEffects({
+      ...processCreateParams(this._def),
+      schema: this,
+      typeName: ZodFirstPartyTypeKind.ZodEffects,
+      effect: { type: "transform", transform }
+    });
+  }
+  default(def) {
+    const defaultValueFunc = typeof def === "function" ? def : () => def;
+    return new ZodDefault({
+      ...processCreateParams(this._def),
+      innerType: this,
+      defaultValue: defaultValueFunc,
+      typeName: ZodFirstPartyTypeKind.ZodDefault
+    });
+  }
+  brand() {
+    return new ZodBranded({
+      typeName: ZodFirstPartyTypeKind.ZodBranded,
+      type: this,
+      ...processCreateParams(this._def)
+    });
+  }
+  catch(def) {
+    const catchValueFunc = typeof def === "function" ? def : () => def;
+    return new ZodCatch({
+      ...processCreateParams(this._def),
+      innerType: this,
+      catchValue: catchValueFunc,
+      typeName: ZodFirstPartyTypeKind.ZodCatch
+    });
+  }
+  describe(description) {
+    const This = this.constructor;
+    return new This({
+      ...this._def,
+      description
+    });
+  }
+  pipe(target) {
+    return ZodPipeline.create(this, target);
+  }
+  readonly() {
+    return ZodReadonly.create(this);
+  }
+  isOptional() {
+    return this.safeParse(void 0).success;
+  }
+  isNullable() {
+    return this.safeParse(null).success;
+  }
+};
+var cuidRegex = /^c[^\s-]{8,}$/i;
+var cuid2Regex = /^[0-9a-z]+$/;
+var ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
+var uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i;
+var nanoidRegex = /^[a-z0-9_-]{21}$/i;
+var jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
+var durationRegex = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
+var emailRegex = /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
+var _emojiRegex = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
+var emojiRegex;
+var ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
+var ipv4CidrRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/;
+var ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+var ipv6CidrRegex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/;
+var base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
+var base64urlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/;
+var dateRegexSource = `((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))`;
+var dateRegex = new RegExp(`^${dateRegexSource}$`);
+function timeRegexSource(args) {
+  let secondsRegexSource = `[0-5]\\d`;
+  if (args.precision) {
+    secondsRegexSource = `${secondsRegexSource}\\.\\d{${args.precision}}`;
+  } else if (args.precision == null) {
+    secondsRegexSource = `${secondsRegexSource}(\\.\\d+)?`;
+  }
+  const secondsQuantifier = args.precision ? "+" : "?";
+  return `([01]\\d|2[0-3]):[0-5]\\d(:${secondsRegexSource})${secondsQuantifier}`;
+}
+function timeRegex(args) {
+  return new RegExp(`^${timeRegexSource(args)}$`);
+}
+function datetimeRegex(args) {
+  let regex = `${dateRegexSource}T${timeRegexSource(args)}`;
+  const opts = [];
+  opts.push(args.local ? `Z?` : `Z`);
+  if (args.offset)
+    opts.push(`([+-]\\d{2}:?\\d{2})`);
+  regex = `${regex}(${opts.join("|")})`;
+  return new RegExp(`^${regex}$`);
+}
+function isValidIP(ip, version) {
+  if ((version === "v4" || !version) && ipv4Regex.test(ip)) {
+    return true;
+  }
+  if ((version === "v6" || !version) && ipv6Regex.test(ip)) {
+    return true;
+  }
+  return false;
+}
+function isValidJWT(jwt2, alg) {
+  if (!jwtRegex.test(jwt2))
+    return false;
+  try {
+    const [header] = jwt2.split(".");
+    if (!header)
+      return false;
+    const base64 = header.replace(/-/g, "+").replace(/_/g, "/").padEnd(header.length + (4 - header.length % 4) % 4, "=");
+    const decoded = JSON.parse(atob(base64));
+    if (typeof decoded !== "object" || decoded === null)
+      return false;
+    if ("typ" in decoded && decoded?.typ !== "JWT")
+      return false;
+    if (!decoded.alg)
+      return false;
+    if (alg && decoded.alg !== alg)
+      return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+function isValidCidr(ip, version) {
+  if ((version === "v4" || !version) && ipv4CidrRegex.test(ip)) {
+    return true;
+  }
+  if ((version === "v6" || !version) && ipv6CidrRegex.test(ip)) {
+    return true;
+  }
+  return false;
+}
+var ZodString = class _ZodString extends ZodType {
+  _parse(input) {
+    if (this._def.coerce) {
+      input.data = String(input.data);
+    }
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.string) {
+      const ctx2 = this._getOrReturnCtx(input);
+      addIssueToContext(ctx2, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.string,
+        received: ctx2.parsedType
+      });
+      return INVALID;
+    }
+    const status = new ParseStatus();
+    let ctx = void 0;
+    for (const check of this._def.checks) {
+      if (check.kind === "min") {
+        if (input.data.length < check.value) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_small,
+            minimum: check.value,
+            type: "string",
+            inclusive: true,
+            exact: false,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "max") {
+        if (input.data.length > check.value) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_big,
+            maximum: check.value,
+            type: "string",
+            inclusive: true,
+            exact: false,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "length") {
+        const tooBig = input.data.length > check.value;
+        const tooSmall = input.data.length < check.value;
+        if (tooBig || tooSmall) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          if (tooBig) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_big,
+              maximum: check.value,
+              type: "string",
+              inclusive: true,
+              exact: true,
+              message: check.message
+            });
+          } else if (tooSmall) {
+            addIssueToContext(ctx, {
+              code: ZodIssueCode.too_small,
+              minimum: check.value,
+              type: "string",
+              inclusive: true,
+              exact: true,
+              message: check.message
+            });
+          }
+          status.dirty();
+        }
+      } else if (check.kind === "email") {
+        if (!emailRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "email",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "emoji") {
+        if (!emojiRegex) {
+          emojiRegex = new RegExp(_emojiRegex, "u");
+        }
+        if (!emojiRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "emoji",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "uuid") {
+        if (!uuidRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "uuid",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "nanoid") {
+        if (!nanoidRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "nanoid",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "cuid") {
+        if (!cuidRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "cuid",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "cuid2") {
+        if (!cuid2Regex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "cuid2",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "ulid") {
+        if (!ulidRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "ulid",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "url") {
+        try {
+          new URL(input.data);
+        } catch {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "url",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "regex") {
+        check.regex.lastIndex = 0;
+        const testResult = check.regex.test(input.data);
+        if (!testResult) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "regex",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "trim") {
+        input.data = input.data.trim();
+      } else if (check.kind === "includes") {
+        if (!input.data.includes(check.value, check.position)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_string,
+            validation: { includes: check.value, position: check.position },
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "toLowerCase") {
+        input.data = input.data.toLowerCase();
+      } else if (check.kind === "toUpperCase") {
+        input.data = input.data.toUpperCase();
+      } else if (check.kind === "startsWith") {
+        if (!input.data.startsWith(check.value)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_string,
+            validation: { startsWith: check.value },
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "endsWith") {
+        if (!input.data.endsWith(check.value)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_string,
+            validation: { endsWith: check.value },
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "datetime") {
+        const regex = datetimeRegex(check);
+        if (!regex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_string,
+            validation: "datetime",
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "date") {
+        const regex = dateRegex;
+        if (!regex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_string,
+            validation: "date",
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "time") {
+        const regex = timeRegex(check);
+        if (!regex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_string,
+            validation: "time",
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "duration") {
+        if (!durationRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "duration",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "ip") {
+        if (!isValidIP(input.data, check.version)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "ip",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "jwt") {
+        if (!isValidJWT(input.data, check.alg)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "jwt",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "cidr") {
+        if (!isValidCidr(input.data, check.version)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "cidr",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "base64") {
+        if (!base64Regex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "base64",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "base64url") {
+        if (!base64urlRegex.test(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            validation: "base64url",
+            code: ZodIssueCode.invalid_string,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else {
+        util.assertNever(check);
+      }
+    }
+    return { status: status.value, value: input.data };
+  }
+  _regex(regex, validation, message) {
+    return this.refinement((data) => regex.test(data), {
+      validation,
+      code: ZodIssueCode.invalid_string,
+      ...errorUtil.errToObj(message)
+    });
+  }
+  _addCheck(check) {
+    return new _ZodString({
+      ...this._def,
+      checks: [...this._def.checks, check]
+    });
+  }
+  email(message) {
+    return this._addCheck({ kind: "email", ...errorUtil.errToObj(message) });
+  }
+  url(message) {
+    return this._addCheck({ kind: "url", ...errorUtil.errToObj(message) });
+  }
+  emoji(message) {
+    return this._addCheck({ kind: "emoji", ...errorUtil.errToObj(message) });
+  }
+  uuid(message) {
+    return this._addCheck({ kind: "uuid", ...errorUtil.errToObj(message) });
+  }
+  nanoid(message) {
+    return this._addCheck({ kind: "nanoid", ...errorUtil.errToObj(message) });
+  }
+  cuid(message) {
+    return this._addCheck({ kind: "cuid", ...errorUtil.errToObj(message) });
+  }
+  cuid2(message) {
+    return this._addCheck({ kind: "cuid2", ...errorUtil.errToObj(message) });
+  }
+  ulid(message) {
+    return this._addCheck({ kind: "ulid", ...errorUtil.errToObj(message) });
+  }
+  base64(message) {
+    return this._addCheck({ kind: "base64", ...errorUtil.errToObj(message) });
+  }
+  base64url(message) {
+    return this._addCheck({
+      kind: "base64url",
+      ...errorUtil.errToObj(message)
+    });
+  }
+  jwt(options) {
+    return this._addCheck({ kind: "jwt", ...errorUtil.errToObj(options) });
+  }
+  ip(options) {
+    return this._addCheck({ kind: "ip", ...errorUtil.errToObj(options) });
+  }
+  cidr(options) {
+    return this._addCheck({ kind: "cidr", ...errorUtil.errToObj(options) });
+  }
+  datetime(options) {
+    if (typeof options === "string") {
+      return this._addCheck({
+        kind: "datetime",
+        precision: null,
+        offset: false,
+        local: false,
+        message: options
+      });
+    }
+    return this._addCheck({
+      kind: "datetime",
+      precision: typeof options?.precision === "undefined" ? null : options?.precision,
+      offset: options?.offset ?? false,
+      local: options?.local ?? false,
+      ...errorUtil.errToObj(options?.message)
+    });
+  }
+  date(message) {
+    return this._addCheck({ kind: "date", message });
+  }
+  time(options) {
+    if (typeof options === "string") {
+      return this._addCheck({
+        kind: "time",
+        precision: null,
+        message: options
+      });
+    }
+    return this._addCheck({
+      kind: "time",
+      precision: typeof options?.precision === "undefined" ? null : options?.precision,
+      ...errorUtil.errToObj(options?.message)
+    });
+  }
+  duration(message) {
+    return this._addCheck({ kind: "duration", ...errorUtil.errToObj(message) });
+  }
+  regex(regex, message) {
+    return this._addCheck({
+      kind: "regex",
+      regex,
+      ...errorUtil.errToObj(message)
+    });
+  }
+  includes(value, options) {
+    return this._addCheck({
+      kind: "includes",
+      value,
+      position: options?.position,
+      ...errorUtil.errToObj(options?.message)
+    });
+  }
+  startsWith(value, message) {
+    return this._addCheck({
+      kind: "startsWith",
+      value,
+      ...errorUtil.errToObj(message)
+    });
+  }
+  endsWith(value, message) {
+    return this._addCheck({
+      kind: "endsWith",
+      value,
+      ...errorUtil.errToObj(message)
+    });
+  }
+  min(minLength, message) {
+    return this._addCheck({
+      kind: "min",
+      value: minLength,
+      ...errorUtil.errToObj(message)
+    });
+  }
+  max(maxLength, message) {
+    return this._addCheck({
+      kind: "max",
+      value: maxLength,
+      ...errorUtil.errToObj(message)
+    });
+  }
+  length(len, message) {
+    return this._addCheck({
+      kind: "length",
+      value: len,
+      ...errorUtil.errToObj(message)
+    });
+  }
+  /**
+   * Equivalent to `.min(1)`
+   */
+  nonempty(message) {
+    return this.min(1, errorUtil.errToObj(message));
+  }
+  trim() {
+    return new _ZodString({
+      ...this._def,
+      checks: [...this._def.checks, { kind: "trim" }]
+    });
+  }
+  toLowerCase() {
+    return new _ZodString({
+      ...this._def,
+      checks: [...this._def.checks, { kind: "toLowerCase" }]
+    });
+  }
+  toUpperCase() {
+    return new _ZodString({
+      ...this._def,
+      checks: [...this._def.checks, { kind: "toUpperCase" }]
+    });
+  }
+  get isDatetime() {
+    return !!this._def.checks.find((ch) => ch.kind === "datetime");
+  }
+  get isDate() {
+    return !!this._def.checks.find((ch) => ch.kind === "date");
+  }
+  get isTime() {
+    return !!this._def.checks.find((ch) => ch.kind === "time");
+  }
+  get isDuration() {
+    return !!this._def.checks.find((ch) => ch.kind === "duration");
+  }
+  get isEmail() {
+    return !!this._def.checks.find((ch) => ch.kind === "email");
+  }
+  get isURL() {
+    return !!this._def.checks.find((ch) => ch.kind === "url");
+  }
+  get isEmoji() {
+    return !!this._def.checks.find((ch) => ch.kind === "emoji");
+  }
+  get isUUID() {
+    return !!this._def.checks.find((ch) => ch.kind === "uuid");
+  }
+  get isNANOID() {
+    return !!this._def.checks.find((ch) => ch.kind === "nanoid");
+  }
+  get isCUID() {
+    return !!this._def.checks.find((ch) => ch.kind === "cuid");
+  }
+  get isCUID2() {
+    return !!this._def.checks.find((ch) => ch.kind === "cuid2");
+  }
+  get isULID() {
+    return !!this._def.checks.find((ch) => ch.kind === "ulid");
+  }
+  get isIP() {
+    return !!this._def.checks.find((ch) => ch.kind === "ip");
+  }
+  get isCIDR() {
+    return !!this._def.checks.find((ch) => ch.kind === "cidr");
+  }
+  get isBase64() {
+    return !!this._def.checks.find((ch) => ch.kind === "base64");
+  }
+  get isBase64url() {
+    return !!this._def.checks.find((ch) => ch.kind === "base64url");
+  }
+  get minLength() {
+    let min = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "min") {
+        if (min === null || ch.value > min)
+          min = ch.value;
+      }
+    }
+    return min;
+  }
+  get maxLength() {
+    let max = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "max") {
+        if (max === null || ch.value < max)
+          max = ch.value;
+      }
+    }
+    return max;
+  }
+};
+ZodString.create = (params) => {
+  return new ZodString({
+    checks: [],
+    typeName: ZodFirstPartyTypeKind.ZodString,
+    coerce: params?.coerce ?? false,
+    ...processCreateParams(params)
+  });
+};
+function floatSafeRemainder(val, step) {
+  const valDecCount = (val.toString().split(".")[1] || "").length;
+  const stepDecCount = (step.toString().split(".")[1] || "").length;
+  const decCount = valDecCount > stepDecCount ? valDecCount : stepDecCount;
+  const valInt = Number.parseInt(val.toFixed(decCount).replace(".", ""));
+  const stepInt = Number.parseInt(step.toFixed(decCount).replace(".", ""));
+  return valInt % stepInt / 10 ** decCount;
+}
+var ZodNumber = class _ZodNumber extends ZodType {
+  constructor() {
+    super(...arguments);
+    this.min = this.gte;
+    this.max = this.lte;
+    this.step = this.multipleOf;
+  }
+  _parse(input) {
+    if (this._def.coerce) {
+      input.data = Number(input.data);
+    }
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.number) {
+      const ctx2 = this._getOrReturnCtx(input);
+      addIssueToContext(ctx2, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.number,
+        received: ctx2.parsedType
+      });
+      return INVALID;
+    }
+    let ctx = void 0;
+    const status = new ParseStatus();
+    for (const check of this._def.checks) {
+      if (check.kind === "int") {
+        if (!util.isInteger(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.invalid_type,
+            expected: "integer",
+            received: "float",
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "min") {
+        const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
+        if (tooSmall) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_small,
+            minimum: check.value,
+            type: "number",
+            inclusive: check.inclusive,
+            exact: false,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "max") {
+        const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
+        if (tooBig) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_big,
+            maximum: check.value,
+            type: "number",
+            inclusive: check.inclusive,
+            exact: false,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "multipleOf") {
+        if (floatSafeRemainder(input.data, check.value) !== 0) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.not_multiple_of,
+            multipleOf: check.value,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "finite") {
+        if (!Number.isFinite(input.data)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.not_finite,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else {
+        util.assertNever(check);
+      }
+    }
+    return { status: status.value, value: input.data };
+  }
+  gte(value, message) {
+    return this.setLimit("min", value, true, errorUtil.toString(message));
+  }
+  gt(value, message) {
+    return this.setLimit("min", value, false, errorUtil.toString(message));
+  }
+  lte(value, message) {
+    return this.setLimit("max", value, true, errorUtil.toString(message));
+  }
+  lt(value, message) {
+    return this.setLimit("max", value, false, errorUtil.toString(message));
+  }
+  setLimit(kind, value, inclusive, message) {
+    return new _ZodNumber({
+      ...this._def,
+      checks: [
+        ...this._def.checks,
+        {
+          kind,
+          value,
+          inclusive,
+          message: errorUtil.toString(message)
+        }
+      ]
+    });
+  }
+  _addCheck(check) {
+    return new _ZodNumber({
+      ...this._def,
+      checks: [...this._def.checks, check]
+    });
+  }
+  int(message) {
+    return this._addCheck({
+      kind: "int",
+      message: errorUtil.toString(message)
+    });
+  }
+  positive(message) {
+    return this._addCheck({
+      kind: "min",
+      value: 0,
+      inclusive: false,
+      message: errorUtil.toString(message)
+    });
+  }
+  negative(message) {
+    return this._addCheck({
+      kind: "max",
+      value: 0,
+      inclusive: false,
+      message: errorUtil.toString(message)
+    });
+  }
+  nonpositive(message) {
+    return this._addCheck({
+      kind: "max",
+      value: 0,
+      inclusive: true,
+      message: errorUtil.toString(message)
+    });
+  }
+  nonnegative(message) {
+    return this._addCheck({
+      kind: "min",
+      value: 0,
+      inclusive: true,
+      message: errorUtil.toString(message)
+    });
+  }
+  multipleOf(value, message) {
+    return this._addCheck({
+      kind: "multipleOf",
+      value,
+      message: errorUtil.toString(message)
+    });
+  }
+  finite(message) {
+    return this._addCheck({
+      kind: "finite",
+      message: errorUtil.toString(message)
+    });
+  }
+  safe(message) {
+    return this._addCheck({
+      kind: "min",
+      inclusive: true,
+      value: Number.MIN_SAFE_INTEGER,
+      message: errorUtil.toString(message)
+    })._addCheck({
+      kind: "max",
+      inclusive: true,
+      value: Number.MAX_SAFE_INTEGER,
+      message: errorUtil.toString(message)
+    });
+  }
+  get minValue() {
+    let min = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "min") {
+        if (min === null || ch.value > min)
+          min = ch.value;
+      }
+    }
+    return min;
+  }
+  get maxValue() {
+    let max = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "max") {
+        if (max === null || ch.value < max)
+          max = ch.value;
+      }
+    }
+    return max;
+  }
+  get isInt() {
+    return !!this._def.checks.find((ch) => ch.kind === "int" || ch.kind === "multipleOf" && util.isInteger(ch.value));
+  }
+  get isFinite() {
+    let max = null;
+    let min = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "finite" || ch.kind === "int" || ch.kind === "multipleOf") {
+        return true;
+      } else if (ch.kind === "min") {
+        if (min === null || ch.value > min)
+          min = ch.value;
+      } else if (ch.kind === "max") {
+        if (max === null || ch.value < max)
+          max = ch.value;
+      }
+    }
+    return Number.isFinite(min) && Number.isFinite(max);
+  }
+};
+ZodNumber.create = (params) => {
+  return new ZodNumber({
+    checks: [],
+    typeName: ZodFirstPartyTypeKind.ZodNumber,
+    coerce: params?.coerce || false,
+    ...processCreateParams(params)
+  });
+};
+var ZodBigInt = class _ZodBigInt extends ZodType {
+  constructor() {
+    super(...arguments);
+    this.min = this.gte;
+    this.max = this.lte;
+  }
+  _parse(input) {
+    if (this._def.coerce) {
+      try {
+        input.data = BigInt(input.data);
+      } catch {
+        return this._getInvalidInput(input);
+      }
+    }
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.bigint) {
+      return this._getInvalidInput(input);
+    }
+    let ctx = void 0;
+    const status = new ParseStatus();
+    for (const check of this._def.checks) {
+      if (check.kind === "min") {
+        const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
+        if (tooSmall) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_small,
+            type: "bigint",
+            minimum: check.value,
+            inclusive: check.inclusive,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "max") {
+        const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
+        if (tooBig) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_big,
+            type: "bigint",
+            maximum: check.value,
+            inclusive: check.inclusive,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "multipleOf") {
+        if (input.data % check.value !== BigInt(0)) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.not_multiple_of,
+            multipleOf: check.value,
+            message: check.message
+          });
+          status.dirty();
+        }
+      } else {
+        util.assertNever(check);
+      }
+    }
+    return { status: status.value, value: input.data };
+  }
+  _getInvalidInput(input) {
+    const ctx = this._getOrReturnCtx(input);
+    addIssueToContext(ctx, {
+      code: ZodIssueCode.invalid_type,
+      expected: ZodParsedType.bigint,
+      received: ctx.parsedType
+    });
+    return INVALID;
+  }
+  gte(value, message) {
+    return this.setLimit("min", value, true, errorUtil.toString(message));
+  }
+  gt(value, message) {
+    return this.setLimit("min", value, false, errorUtil.toString(message));
+  }
+  lte(value, message) {
+    return this.setLimit("max", value, true, errorUtil.toString(message));
+  }
+  lt(value, message) {
+    return this.setLimit("max", value, false, errorUtil.toString(message));
+  }
+  setLimit(kind, value, inclusive, message) {
+    return new _ZodBigInt({
+      ...this._def,
+      checks: [
+        ...this._def.checks,
+        {
+          kind,
+          value,
+          inclusive,
+          message: errorUtil.toString(message)
+        }
+      ]
+    });
+  }
+  _addCheck(check) {
+    return new _ZodBigInt({
+      ...this._def,
+      checks: [...this._def.checks, check]
+    });
+  }
+  positive(message) {
+    return this._addCheck({
+      kind: "min",
+      value: BigInt(0),
+      inclusive: false,
+      message: errorUtil.toString(message)
+    });
+  }
+  negative(message) {
+    return this._addCheck({
+      kind: "max",
+      value: BigInt(0),
+      inclusive: false,
+      message: errorUtil.toString(message)
+    });
+  }
+  nonpositive(message) {
+    return this._addCheck({
+      kind: "max",
+      value: BigInt(0),
+      inclusive: true,
+      message: errorUtil.toString(message)
+    });
+  }
+  nonnegative(message) {
+    return this._addCheck({
+      kind: "min",
+      value: BigInt(0),
+      inclusive: true,
+      message: errorUtil.toString(message)
+    });
+  }
+  multipleOf(value, message) {
+    return this._addCheck({
+      kind: "multipleOf",
+      value,
+      message: errorUtil.toString(message)
+    });
+  }
+  get minValue() {
+    let min = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "min") {
+        if (min === null || ch.value > min)
+          min = ch.value;
+      }
+    }
+    return min;
+  }
+  get maxValue() {
+    let max = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "max") {
+        if (max === null || ch.value < max)
+          max = ch.value;
+      }
+    }
+    return max;
+  }
+};
+ZodBigInt.create = (params) => {
+  return new ZodBigInt({
+    checks: [],
+    typeName: ZodFirstPartyTypeKind.ZodBigInt,
+    coerce: params?.coerce ?? false,
+    ...processCreateParams(params)
+  });
+};
+var ZodBoolean = class extends ZodType {
+  _parse(input) {
+    if (this._def.coerce) {
+      input.data = Boolean(input.data);
+    }
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.boolean) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.boolean,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    return OK(input.data);
+  }
+};
+ZodBoolean.create = (params) => {
+  return new ZodBoolean({
+    typeName: ZodFirstPartyTypeKind.ZodBoolean,
+    coerce: params?.coerce || false,
+    ...processCreateParams(params)
+  });
+};
+var ZodDate = class _ZodDate extends ZodType {
+  _parse(input) {
+    if (this._def.coerce) {
+      input.data = new Date(input.data);
+    }
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.date) {
+      const ctx2 = this._getOrReturnCtx(input);
+      addIssueToContext(ctx2, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.date,
+        received: ctx2.parsedType
+      });
+      return INVALID;
+    }
+    if (Number.isNaN(input.data.getTime())) {
+      const ctx2 = this._getOrReturnCtx(input);
+      addIssueToContext(ctx2, {
+        code: ZodIssueCode.invalid_date
+      });
+      return INVALID;
+    }
+    const status = new ParseStatus();
+    let ctx = void 0;
+    for (const check of this._def.checks) {
+      if (check.kind === "min") {
+        if (input.data.getTime() < check.value) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_small,
+            message: check.message,
+            inclusive: true,
+            exact: false,
+            minimum: check.value,
+            type: "date"
+          });
+          status.dirty();
+        }
+      } else if (check.kind === "max") {
+        if (input.data.getTime() > check.value) {
+          ctx = this._getOrReturnCtx(input, ctx);
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.too_big,
+            message: check.message,
+            inclusive: true,
+            exact: false,
+            maximum: check.value,
+            type: "date"
+          });
+          status.dirty();
+        }
+      } else {
+        util.assertNever(check);
+      }
+    }
+    return {
+      status: status.value,
+      value: new Date(input.data.getTime())
+    };
+  }
+  _addCheck(check) {
+    return new _ZodDate({
+      ...this._def,
+      checks: [...this._def.checks, check]
+    });
+  }
+  min(minDate, message) {
+    return this._addCheck({
+      kind: "min",
+      value: minDate.getTime(),
+      message: errorUtil.toString(message)
+    });
+  }
+  max(maxDate, message) {
+    return this._addCheck({
+      kind: "max",
+      value: maxDate.getTime(),
+      message: errorUtil.toString(message)
+    });
+  }
+  get minDate() {
+    let min = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "min") {
+        if (min === null || ch.value > min)
+          min = ch.value;
+      }
+    }
+    return min != null ? new Date(min) : null;
+  }
+  get maxDate() {
+    let max = null;
+    for (const ch of this._def.checks) {
+      if (ch.kind === "max") {
+        if (max === null || ch.value < max)
+          max = ch.value;
+      }
+    }
+    return max != null ? new Date(max) : null;
+  }
+};
+ZodDate.create = (params) => {
+  return new ZodDate({
+    checks: [],
+    coerce: params?.coerce || false,
+    typeName: ZodFirstPartyTypeKind.ZodDate,
+    ...processCreateParams(params)
+  });
+};
+var ZodSymbol = class extends ZodType {
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.symbol) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.symbol,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    return OK(input.data);
+  }
+};
+ZodSymbol.create = (params) => {
+  return new ZodSymbol({
+    typeName: ZodFirstPartyTypeKind.ZodSymbol,
+    ...processCreateParams(params)
+  });
+};
+var ZodUndefined = class extends ZodType {
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.undefined) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.undefined,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    return OK(input.data);
+  }
+};
+ZodUndefined.create = (params) => {
+  return new ZodUndefined({
+    typeName: ZodFirstPartyTypeKind.ZodUndefined,
+    ...processCreateParams(params)
+  });
+};
+var ZodNull = class extends ZodType {
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.null) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.null,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    return OK(input.data);
+  }
+};
+ZodNull.create = (params) => {
+  return new ZodNull({
+    typeName: ZodFirstPartyTypeKind.ZodNull,
+    ...processCreateParams(params)
+  });
+};
+var ZodAny = class extends ZodType {
+  constructor() {
+    super(...arguments);
+    this._any = true;
+  }
+  _parse(input) {
+    return OK(input.data);
+  }
+};
+ZodAny.create = (params) => {
+  return new ZodAny({
+    typeName: ZodFirstPartyTypeKind.ZodAny,
+    ...processCreateParams(params)
+  });
+};
+var ZodUnknown = class extends ZodType {
+  constructor() {
+    super(...arguments);
+    this._unknown = true;
+  }
+  _parse(input) {
+    return OK(input.data);
+  }
+};
+ZodUnknown.create = (params) => {
+  return new ZodUnknown({
+    typeName: ZodFirstPartyTypeKind.ZodUnknown,
+    ...processCreateParams(params)
+  });
+};
+var ZodNever = class extends ZodType {
+  _parse(input) {
+    const ctx = this._getOrReturnCtx(input);
+    addIssueToContext(ctx, {
+      code: ZodIssueCode.invalid_type,
+      expected: ZodParsedType.never,
+      received: ctx.parsedType
+    });
+    return INVALID;
+  }
+};
+ZodNever.create = (params) => {
+  return new ZodNever({
+    typeName: ZodFirstPartyTypeKind.ZodNever,
+    ...processCreateParams(params)
+  });
+};
+var ZodVoid = class extends ZodType {
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.undefined) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.void,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    return OK(input.data);
+  }
+};
+ZodVoid.create = (params) => {
+  return new ZodVoid({
+    typeName: ZodFirstPartyTypeKind.ZodVoid,
+    ...processCreateParams(params)
+  });
+};
+var ZodArray = class _ZodArray extends ZodType {
+  _parse(input) {
+    const { ctx, status } = this._processInputParams(input);
+    const def = this._def;
+    if (ctx.parsedType !== ZodParsedType.array) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.array,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    if (def.exactLength !== null) {
+      const tooBig = ctx.data.length > def.exactLength.value;
+      const tooSmall = ctx.data.length < def.exactLength.value;
+      if (tooBig || tooSmall) {
+        addIssueToContext(ctx, {
+          code: tooBig ? ZodIssueCode.too_big : ZodIssueCode.too_small,
+          minimum: tooSmall ? def.exactLength.value : void 0,
+          maximum: tooBig ? def.exactLength.value : void 0,
+          type: "array",
+          inclusive: true,
+          exact: true,
+          message: def.exactLength.message
+        });
+        status.dirty();
+      }
+    }
+    if (def.minLength !== null) {
+      if (ctx.data.length < def.minLength.value) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.too_small,
+          minimum: def.minLength.value,
+          type: "array",
+          inclusive: true,
+          exact: false,
+          message: def.minLength.message
+        });
+        status.dirty();
+      }
+    }
+    if (def.maxLength !== null) {
+      if (ctx.data.length > def.maxLength.value) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.too_big,
+          maximum: def.maxLength.value,
+          type: "array",
+          inclusive: true,
+          exact: false,
+          message: def.maxLength.message
+        });
+        status.dirty();
+      }
+    }
+    if (ctx.common.async) {
+      return Promise.all([...ctx.data].map((item, i) => {
+        return def.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i));
+      })).then((result2) => {
+        return ParseStatus.mergeArray(status, result2);
+      });
+    }
+    const result = [...ctx.data].map((item, i) => {
+      return def.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i));
+    });
+    return ParseStatus.mergeArray(status, result);
+  }
+  get element() {
+    return this._def.type;
+  }
+  min(minLength, message) {
+    return new _ZodArray({
+      ...this._def,
+      minLength: { value: minLength, message: errorUtil.toString(message) }
+    });
+  }
+  max(maxLength, message) {
+    return new _ZodArray({
+      ...this._def,
+      maxLength: { value: maxLength, message: errorUtil.toString(message) }
+    });
+  }
+  length(len, message) {
+    return new _ZodArray({
+      ...this._def,
+      exactLength: { value: len, message: errorUtil.toString(message) }
+    });
+  }
+  nonempty(message) {
+    return this.min(1, message);
+  }
+};
+ZodArray.create = (schema, params) => {
+  return new ZodArray({
+    type: schema,
+    minLength: null,
+    maxLength: null,
+    exactLength: null,
+    typeName: ZodFirstPartyTypeKind.ZodArray,
+    ...processCreateParams(params)
+  });
+};
+function deepPartialify(schema) {
+  if (schema instanceof ZodObject) {
+    const newShape = {};
+    for (const key in schema.shape) {
+      const fieldSchema = schema.shape[key];
+      newShape[key] = ZodOptional.create(deepPartialify(fieldSchema));
+    }
+    return new ZodObject({
+      ...schema._def,
+      shape: () => newShape
+    });
+  } else if (schema instanceof ZodArray) {
+    return new ZodArray({
+      ...schema._def,
+      type: deepPartialify(schema.element)
+    });
+  } else if (schema instanceof ZodOptional) {
+    return ZodOptional.create(deepPartialify(schema.unwrap()));
+  } else if (schema instanceof ZodNullable) {
+    return ZodNullable.create(deepPartialify(schema.unwrap()));
+  } else if (schema instanceof ZodTuple) {
+    return ZodTuple.create(schema.items.map((item) => deepPartialify(item)));
+  } else {
+    return schema;
+  }
+}
+var ZodObject = class _ZodObject extends ZodType {
+  constructor() {
+    super(...arguments);
+    this._cached = null;
+    this.nonstrict = this.passthrough;
+    this.augment = this.extend;
+  }
+  _getCached() {
+    if (this._cached !== null)
+      return this._cached;
+    const shape = this._def.shape();
+    const keys = util.objectKeys(shape);
+    this._cached = { shape, keys };
+    return this._cached;
+  }
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.object) {
+      const ctx2 = this._getOrReturnCtx(input);
+      addIssueToContext(ctx2, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.object,
+        received: ctx2.parsedType
+      });
+      return INVALID;
+    }
+    const { status, ctx } = this._processInputParams(input);
+    const { shape, keys: shapeKeys } = this._getCached();
+    const extraKeys = [];
+    if (!(this._def.catchall instanceof ZodNever && this._def.unknownKeys === "strip")) {
+      for (const key in ctx.data) {
+        if (!shapeKeys.includes(key)) {
+          extraKeys.push(key);
+        }
+      }
+    }
+    const pairs = [];
+    for (const key of shapeKeys) {
+      const keyValidator = shape[key];
+      const value = ctx.data[key];
+      pairs.push({
+        key: { status: "valid", value: key },
+        value: keyValidator._parse(new ParseInputLazyPath(ctx, value, ctx.path, key)),
+        alwaysSet: key in ctx.data
+      });
+    }
+    if (this._def.catchall instanceof ZodNever) {
+      const unknownKeys = this._def.unknownKeys;
+      if (unknownKeys === "passthrough") {
+        for (const key of extraKeys) {
+          pairs.push({
+            key: { status: "valid", value: key },
+            value: { status: "valid", value: ctx.data[key] }
+          });
+        }
+      } else if (unknownKeys === "strict") {
+        if (extraKeys.length > 0) {
+          addIssueToContext(ctx, {
+            code: ZodIssueCode.unrecognized_keys,
+            keys: extraKeys
+          });
+          status.dirty();
+        }
+      } else if (unknownKeys === "strip") {
+      } else {
+        throw new Error(`Internal ZodObject error: invalid unknownKeys value.`);
+      }
+    } else {
+      const catchall = this._def.catchall;
+      for (const key of extraKeys) {
+        const value = ctx.data[key];
+        pairs.push({
+          key: { status: "valid", value: key },
+          value: catchall._parse(
+            new ParseInputLazyPath(ctx, value, ctx.path, key)
+            //, ctx.child(key), value, getParsedType(value)
+          ),
+          alwaysSet: key in ctx.data
+        });
+      }
+    }
+    if (ctx.common.async) {
+      return Promise.resolve().then(async () => {
+        const syncPairs = [];
+        for (const pair of pairs) {
+          const key = await pair.key;
+          const value = await pair.value;
+          syncPairs.push({
+            key,
+            value,
+            alwaysSet: pair.alwaysSet
+          });
+        }
+        return syncPairs;
+      }).then((syncPairs) => {
+        return ParseStatus.mergeObjectSync(status, syncPairs);
+      });
+    } else {
+      return ParseStatus.mergeObjectSync(status, pairs);
+    }
+  }
+  get shape() {
+    return this._def.shape();
+  }
+  strict(message) {
+    errorUtil.errToObj;
+    return new _ZodObject({
+      ...this._def,
+      unknownKeys: "strict",
+      ...message !== void 0 ? {
+        errorMap: (issue, ctx) => {
+          const defaultError = this._def.errorMap?.(issue, ctx).message ?? ctx.defaultError;
+          if (issue.code === "unrecognized_keys")
+            return {
+              message: errorUtil.errToObj(message).message ?? defaultError
+            };
+          return {
+            message: defaultError
+          };
+        }
+      } : {}
+    });
+  }
+  strip() {
+    return new _ZodObject({
+      ...this._def,
+      unknownKeys: "strip"
+    });
+  }
+  passthrough() {
+    return new _ZodObject({
+      ...this._def,
+      unknownKeys: "passthrough"
+    });
+  }
+  // const AugmentFactory =
+  //   <Def extends ZodObjectDef>(def: Def) =>
+  //   <Augmentation extends ZodRawShape>(
+  //     augmentation: Augmentation
+  //   ): ZodObject<
+  //     extendShape<ReturnType<Def["shape"]>, Augmentation>,
+  //     Def["unknownKeys"],
+  //     Def["catchall"]
+  //   > => {
+  //     return new ZodObject({
+  //       ...def,
+  //       shape: () => ({
+  //         ...def.shape(),
+  //         ...augmentation,
+  //       }),
+  //     }) as any;
+  //   };
+  extend(augmentation) {
+    return new _ZodObject({
+      ...this._def,
+      shape: () => ({
+        ...this._def.shape(),
+        ...augmentation
+      })
+    });
+  }
+  /**
+   * Prior to zod@1.0.12 there was a bug in the
+   * inferred type of merged objects. Please
+   * upgrade if you are experiencing issues.
+   */
+  merge(merging) {
+    const merged = new _ZodObject({
+      unknownKeys: merging._def.unknownKeys,
+      catchall: merging._def.catchall,
+      shape: () => ({
+        ...this._def.shape(),
+        ...merging._def.shape()
+      }),
+      typeName: ZodFirstPartyTypeKind.ZodObject
+    });
+    return merged;
+  }
+  // merge<
+  //   Incoming extends AnyZodObject,
+  //   Augmentation extends Incoming["shape"],
+  //   NewOutput extends {
+  //     [k in keyof Augmentation | keyof Output]: k extends keyof Augmentation
+  //       ? Augmentation[k]["_output"]
+  //       : k extends keyof Output
+  //       ? Output[k]
+  //       : never;
+  //   },
+  //   NewInput extends {
+  //     [k in keyof Augmentation | keyof Input]: k extends keyof Augmentation
+  //       ? Augmentation[k]["_input"]
+  //       : k extends keyof Input
+  //       ? Input[k]
+  //       : never;
+  //   }
+  // >(
+  //   merging: Incoming
+  // ): ZodObject<
+  //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
+  //   Incoming["_def"]["unknownKeys"],
+  //   Incoming["_def"]["catchall"],
+  //   NewOutput,
+  //   NewInput
+  // > {
+  //   const merged: any = new ZodObject({
+  //     unknownKeys: merging._def.unknownKeys,
+  //     catchall: merging._def.catchall,
+  //     shape: () =>
+  //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
+  //     typeName: ZodFirstPartyTypeKind.ZodObject,
+  //   }) as any;
+  //   return merged;
+  // }
+  setKey(key, schema) {
+    return this.augment({ [key]: schema });
+  }
+  // merge<Incoming extends AnyZodObject>(
+  //   merging: Incoming
+  // ): //ZodObject<T & Incoming["_shape"], UnknownKeys, Catchall> = (merging) => {
+  // ZodObject<
+  //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
+  //   Incoming["_def"]["unknownKeys"],
+  //   Incoming["_def"]["catchall"]
+  // > {
+  //   // const mergedShape = objectUtil.mergeShapes(
+  //   //   this._def.shape(),
+  //   //   merging._def.shape()
+  //   // );
+  //   const merged: any = new ZodObject({
+  //     unknownKeys: merging._def.unknownKeys,
+  //     catchall: merging._def.catchall,
+  //     shape: () =>
+  //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
+  //     typeName: ZodFirstPartyTypeKind.ZodObject,
+  //   }) as any;
+  //   return merged;
+  // }
+  catchall(index) {
+    return new _ZodObject({
+      ...this._def,
+      catchall: index
+    });
+  }
+  pick(mask) {
+    const shape = {};
+    for (const key of util.objectKeys(mask)) {
+      if (mask[key] && this.shape[key]) {
+        shape[key] = this.shape[key];
+      }
+    }
+    return new _ZodObject({
+      ...this._def,
+      shape: () => shape
+    });
+  }
+  omit(mask) {
+    const shape = {};
+    for (const key of util.objectKeys(this.shape)) {
+      if (!mask[key]) {
+        shape[key] = this.shape[key];
+      }
+    }
+    return new _ZodObject({
+      ...this._def,
+      shape: () => shape
+    });
+  }
+  /**
+   * @deprecated
+   */
+  deepPartial() {
+    return deepPartialify(this);
+  }
+  partial(mask) {
+    const newShape = {};
+    for (const key of util.objectKeys(this.shape)) {
+      const fieldSchema = this.shape[key];
+      if (mask && !mask[key]) {
+        newShape[key] = fieldSchema;
+      } else {
+        newShape[key] = fieldSchema.optional();
+      }
+    }
+    return new _ZodObject({
+      ...this._def,
+      shape: () => newShape
+    });
+  }
+  required(mask) {
+    const newShape = {};
+    for (const key of util.objectKeys(this.shape)) {
+      if (mask && !mask[key]) {
+        newShape[key] = this.shape[key];
+      } else {
+        const fieldSchema = this.shape[key];
+        let newField = fieldSchema;
+        while (newField instanceof ZodOptional) {
+          newField = newField._def.innerType;
+        }
+        newShape[key] = newField;
+      }
+    }
+    return new _ZodObject({
+      ...this._def,
+      shape: () => newShape
+    });
+  }
+  keyof() {
+    return createZodEnum(util.objectKeys(this.shape));
+  }
+};
+ZodObject.create = (shape, params) => {
+  return new ZodObject({
+    shape: () => shape,
+    unknownKeys: "strip",
+    catchall: ZodNever.create(),
+    typeName: ZodFirstPartyTypeKind.ZodObject,
+    ...processCreateParams(params)
+  });
+};
+ZodObject.strictCreate = (shape, params) => {
+  return new ZodObject({
+    shape: () => shape,
+    unknownKeys: "strict",
+    catchall: ZodNever.create(),
+    typeName: ZodFirstPartyTypeKind.ZodObject,
+    ...processCreateParams(params)
+  });
+};
+ZodObject.lazycreate = (shape, params) => {
+  return new ZodObject({
+    shape,
+    unknownKeys: "strip",
+    catchall: ZodNever.create(),
+    typeName: ZodFirstPartyTypeKind.ZodObject,
+    ...processCreateParams(params)
+  });
+};
+var ZodUnion = class extends ZodType {
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    const options = this._def.options;
+    function handleResults(results) {
+      for (const result of results) {
+        if (result.result.status === "valid") {
+          return result.result;
+        }
+      }
+      for (const result of results) {
+        if (result.result.status === "dirty") {
+          ctx.common.issues.push(...result.ctx.common.issues);
+          return result.result;
+        }
+      }
+      const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues));
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_union,
+        unionErrors
+      });
+      return INVALID;
+    }
+    if (ctx.common.async) {
+      return Promise.all(options.map(async (option) => {
+        const childCtx = {
+          ...ctx,
+          common: {
+            ...ctx.common,
+            issues: []
+          },
+          parent: null
+        };
+        return {
+          result: await option._parseAsync({
+            data: ctx.data,
+            path: ctx.path,
+            parent: childCtx
+          }),
+          ctx: childCtx
+        };
+      })).then(handleResults);
+    } else {
+      let dirty = void 0;
+      const issues = [];
+      for (const option of options) {
+        const childCtx = {
+          ...ctx,
+          common: {
+            ...ctx.common,
+            issues: []
+          },
+          parent: null
+        };
+        const result = option._parseSync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: childCtx
+        });
+        if (result.status === "valid") {
+          return result;
+        } else if (result.status === "dirty" && !dirty) {
+          dirty = { result, ctx: childCtx };
+        }
+        if (childCtx.common.issues.length) {
+          issues.push(childCtx.common.issues);
+        }
+      }
+      if (dirty) {
+        ctx.common.issues.push(...dirty.ctx.common.issues);
+        return dirty.result;
+      }
+      const unionErrors = issues.map((issues2) => new ZodError(issues2));
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_union,
+        unionErrors
+      });
+      return INVALID;
+    }
+  }
+  get options() {
+    return this._def.options;
+  }
+};
+ZodUnion.create = (types, params) => {
+  return new ZodUnion({
+    options: types,
+    typeName: ZodFirstPartyTypeKind.ZodUnion,
+    ...processCreateParams(params)
+  });
+};
+var getDiscriminator = (type) => {
+  if (type instanceof ZodLazy) {
+    return getDiscriminator(type.schema);
+  } else if (type instanceof ZodEffects) {
+    return getDiscriminator(type.innerType());
+  } else if (type instanceof ZodLiteral) {
+    return [type.value];
+  } else if (type instanceof ZodEnum) {
+    return type.options;
+  } else if (type instanceof ZodNativeEnum) {
+    return util.objectValues(type.enum);
+  } else if (type instanceof ZodDefault) {
+    return getDiscriminator(type._def.innerType);
+  } else if (type instanceof ZodUndefined) {
+    return [void 0];
+  } else if (type instanceof ZodNull) {
+    return [null];
+  } else if (type instanceof ZodOptional) {
+    return [void 0, ...getDiscriminator(type.unwrap())];
+  } else if (type instanceof ZodNullable) {
+    return [null, ...getDiscriminator(type.unwrap())];
+  } else if (type instanceof ZodBranded) {
+    return getDiscriminator(type.unwrap());
+  } else if (type instanceof ZodReadonly) {
+    return getDiscriminator(type.unwrap());
+  } else if (type instanceof ZodCatch) {
+    return getDiscriminator(type._def.innerType);
+  } else {
+    return [];
+  }
+};
+var ZodDiscriminatedUnion = class _ZodDiscriminatedUnion extends ZodType {
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.object) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.object,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    const discriminator = this.discriminator;
+    const discriminatorValue = ctx.data[discriminator];
+    const option = this.optionsMap.get(discriminatorValue);
+    if (!option) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_union_discriminator,
+        options: Array.from(this.optionsMap.keys()),
+        path: [discriminator]
+      });
+      return INVALID;
+    }
+    if (ctx.common.async) {
+      return option._parseAsync({
+        data: ctx.data,
+        path: ctx.path,
+        parent: ctx
+      });
+    } else {
+      return option._parseSync({
+        data: ctx.data,
+        path: ctx.path,
+        parent: ctx
+      });
+    }
+  }
+  get discriminator() {
+    return this._def.discriminator;
+  }
+  get options() {
+    return this._def.options;
+  }
+  get optionsMap() {
+    return this._def.optionsMap;
+  }
+  /**
+   * The constructor of the discriminated union schema. Its behaviour is very similar to that of the normal z.union() constructor.
+   * However, it only allows a union of objects, all of which need to share a discriminator property. This property must
+   * have a different value for each object in the union.
+   * @param discriminator the name of the discriminator property
+   * @param types an array of object schemas
+   * @param params
+   */
+  static create(discriminator, options, params) {
+    const optionsMap = /* @__PURE__ */ new Map();
+    for (const type of options) {
+      const discriminatorValues = getDiscriminator(type.shape[discriminator]);
+      if (!discriminatorValues.length) {
+        throw new Error(`A discriminator value for key \`${discriminator}\` could not be extracted from all schema options`);
+      }
+      for (const value of discriminatorValues) {
+        if (optionsMap.has(value)) {
+          throw new Error(`Discriminator property ${String(discriminator)} has duplicate value ${String(value)}`);
+        }
+        optionsMap.set(value, type);
+      }
+    }
+    return new _ZodDiscriminatedUnion({
+      typeName: ZodFirstPartyTypeKind.ZodDiscriminatedUnion,
+      discriminator,
+      options,
+      optionsMap,
+      ...processCreateParams(params)
+    });
+  }
+};
+function mergeValues(a, b) {
+  const aType = getParsedType(a);
+  const bType = getParsedType(b);
+  if (a === b) {
+    return { valid: true, data: a };
+  } else if (aType === ZodParsedType.object && bType === ZodParsedType.object) {
+    const bKeys = util.objectKeys(b);
+    const sharedKeys = util.objectKeys(a).filter((key) => bKeys.indexOf(key) !== -1);
+    const newObj = { ...a, ...b };
+    for (const key of sharedKeys) {
+      const sharedValue = mergeValues(a[key], b[key]);
+      if (!sharedValue.valid) {
+        return { valid: false };
+      }
+      newObj[key] = sharedValue.data;
+    }
+    return { valid: true, data: newObj };
+  } else if (aType === ZodParsedType.array && bType === ZodParsedType.array) {
+    if (a.length !== b.length) {
+      return { valid: false };
+    }
+    const newArray = [];
+    for (let index = 0; index < a.length; index++) {
+      const itemA = a[index];
+      const itemB = b[index];
+      const sharedValue = mergeValues(itemA, itemB);
+      if (!sharedValue.valid) {
+        return { valid: false };
+      }
+      newArray.push(sharedValue.data);
+    }
+    return { valid: true, data: newArray };
+  } else if (aType === ZodParsedType.date && bType === ZodParsedType.date && +a === +b) {
+    return { valid: true, data: a };
+  } else {
+    return { valid: false };
+  }
+}
+var ZodIntersection = class extends ZodType {
+  _parse(input) {
+    const { status, ctx } = this._processInputParams(input);
+    const handleParsed = (parsedLeft, parsedRight) => {
+      if (isAborted(parsedLeft) || isAborted(parsedRight)) {
+        return INVALID;
+      }
+      const merged = mergeValues(parsedLeft.value, parsedRight.value);
+      if (!merged.valid) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.invalid_intersection_types
+        });
+        return INVALID;
+      }
+      if (isDirty(parsedLeft) || isDirty(parsedRight)) {
+        status.dirty();
+      }
+      return { status: status.value, value: merged.data };
+    };
+    if (ctx.common.async) {
+      return Promise.all([
+        this._def.left._parseAsync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        }),
+        this._def.right._parseAsync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        })
+      ]).then(([left, right]) => handleParsed(left, right));
+    } else {
+      return handleParsed(this._def.left._parseSync({
+        data: ctx.data,
+        path: ctx.path,
+        parent: ctx
+      }), this._def.right._parseSync({
+        data: ctx.data,
+        path: ctx.path,
+        parent: ctx
+      }));
+    }
+  }
+};
+ZodIntersection.create = (left, right, params) => {
+  return new ZodIntersection({
+    left,
+    right,
+    typeName: ZodFirstPartyTypeKind.ZodIntersection,
+    ...processCreateParams(params)
+  });
+};
+var ZodTuple = class _ZodTuple extends ZodType {
+  _parse(input) {
+    const { status, ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.array) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.array,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    if (ctx.data.length < this._def.items.length) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.too_small,
+        minimum: this._def.items.length,
+        inclusive: true,
+        exact: false,
+        type: "array"
+      });
+      return INVALID;
+    }
+    const rest = this._def.rest;
+    if (!rest && ctx.data.length > this._def.items.length) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.too_big,
+        maximum: this._def.items.length,
+        inclusive: true,
+        exact: false,
+        type: "array"
+      });
+      status.dirty();
+    }
+    const items = [...ctx.data].map((item, itemIndex) => {
+      const schema = this._def.items[itemIndex] || this._def.rest;
+      if (!schema)
+        return null;
+      return schema._parse(new ParseInputLazyPath(ctx, item, ctx.path, itemIndex));
+    }).filter((x) => !!x);
+    if (ctx.common.async) {
+      return Promise.all(items).then((results) => {
+        return ParseStatus.mergeArray(status, results);
+      });
+    } else {
+      return ParseStatus.mergeArray(status, items);
+    }
+  }
+  get items() {
+    return this._def.items;
+  }
+  rest(rest) {
+    return new _ZodTuple({
+      ...this._def,
+      rest
+    });
+  }
+};
+ZodTuple.create = (schemas, params) => {
+  if (!Array.isArray(schemas)) {
+    throw new Error("You must pass an array of schemas to z.tuple([ ... ])");
+  }
+  return new ZodTuple({
+    items: schemas,
+    typeName: ZodFirstPartyTypeKind.ZodTuple,
+    rest: null,
+    ...processCreateParams(params)
+  });
+};
+var ZodRecord = class _ZodRecord extends ZodType {
+  get keySchema() {
+    return this._def.keyType;
+  }
+  get valueSchema() {
+    return this._def.valueType;
+  }
+  _parse(input) {
+    const { status, ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.object) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.object,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    const pairs = [];
+    const keyType = this._def.keyType;
+    const valueType = this._def.valueType;
+    for (const key in ctx.data) {
+      pairs.push({
+        key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, key)),
+        value: valueType._parse(new ParseInputLazyPath(ctx, ctx.data[key], ctx.path, key)),
+        alwaysSet: key in ctx.data
+      });
+    }
+    if (ctx.common.async) {
+      return ParseStatus.mergeObjectAsync(status, pairs);
+    } else {
+      return ParseStatus.mergeObjectSync(status, pairs);
+    }
+  }
+  get element() {
+    return this._def.valueType;
+  }
+  static create(first, second, third) {
+    if (second instanceof ZodType) {
+      return new _ZodRecord({
+        keyType: first,
+        valueType: second,
+        typeName: ZodFirstPartyTypeKind.ZodRecord,
+        ...processCreateParams(third)
+      });
+    }
+    return new _ZodRecord({
+      keyType: ZodString.create(),
+      valueType: first,
+      typeName: ZodFirstPartyTypeKind.ZodRecord,
+      ...processCreateParams(second)
+    });
+  }
+};
+var ZodMap = class extends ZodType {
+  get keySchema() {
+    return this._def.keyType;
+  }
+  get valueSchema() {
+    return this._def.valueType;
+  }
+  _parse(input) {
+    const { status, ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.map) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.map,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    const keyType = this._def.keyType;
+    const valueType = this._def.valueType;
+    const pairs = [...ctx.data.entries()].map(([key, value], index) => {
+      return {
+        key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, [index, "key"])),
+        value: valueType._parse(new ParseInputLazyPath(ctx, value, ctx.path, [index, "value"]))
+      };
+    });
+    if (ctx.common.async) {
+      const finalMap = /* @__PURE__ */ new Map();
+      return Promise.resolve().then(async () => {
+        for (const pair of pairs) {
+          const key = await pair.key;
+          const value = await pair.value;
+          if (key.status === "aborted" || value.status === "aborted") {
+            return INVALID;
+          }
+          if (key.status === "dirty" || value.status === "dirty") {
+            status.dirty();
+          }
+          finalMap.set(key.value, value.value);
+        }
+        return { status: status.value, value: finalMap };
+      });
+    } else {
+      const finalMap = /* @__PURE__ */ new Map();
+      for (const pair of pairs) {
+        const key = pair.key;
+        const value = pair.value;
+        if (key.status === "aborted" || value.status === "aborted") {
+          return INVALID;
+        }
+        if (key.status === "dirty" || value.status === "dirty") {
+          status.dirty();
+        }
+        finalMap.set(key.value, value.value);
+      }
+      return { status: status.value, value: finalMap };
+    }
+  }
+};
+ZodMap.create = (keyType, valueType, params) => {
+  return new ZodMap({
+    valueType,
+    keyType,
+    typeName: ZodFirstPartyTypeKind.ZodMap,
+    ...processCreateParams(params)
+  });
+};
+var ZodSet = class _ZodSet extends ZodType {
+  _parse(input) {
+    const { status, ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.set) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.set,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    const def = this._def;
+    if (def.minSize !== null) {
+      if (ctx.data.size < def.minSize.value) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.too_small,
+          minimum: def.minSize.value,
+          type: "set",
+          inclusive: true,
+          exact: false,
+          message: def.minSize.message
+        });
+        status.dirty();
+      }
+    }
+    if (def.maxSize !== null) {
+      if (ctx.data.size > def.maxSize.value) {
+        addIssueToContext(ctx, {
+          code: ZodIssueCode.too_big,
+          maximum: def.maxSize.value,
+          type: "set",
+          inclusive: true,
+          exact: false,
+          message: def.maxSize.message
+        });
+        status.dirty();
+      }
+    }
+    const valueType = this._def.valueType;
+    function finalizeSet(elements2) {
+      const parsedSet = /* @__PURE__ */ new Set();
+      for (const element of elements2) {
+        if (element.status === "aborted")
+          return INVALID;
+        if (element.status === "dirty")
+          status.dirty();
+        parsedSet.add(element.value);
+      }
+      return { status: status.value, value: parsedSet };
+    }
+    const elements = [...ctx.data.values()].map((item, i) => valueType._parse(new ParseInputLazyPath(ctx, item, ctx.path, i)));
+    if (ctx.common.async) {
+      return Promise.all(elements).then((elements2) => finalizeSet(elements2));
+    } else {
+      return finalizeSet(elements);
+    }
+  }
+  min(minSize, message) {
+    return new _ZodSet({
+      ...this._def,
+      minSize: { value: minSize, message: errorUtil.toString(message) }
+    });
+  }
+  max(maxSize, message) {
+    return new _ZodSet({
+      ...this._def,
+      maxSize: { value: maxSize, message: errorUtil.toString(message) }
+    });
+  }
+  size(size, message) {
+    return this.min(size, message).max(size, message);
+  }
+  nonempty(message) {
+    return this.min(1, message);
+  }
+};
+ZodSet.create = (valueType, params) => {
+  return new ZodSet({
+    valueType,
+    minSize: null,
+    maxSize: null,
+    typeName: ZodFirstPartyTypeKind.ZodSet,
+    ...processCreateParams(params)
+  });
+};
+var ZodFunction = class _ZodFunction extends ZodType {
+  constructor() {
+    super(...arguments);
+    this.validate = this.implement;
+  }
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.function) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.function,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    function makeArgsIssue(args, error) {
+      return makeIssue({
+        data: args,
+        path: ctx.path,
+        errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
+        issueData: {
+          code: ZodIssueCode.invalid_arguments,
+          argumentsError: error
+        }
+      });
+    }
+    function makeReturnsIssue(returns, error) {
+      return makeIssue({
+        data: returns,
+        path: ctx.path,
+        errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
+        issueData: {
+          code: ZodIssueCode.invalid_return_type,
+          returnTypeError: error
+        }
+      });
+    }
+    const params = { errorMap: ctx.common.contextualErrorMap };
+    const fn = ctx.data;
+    if (this._def.returns instanceof ZodPromise) {
+      const me = this;
+      return OK(async function(...args) {
+        const error = new ZodError([]);
+        const parsedArgs = await me._def.args.parseAsync(args, params).catch((e) => {
+          error.addIssue(makeArgsIssue(args, e));
+          throw error;
+        });
+        const result = await Reflect.apply(fn, this, parsedArgs);
+        const parsedReturns = await me._def.returns._def.type.parseAsync(result, params).catch((e) => {
+          error.addIssue(makeReturnsIssue(result, e));
+          throw error;
+        });
+        return parsedReturns;
+      });
+    } else {
+      const me = this;
+      return OK(function(...args) {
+        const parsedArgs = me._def.args.safeParse(args, params);
+        if (!parsedArgs.success) {
+          throw new ZodError([makeArgsIssue(args, parsedArgs.error)]);
+        }
+        const result = Reflect.apply(fn, this, parsedArgs.data);
+        const parsedReturns = me._def.returns.safeParse(result, params);
+        if (!parsedReturns.success) {
+          throw new ZodError([makeReturnsIssue(result, parsedReturns.error)]);
+        }
+        return parsedReturns.data;
+      });
+    }
+  }
+  parameters() {
+    return this._def.args;
+  }
+  returnType() {
+    return this._def.returns;
+  }
+  args(...items) {
+    return new _ZodFunction({
+      ...this._def,
+      args: ZodTuple.create(items).rest(ZodUnknown.create())
+    });
+  }
+  returns(returnType) {
+    return new _ZodFunction({
+      ...this._def,
+      returns: returnType
+    });
+  }
+  implement(func) {
+    const validatedFunc = this.parse(func);
+    return validatedFunc;
+  }
+  strictImplement(func) {
+    const validatedFunc = this.parse(func);
+    return validatedFunc;
+  }
+  static create(args, returns, params) {
+    return new _ZodFunction({
+      args: args ? args : ZodTuple.create([]).rest(ZodUnknown.create()),
+      returns: returns || ZodUnknown.create(),
+      typeName: ZodFirstPartyTypeKind.ZodFunction,
+      ...processCreateParams(params)
+    });
+  }
+};
+var ZodLazy = class extends ZodType {
+  get schema() {
+    return this._def.getter();
+  }
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    const lazySchema = this._def.getter();
+    return lazySchema._parse({ data: ctx.data, path: ctx.path, parent: ctx });
+  }
+};
+ZodLazy.create = (getter, params) => {
+  return new ZodLazy({
+    getter,
+    typeName: ZodFirstPartyTypeKind.ZodLazy,
+    ...processCreateParams(params)
+  });
+};
+var ZodLiteral = class extends ZodType {
+  _parse(input) {
+    if (input.data !== this._def.value) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        received: ctx.data,
+        code: ZodIssueCode.invalid_literal,
+        expected: this._def.value
+      });
+      return INVALID;
+    }
+    return { status: "valid", value: input.data };
+  }
+  get value() {
+    return this._def.value;
+  }
+};
+ZodLiteral.create = (value, params) => {
+  return new ZodLiteral({
+    value,
+    typeName: ZodFirstPartyTypeKind.ZodLiteral,
+    ...processCreateParams(params)
+  });
+};
+function createZodEnum(values, params) {
+  return new ZodEnum({
+    values,
+    typeName: ZodFirstPartyTypeKind.ZodEnum,
+    ...processCreateParams(params)
+  });
+}
+var ZodEnum = class _ZodEnum extends ZodType {
+  _parse(input) {
+    if (typeof input.data !== "string") {
+      const ctx = this._getOrReturnCtx(input);
+      const expectedValues = this._def.values;
+      addIssueToContext(ctx, {
+        expected: util.joinValues(expectedValues),
+        received: ctx.parsedType,
+        code: ZodIssueCode.invalid_type
+      });
+      return INVALID;
+    }
+    if (!this._cache) {
+      this._cache = new Set(this._def.values);
+    }
+    if (!this._cache.has(input.data)) {
+      const ctx = this._getOrReturnCtx(input);
+      const expectedValues = this._def.values;
+      addIssueToContext(ctx, {
+        received: ctx.data,
+        code: ZodIssueCode.invalid_enum_value,
+        options: expectedValues
+      });
+      return INVALID;
+    }
+    return OK(input.data);
+  }
+  get options() {
+    return this._def.values;
+  }
+  get enum() {
+    const enumValues = {};
+    for (const val of this._def.values) {
+      enumValues[val] = val;
+    }
+    return enumValues;
+  }
+  get Values() {
+    const enumValues = {};
+    for (const val of this._def.values) {
+      enumValues[val] = val;
+    }
+    return enumValues;
+  }
+  get Enum() {
+    const enumValues = {};
+    for (const val of this._def.values) {
+      enumValues[val] = val;
+    }
+    return enumValues;
+  }
+  extract(values, newDef = this._def) {
+    return _ZodEnum.create(values, {
+      ...this._def,
+      ...newDef
+    });
+  }
+  exclude(values, newDef = this._def) {
+    return _ZodEnum.create(this.options.filter((opt) => !values.includes(opt)), {
+      ...this._def,
+      ...newDef
+    });
+  }
+};
+ZodEnum.create = createZodEnum;
+var ZodNativeEnum = class extends ZodType {
+  _parse(input) {
+    const nativeEnumValues = util.getValidEnumValues(this._def.values);
+    const ctx = this._getOrReturnCtx(input);
+    if (ctx.parsedType !== ZodParsedType.string && ctx.parsedType !== ZodParsedType.number) {
+      const expectedValues = util.objectValues(nativeEnumValues);
+      addIssueToContext(ctx, {
+        expected: util.joinValues(expectedValues),
+        received: ctx.parsedType,
+        code: ZodIssueCode.invalid_type
+      });
+      return INVALID;
+    }
+    if (!this._cache) {
+      this._cache = new Set(util.getValidEnumValues(this._def.values));
+    }
+    if (!this._cache.has(input.data)) {
+      const expectedValues = util.objectValues(nativeEnumValues);
+      addIssueToContext(ctx, {
+        received: ctx.data,
+        code: ZodIssueCode.invalid_enum_value,
+        options: expectedValues
+      });
+      return INVALID;
+    }
+    return OK(input.data);
+  }
+  get enum() {
+    return this._def.values;
+  }
+};
+ZodNativeEnum.create = (values, params) => {
+  return new ZodNativeEnum({
+    values,
+    typeName: ZodFirstPartyTypeKind.ZodNativeEnum,
+    ...processCreateParams(params)
+  });
+};
+var ZodPromise = class extends ZodType {
+  unwrap() {
+    return this._def.type;
+  }
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    if (ctx.parsedType !== ZodParsedType.promise && ctx.common.async === false) {
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.promise,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    const promisified = ctx.parsedType === ZodParsedType.promise ? ctx.data : Promise.resolve(ctx.data);
+    return OK(promisified.then((data) => {
+      return this._def.type.parseAsync(data, {
+        path: ctx.path,
+        errorMap: ctx.common.contextualErrorMap
+      });
+    }));
+  }
+};
+ZodPromise.create = (schema, params) => {
+  return new ZodPromise({
+    type: schema,
+    typeName: ZodFirstPartyTypeKind.ZodPromise,
+    ...processCreateParams(params)
+  });
+};
+var ZodEffects = class extends ZodType {
+  innerType() {
+    return this._def.schema;
+  }
+  sourceType() {
+    return this._def.schema._def.typeName === ZodFirstPartyTypeKind.ZodEffects ? this._def.schema.sourceType() : this._def.schema;
+  }
+  _parse(input) {
+    const { status, ctx } = this._processInputParams(input);
+    const effect = this._def.effect || null;
+    const checkCtx = {
+      addIssue: (arg) => {
+        addIssueToContext(ctx, arg);
+        if (arg.fatal) {
+          status.abort();
+        } else {
+          status.dirty();
+        }
+      },
+      get path() {
+        return ctx.path;
+      }
+    };
+    checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
+    if (effect.type === "preprocess") {
+      const processed = effect.transform(ctx.data, checkCtx);
+      if (ctx.common.async) {
+        return Promise.resolve(processed).then(async (processed2) => {
+          if (status.value === "aborted")
+            return INVALID;
+          const result = await this._def.schema._parseAsync({
+            data: processed2,
+            path: ctx.path,
+            parent: ctx
+          });
+          if (result.status === "aborted")
+            return INVALID;
+          if (result.status === "dirty")
+            return DIRTY(result.value);
+          if (status.value === "dirty")
+            return DIRTY(result.value);
+          return result;
+        });
+      } else {
+        if (status.value === "aborted")
+          return INVALID;
+        const result = this._def.schema._parseSync({
+          data: processed,
+          path: ctx.path,
+          parent: ctx
+        });
+        if (result.status === "aborted")
+          return INVALID;
+        if (result.status === "dirty")
+          return DIRTY(result.value);
+        if (status.value === "dirty")
+          return DIRTY(result.value);
+        return result;
+      }
+    }
+    if (effect.type === "refinement") {
+      const executeRefinement = (acc) => {
+        const result = effect.refinement(acc, checkCtx);
+        if (ctx.common.async) {
+          return Promise.resolve(result);
+        }
+        if (result instanceof Promise) {
+          throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
+        }
+        return acc;
+      };
+      if (ctx.common.async === false) {
+        const inner = this._def.schema._parseSync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        });
+        if (inner.status === "aborted")
+          return INVALID;
+        if (inner.status === "dirty")
+          status.dirty();
+        executeRefinement(inner.value);
+        return { status: status.value, value: inner.value };
+      } else {
+        return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((inner) => {
+          if (inner.status === "aborted")
+            return INVALID;
+          if (inner.status === "dirty")
+            status.dirty();
+          return executeRefinement(inner.value).then(() => {
+            return { status: status.value, value: inner.value };
+          });
+        });
+      }
+    }
+    if (effect.type === "transform") {
+      if (ctx.common.async === false) {
+        const base = this._def.schema._parseSync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        });
+        if (!isValid(base))
+          return INVALID;
+        const result = effect.transform(base.value, checkCtx);
+        if (result instanceof Promise) {
+          throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
+        }
+        return { status: status.value, value: result };
+      } else {
+        return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base) => {
+          if (!isValid(base))
+            return INVALID;
+          return Promise.resolve(effect.transform(base.value, checkCtx)).then((result) => ({
+            status: status.value,
+            value: result
+          }));
+        });
+      }
+    }
+    util.assertNever(effect);
+  }
+};
+ZodEffects.create = (schema, effect, params) => {
+  return new ZodEffects({
+    schema,
+    typeName: ZodFirstPartyTypeKind.ZodEffects,
+    effect,
+    ...processCreateParams(params)
+  });
+};
+ZodEffects.createWithPreprocess = (preprocess, schema, params) => {
+  return new ZodEffects({
+    schema,
+    effect: { type: "preprocess", transform: preprocess },
+    typeName: ZodFirstPartyTypeKind.ZodEffects,
+    ...processCreateParams(params)
+  });
+};
+var ZodOptional = class extends ZodType {
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType === ZodParsedType.undefined) {
+      return OK(void 0);
+    }
+    return this._def.innerType._parse(input);
+  }
+  unwrap() {
+    return this._def.innerType;
+  }
+};
+ZodOptional.create = (type, params) => {
+  return new ZodOptional({
+    innerType: type,
+    typeName: ZodFirstPartyTypeKind.ZodOptional,
+    ...processCreateParams(params)
+  });
+};
+var ZodNullable = class extends ZodType {
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType === ZodParsedType.null) {
+      return OK(null);
+    }
+    return this._def.innerType._parse(input);
+  }
+  unwrap() {
+    return this._def.innerType;
+  }
+};
+ZodNullable.create = (type, params) => {
+  return new ZodNullable({
+    innerType: type,
+    typeName: ZodFirstPartyTypeKind.ZodNullable,
+    ...processCreateParams(params)
+  });
+};
+var ZodDefault = class extends ZodType {
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    let data = ctx.data;
+    if (ctx.parsedType === ZodParsedType.undefined) {
+      data = this._def.defaultValue();
+    }
+    return this._def.innerType._parse({
+      data,
+      path: ctx.path,
+      parent: ctx
+    });
+  }
+  removeDefault() {
+    return this._def.innerType;
+  }
+};
+ZodDefault.create = (type, params) => {
+  return new ZodDefault({
+    innerType: type,
+    typeName: ZodFirstPartyTypeKind.ZodDefault,
+    defaultValue: typeof params.default === "function" ? params.default : () => params.default,
+    ...processCreateParams(params)
+  });
+};
+var ZodCatch = class extends ZodType {
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    const newCtx = {
+      ...ctx,
+      common: {
+        ...ctx.common,
+        issues: []
+      }
+    };
+    const result = this._def.innerType._parse({
+      data: newCtx.data,
+      path: newCtx.path,
+      parent: {
+        ...newCtx
+      }
+    });
+    if (isAsync(result)) {
+      return result.then((result2) => {
+        return {
+          status: "valid",
+          value: result2.status === "valid" ? result2.value : this._def.catchValue({
+            get error() {
+              return new ZodError(newCtx.common.issues);
+            },
+            input: newCtx.data
+          })
+        };
+      });
+    } else {
+      return {
+        status: "valid",
+        value: result.status === "valid" ? result.value : this._def.catchValue({
+          get error() {
+            return new ZodError(newCtx.common.issues);
+          },
+          input: newCtx.data
+        })
+      };
+    }
+  }
+  removeCatch() {
+    return this._def.innerType;
+  }
+};
+ZodCatch.create = (type, params) => {
+  return new ZodCatch({
+    innerType: type,
+    typeName: ZodFirstPartyTypeKind.ZodCatch,
+    catchValue: typeof params.catch === "function" ? params.catch : () => params.catch,
+    ...processCreateParams(params)
+  });
+};
+var ZodNaN = class extends ZodType {
+  _parse(input) {
+    const parsedType = this._getType(input);
+    if (parsedType !== ZodParsedType.nan) {
+      const ctx = this._getOrReturnCtx(input);
+      addIssueToContext(ctx, {
+        code: ZodIssueCode.invalid_type,
+        expected: ZodParsedType.nan,
+        received: ctx.parsedType
+      });
+      return INVALID;
+    }
+    return { status: "valid", value: input.data };
+  }
+};
+ZodNaN.create = (params) => {
+  return new ZodNaN({
+    typeName: ZodFirstPartyTypeKind.ZodNaN,
+    ...processCreateParams(params)
+  });
+};
+var BRAND = /* @__PURE__ */ Symbol("zod_brand");
+var ZodBranded = class extends ZodType {
+  _parse(input) {
+    const { ctx } = this._processInputParams(input);
+    const data = ctx.data;
+    return this._def.type._parse({
+      data,
+      path: ctx.path,
+      parent: ctx
+    });
+  }
+  unwrap() {
+    return this._def.type;
+  }
+};
+var ZodPipeline = class _ZodPipeline extends ZodType {
+  _parse(input) {
+    const { status, ctx } = this._processInputParams(input);
+    if (ctx.common.async) {
+      const handleAsync = async () => {
+        const inResult = await this._def.in._parseAsync({
+          data: ctx.data,
+          path: ctx.path,
+          parent: ctx
+        });
+        if (inResult.status === "aborted")
+          return INVALID;
+        if (inResult.status === "dirty") {
+          status.dirty();
+          return DIRTY(inResult.value);
+        } else {
+          return this._def.out._parseAsync({
+            data: inResult.value,
+            path: ctx.path,
+            parent: ctx
+          });
+        }
+      };
+      return handleAsync();
+    } else {
+      const inResult = this._def.in._parseSync({
+        data: ctx.data,
+        path: ctx.path,
+        parent: ctx
+      });
+      if (inResult.status === "aborted")
+        return INVALID;
+      if (inResult.status === "dirty") {
+        status.dirty();
+        return {
+          status: "dirty",
+          value: inResult.value
+        };
+      } else {
+        return this._def.out._parseSync({
+          data: inResult.value,
+          path: ctx.path,
+          parent: ctx
+        });
+      }
+    }
+  }
+  static create(a, b) {
+    return new _ZodPipeline({
+      in: a,
+      out: b,
+      typeName: ZodFirstPartyTypeKind.ZodPipeline
+    });
+  }
+};
+var ZodReadonly = class extends ZodType {
+  _parse(input) {
+    const result = this._def.innerType._parse(input);
+    const freeze = (data) => {
+      if (isValid(data)) {
+        data.value = Object.freeze(data.value);
+      }
+      return data;
+    };
+    return isAsync(result) ? result.then((data) => freeze(data)) : freeze(result);
+  }
+  unwrap() {
+    return this._def.innerType;
+  }
+};
+ZodReadonly.create = (type, params) => {
+  return new ZodReadonly({
+    innerType: type,
+    typeName: ZodFirstPartyTypeKind.ZodReadonly,
+    ...processCreateParams(params)
+  });
+};
+function cleanParams(params, data) {
+  const p = typeof params === "function" ? params(data) : typeof params === "string" ? { message: params } : params;
+  const p2 = typeof p === "string" ? { message: p } : p;
+  return p2;
+}
+function custom(check, _params = {}, fatal) {
+  if (check)
+    return ZodAny.create().superRefine((data, ctx) => {
+      const r = check(data);
+      if (r instanceof Promise) {
+        return r.then((r2) => {
+          if (!r2) {
+            const params = cleanParams(_params, data);
+            const _fatal = params.fatal ?? fatal ?? true;
+            ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
+          }
+        });
+      }
+      if (!r) {
+        const params = cleanParams(_params, data);
+        const _fatal = params.fatal ?? fatal ?? true;
+        ctx.addIssue({ code: "custom", ...params, fatal: _fatal });
+      }
+      return;
+    });
+  return ZodAny.create();
+}
+var late = {
+  object: ZodObject.lazycreate
+};
+var ZodFirstPartyTypeKind;
+(function(ZodFirstPartyTypeKind2) {
+  ZodFirstPartyTypeKind2["ZodString"] = "ZodString";
+  ZodFirstPartyTypeKind2["ZodNumber"] = "ZodNumber";
+  ZodFirstPartyTypeKind2["ZodNaN"] = "ZodNaN";
+  ZodFirstPartyTypeKind2["ZodBigInt"] = "ZodBigInt";
+  ZodFirstPartyTypeKind2["ZodBoolean"] = "ZodBoolean";
+  ZodFirstPartyTypeKind2["ZodDate"] = "ZodDate";
+  ZodFirstPartyTypeKind2["ZodSymbol"] = "ZodSymbol";
+  ZodFirstPartyTypeKind2["ZodUndefined"] = "ZodUndefined";
+  ZodFirstPartyTypeKind2["ZodNull"] = "ZodNull";
+  ZodFirstPartyTypeKind2["ZodAny"] = "ZodAny";
+  ZodFirstPartyTypeKind2["ZodUnknown"] = "ZodUnknown";
+  ZodFirstPartyTypeKind2["ZodNever"] = "ZodNever";
+  ZodFirstPartyTypeKind2["ZodVoid"] = "ZodVoid";
+  ZodFirstPartyTypeKind2["ZodArray"] = "ZodArray";
+  ZodFirstPartyTypeKind2["ZodObject"] = "ZodObject";
+  ZodFirstPartyTypeKind2["ZodUnion"] = "ZodUnion";
+  ZodFirstPartyTypeKind2["ZodDiscriminatedUnion"] = "ZodDiscriminatedUnion";
+  ZodFirstPartyTypeKind2["ZodIntersection"] = "ZodIntersection";
+  ZodFirstPartyTypeKind2["ZodTuple"] = "ZodTuple";
+  ZodFirstPartyTypeKind2["ZodRecord"] = "ZodRecord";
+  ZodFirstPartyTypeKind2["ZodMap"] = "ZodMap";
+  ZodFirstPartyTypeKind2["ZodSet"] = "ZodSet";
+  ZodFirstPartyTypeKind2["ZodFunction"] = "ZodFunction";
+  ZodFirstPartyTypeKind2["ZodLazy"] = "ZodLazy";
+  ZodFirstPartyTypeKind2["ZodLiteral"] = "ZodLiteral";
+  ZodFirstPartyTypeKind2["ZodEnum"] = "ZodEnum";
+  ZodFirstPartyTypeKind2["ZodEffects"] = "ZodEffects";
+  ZodFirstPartyTypeKind2["ZodNativeEnum"] = "ZodNativeEnum";
+  ZodFirstPartyTypeKind2["ZodOptional"] = "ZodOptional";
+  ZodFirstPartyTypeKind2["ZodNullable"] = "ZodNullable";
+  ZodFirstPartyTypeKind2["ZodDefault"] = "ZodDefault";
+  ZodFirstPartyTypeKind2["ZodCatch"] = "ZodCatch";
+  ZodFirstPartyTypeKind2["ZodPromise"] = "ZodPromise";
+  ZodFirstPartyTypeKind2["ZodBranded"] = "ZodBranded";
+  ZodFirstPartyTypeKind2["ZodPipeline"] = "ZodPipeline";
+  ZodFirstPartyTypeKind2["ZodReadonly"] = "ZodReadonly";
+})(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
+var instanceOfType = (cls, params = {
+  message: `Input not instance of ${cls.name}`
+}) => custom((data) => data instanceof cls, params);
+var stringType = ZodString.create;
+var numberType = ZodNumber.create;
+var nanType = ZodNaN.create;
+var bigIntType = ZodBigInt.create;
+var booleanType = ZodBoolean.create;
+var dateType = ZodDate.create;
+var symbolType = ZodSymbol.create;
+var undefinedType = ZodUndefined.create;
+var nullType = ZodNull.create;
+var anyType = ZodAny.create;
+var unknownType = ZodUnknown.create;
+var neverType = ZodNever.create;
+var voidType = ZodVoid.create;
+var arrayType = ZodArray.create;
+var objectType = ZodObject.create;
+var strictObjectType = ZodObject.strictCreate;
+var unionType = ZodUnion.create;
+var discriminatedUnionType = ZodDiscriminatedUnion.create;
+var intersectionType = ZodIntersection.create;
+var tupleType = ZodTuple.create;
+var recordType = ZodRecord.create;
+var mapType = ZodMap.create;
+var setType = ZodSet.create;
+var functionType = ZodFunction.create;
+var lazyType = ZodLazy.create;
+var literalType = ZodLiteral.create;
+var enumType = ZodEnum.create;
+var nativeEnumType = ZodNativeEnum.create;
+var promiseType = ZodPromise.create;
+var effectsType = ZodEffects.create;
+var optionalType = ZodOptional.create;
+var nullableType = ZodNullable.create;
+var preprocessType = ZodEffects.createWithPreprocess;
+var pipelineType = ZodPipeline.create;
+var ostring = () => stringType().optional();
+var onumber = () => numberType().optional();
+var oboolean = () => booleanType().optional();
+var coerce = {
+  string: ((arg) => ZodString.create({ ...arg, coerce: true })),
+  number: ((arg) => ZodNumber.create({ ...arg, coerce: true })),
+  boolean: ((arg) => ZodBoolean.create({
+    ...arg,
+    coerce: true
+  })),
+  bigint: ((arg) => ZodBigInt.create({ ...arg, coerce: true })),
+  date: ((arg) => ZodDate.create({ ...arg, coerce: true }))
+};
+var NEVER = INVALID;
+
+// server/src/database/connection.ts
+var import_pg = __toESM(require("pg"));
+var import_dotenv = __toESM(require_main());
+import_dotenv.default.config();
+var pool = new import_pg.default.Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+  idleTimeoutMillis: 3e4,
+  connectionTimeoutMillis: 2e3
+});
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
+  process.exit(-1);
+});
+var db = {
+  query: (text, params) => pool.query(text, params),
+  getClient: () => pool.connect(),
+  pool
+};
+
+// server/src/shared/id.ts
+var ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+function randomString(length) {
+  let result = "";
+  const bytes = new Uint8Array(length);
+  if (typeof globalThis.crypto?.getRandomValues === "function") {
+    globalThis.crypto.getRandomValues(bytes);
+  } else {
+    const { randomBytes } = require("crypto");
+    const buf = randomBytes(length);
+    for (let i = 0; i < length; i++) bytes[i] = buf[i];
+  }
+  for (let i = 0; i < length; i++) {
+    result += ALPHABET[bytes[i] % ALPHABET.length];
+  }
+  return result;
+}
+var PREFIXES = {
+  users: "usr",
+  email_verifications: "evt",
+  login_attempts: "lat",
+  accounts: "acc",
+  people: "per",
+  categories: "cat",
+  loans: "ln",
+  transactions: "txn",
+  transaction_transfers: "tfr",
+  loan_repayments: "lre"
+};
+function generateId(table) {
+  const prefix = PREFIXES[table];
+  return `${prefix}_${randomString(12)}`;
+}
+
+// server/src/database/seed.ts
+var SCHEMA = "finance_tracker";
+var DEFAULT_INCOME_CATEGORIES = [
+  "Salary",
+  "Bonus",
+  "Freelance",
+  "Business Income",
+  "Gift Received",
+  "Interest",
+  "Other Income"
+];
+var DEFAULT_EXPENSE_CATEGORIES = [
+  "Food",
+  "Transport",
+  "Rent",
+  "Shopping",
+  "Utilities",
+  "Entertainment",
+  "Education",
+  "Medical",
+  "Other Expense"
+];
+async function seedDefaultCategories(userId) {
+  const client = await db.getClient();
+  try {
+    await client.query("BEGIN");
+    for (const name of DEFAULT_INCOME_CATEGORIES) {
+      const id = generateId("categories");
+      await client.query(
+        `INSERT INTO ${SCHEMA}.categories (id, user_id, name, type)
+         VALUES ($1, $2, $3, 'INCOME')
+         ON CONFLICT (user_id, name, type) DO NOTHING`,
+        [id, userId, name]
+      );
+    }
+    for (const name of DEFAULT_EXPENSE_CATEGORIES) {
+      const id = generateId("categories");
+      await client.query(
+        `INSERT INTO ${SCHEMA}.categories (id, user_id, name, type)
+         VALUES ($1, $2, $3, 'EXPENSE')
+         ON CONFLICT (user_id, name, type) DO NOTHING`,
+        [id, userId, name]
+      );
+    }
+    await client.query("COMMIT");
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+// server/src/shared/token.ts
+var import_jsonwebtoken = __toESM(require_jsonwebtoken());
+var import_cookie = __toESM(require_cookie());
+var JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || "dev-secret-change-in-production";
+var JWT_EXPIRY = "7d";
+var COOKIE_NAME = "token";
+function signToken(userId) {
+  return import_jsonwebtoken.default.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+}
+function verifyToken(token) {
+  try {
+    return import_jsonwebtoken.default.verify(token, JWT_SECRET);
+  } catch {
+    return null;
+  }
+}
+function setTokenCookie(res, token) {
+  const isProduction2 = process.env.NODE_ENV === "production";
+  const cookieStr = import_cookie.default.serialize(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: isProduction2,
+    sameSite: isProduction2 ? "strict" : "lax",
+    maxAge: 7 * 24 * 60 * 60,
+    // 7 days in seconds
+    path: "/"
+  });
+  res.setHeader("Set-Cookie", cookieStr);
+}
+function clearTokenCookie(res) {
+  const isProduction2 = process.env.NODE_ENV === "production";
+  const cookieStr = import_cookie.default.serialize(COOKIE_NAME, "", {
+    httpOnly: true,
+    secure: isProduction2,
+    sameSite: isProduction2 ? "strict" : "lax",
+    maxAge: 0,
+    path: "/"
+  });
+  res.setHeader("Set-Cookie", cookieStr);
+}
+function getTokenFromCookie(cookieHeader) {
+  if (!cookieHeader) return null;
+  const parsed = import_cookie.default.parse(cookieHeader);
+  return parsed[COOKIE_NAME] || null;
+}
+
+// server/src/middleware/auth.ts
+function requireAuth(req, res, next) {
+  const token = getTokenFromCookie(req.headers.cookie);
+  if (!token) {
+    res.status(401).json({
+      success: false,
+      error: {
+        code: "UNAUTHORIZED",
+        message: "You must be logged in to access this resource"
+      }
+    });
+    return;
+  }
+  const payload = verifyToken(token);
+  if (!payload) {
+    res.status(401).json({
+      success: false,
+      error: {
+        code: "UNAUTHORIZED",
+        message: "Your session has expired. Please log in again."
+      }
+    });
+    return;
+  }
+  req.userId = payload.userId;
+  next();
+}
+function getUserId(req) {
+  const userId = req.userId;
+  if (!userId) {
+    throw new Error("Not authenticated");
+  }
+  return userId;
+}
+
+// server/src/middleware/validation.ts
+function validateBody(schema) {
+  return (req, res, next) => {
+    const result = schema.safeParse(req.body);
+    if (!result.success) {
+      const firstError = result.error.errors[0];
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: firstError?.message || "Invalid input"
+        }
+      });
+      return;
+    }
+    req.body = result.data;
+    next();
+  };
+}
+function validateQuery(schema) {
+  return (req, res, next) => {
+    const result = schema.safeParse(req.query);
+    if (!result.success) {
+      const firstError = result.error.errors[0];
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "VALIDATION_ERROR",
+          message: firstError?.message || "Invalid query parameters"
+        }
+      });
+      return;
+    }
+    req.query = result.data;
+    next();
+  };
+}
+
+// server/src/services/lockout.ts
+var SCHEMA2 = "finance_tracker";
+var MAX_ATTEMPTS = parseInt(process.env.MAX_LOGIN_ATTEMPTS || "5", 10);
+var LOCKOUT_MINUTES = parseInt(process.env.LOCKOUT_DURATION_MINUTES || "10", 10);
+async function isAccountLocked(email) {
+  const result = await db.query(
+    `SELECT is_locked, locked_until
+     FROM ${SCHEMA2}.users
+     WHERE email = $1`,
+    [email]
+  );
+  if (result.rows.length === 0) {
+    return { locked: false };
+  }
+  const user = result.rows[0];
+  if (!user.is_locked || !user.locked_until) {
+    return { locked: false };
+  }
+  const lockExpiry = new Date(user.locked_until);
+  const now = /* @__PURE__ */ new Date();
+  if (now >= lockExpiry) {
+    await db.query(
+      `UPDATE ${SCHEMA2}.users
+       SET is_locked = FALSE, locked_until = NULL, failed_login_attempts = 0
+       WHERE email = $1`,
+      [email]
+    );
+    return { locked: false };
+  }
+  const remainingSeconds = Math.ceil((lockExpiry.getTime() - now.getTime()) / 1e3);
+  return { locked: true, remainingSeconds };
+}
+async function recordFailedLogin(email, ipAddress) {
+  const id = generateId("login_attempts");
+  await db.query(
+    `INSERT INTO ${SCHEMA2}.login_attempts (id, email, ip_address, success)
+     VALUES ($1, $2, $3, FALSE)`,
+    [id, email, ipAddress || null]
+  );
+  const result = await db.query(
+    `UPDATE ${SCHEMA2}.users
+     SET failed_login_attempts = failed_login_attempts + 1,
+         last_failed_login = NOW(),
+         updated_at = NOW()
+     WHERE email = $1
+     RETURNING failed_login_attempts`,
+    [email]
+  );
+  if (result.rows.length === 0) {
+    return { locked: false, attemptsRemaining: MAX_ATTEMPTS };
+  }
+  const attempts = result.rows[0].failed_login_attempts;
+  const attemptsRemaining = MAX_ATTEMPTS - attempts;
+  if (attempts >= MAX_ATTEMPTS) {
+    const lockUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1e3);
+    await db.query(
+      `UPDATE ${SCHEMA2}.users
+       SET is_locked = TRUE, locked_until = $1, updated_at = NOW()
+       WHERE email = $2`,
+      [lockUntil, email]
+    );
+    return { locked: true, attemptsRemaining: 0, lockDurationMinutes: LOCKOUT_MINUTES };
+  }
+  return { locked: false, attemptsRemaining };
+}
+async function resetFailedLogins(email) {
+  await db.query(
+    `UPDATE ${SCHEMA2}.users
+     SET failed_login_attempts = 0,
+         is_locked = FALSE,
+         locked_until = NULL,
+         last_failed_login = NULL,
+         updated_at = NOW()
+     WHERE email = $1`,
+    [email]
+  );
+  const id = generateId("login_attempts");
+  await db.query(
+    `INSERT INTO ${SCHEMA2}.login_attempts (id, email, success)
+     VALUES ($1, $2, TRUE)`,
+    [id, email]
+  );
+}
+
+// server/src/services/email.ts
+var import_nodemailer = __toESM(require_nodemailer());
+var import_crypto = __toESM(require("crypto"));
+var import_dotenv2 = __toESM(require_main());
+import_dotenv2.default.config();
+var transporter = import_nodemailer.default.createTransport({
+  host: process.env.SMTP_HOST || "smtp.ethereal.email",
+  port: parseInt(process.env.SMTP_PORT || "587"),
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
+transporter.verify().then(() => {
+  console.log("\u2705 Email server connected");
+}).catch((err) => {
+  console.warn("\u26A0\uFE0F  Email server not available:", err.message);
+  console.warn("   Emails will be logged to console instead.");
+});
+var isEmailConfigured = !!process.env.SMTP_USER && process.env.SMTP_USER !== "your-ethereal-user@ethereal.email";
+function verificationEmailHtml(code, purpose) {
+  const title = purpose === "registration" ? "Verify Your Email" : "Reset Your Password";
+  const body = purpose === "registration" ? "Thank you for signing up! Use the code below to verify your email address." : "You requested a password reset. Use the code below to set a new password.";
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -51245,11 +51001,11 @@ var require_email = __commonJS({
   </div>
 </body>
 </html>`;
-    }
-    function verificationEmailText(code, purpose) {
-      const title = purpose === "registration" ? "Verify Your Email" : "Reset Your Password";
-      const body = purpose === "registration" ? "Thank you for signing up! Use the code below to verify your email address." : "You requested a password reset. Use the code below to set a new password.";
-      return `
+}
+function verificationEmailText(code, purpose) {
+  const title = purpose === "registration" ? "Verify Your Email" : "Reset Your Password";
+  const body = purpose === "registration" ? "Thank you for signing up! Use the code below to verify your email address." : "You requested a password reset. Use the code below to set a new password.";
+  return `
 ${title}
 Balqen
 
@@ -51261,56 +51017,56 @@ This code expires in 15 minutes.
 
 If you didn't request this, you can safely ignore this email.
   `.trim();
-    }
-    async function sendEmail(options) {
-      try {
-        if (!isEmailConfigured) {
-          console.log("\n\u{1F4E7} \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-          console.log(`   To: ${options.to}`);
-          console.log(`   Subject: ${options.subject}`);
-          console.log("   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500");
-          const codeMatch = options.text.match(/code:\s*(\w+)/i);
-          if (codeMatch) {
-            console.log(`   \u{1F511} Verification Code: ${codeMatch[1]}`);
-          }
-          console.log("   \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n");
-          return true;
-        }
-        await transporter.sendMail({
-          from: process.env.EMAIL_FROM || "Balqen <noreply@balqen.com>",
-          to: options.to,
-          subject: options.subject,
-          html: options.html,
-          text: options.text
-        });
-        return true;
-      } catch (error) {
-        console.error("Failed to send email:", error);
-        return false;
+}
+async function sendEmail(options) {
+  try {
+    if (!isEmailConfigured) {
+      console.log("\n\u{1F4E7} \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+      console.log(`   To: ${options.to}`);
+      console.log(`   Subject: ${options.subject}`);
+      console.log("   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500");
+      const codeMatch = options.text.match(/code:\s*(\w+)/i);
+      if (codeMatch) {
+        console.log(`   \u{1F511} Verification Code: ${codeMatch[1]}`);
       }
+      console.log("   \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n");
+      return true;
     }
-    async function sendVerificationCode(email, code, purpose) {
-      const subject = purpose === "registration" ? "Verify Your Email - Balqen" : "Reset Your Password - Balqen";
-      return sendEmail({
-        to: email,
-        subject,
-        html: verificationEmailHtml(code, purpose),
-        text: verificationEmailText(code, purpose)
-      });
-    }
-    function transactionReceiptHtml(data) {
-      const { senderName, recipientName, transactionType, amount, date, description, direction } = data;
-      const typeLabel = transactionType.replace(/_/g, " ");
-      const formattedAmount = `BDT ${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      const formattedDate = new Date(date).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      });
-      const isPositive = ["INCOME", "BORROW", "LEND_REPAYMENT"].includes(transactionType);
-      const accentColor = isPositive ? "#16a34a" : "#dc2626";
-      const directionText = direction === "received" ? `${senderName} recorded a payment from you:` : `${senderName} sent you a transaction confirmation:`;
-      return `
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || "Balqen <noreply@balqen.com>",
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+      text: options.text
+    });
+    return true;
+  } catch (error) {
+    console.error("Failed to send email:", error);
+    return false;
+  }
+}
+async function sendVerificationCode(email, code, purpose) {
+  const subject = purpose === "registration" ? "Verify Your Email - Balqen" : "Reset Your Password - Balqen";
+  return sendEmail({
+    to: email,
+    subject,
+    html: verificationEmailHtml(code, purpose),
+    text: verificationEmailText(code, purpose)
+  });
+}
+function transactionReceiptHtml(data) {
+  const { senderName, recipientName, transactionType, amount, date, description, direction } = data;
+  const typeLabel = transactionType.replace(/_/g, " ");
+  const formattedAmount = `BDT ${amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const formattedDate = new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
+  const isPositive = ["INCOME", "BORROW", "LEND_REPAYMENT"].includes(transactionType);
+  const accentColor = isPositive ? "#16a34a" : "#dc2626";
+  const directionText = direction === "received" ? `${senderName} recorded a payment from you:` : `${senderName} sent you a transaction confirmation:`;
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -51370,10 +51126,10 @@ If you didn't request this, you can safely ignore this email.
   </div>
 </body>
 </html>`;
-    }
-    function transactionReceiptText(data) {
-      const formattedAmount = `BDT ${data.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-      return `
+}
+function transactionReceiptText(data) {
+  const formattedAmount = `BDT ${data.amount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `
 Transaction Receipt - Balqen
 
 Hi ${data.recipientName},
@@ -51387,3087 +51143,3466 @@ Description: ${data.description}` : ""}
 
 This notification was sent by ${data.senderName} using Balqen.
   `.trim();
+}
+async function sendTransactionReceipt(options) {
+  const { to, senderName, recipientName, transactionType, amount, date, description } = options;
+  const direction = ["INCOME", "BORROW", "LEND_REPAYMENT"].includes(transactionType) ? "received" : "sent";
+  const typeLabel = transactionType.replace(/_/g, " ").toLowerCase();
+  const subject = `${typeLabel.replace(/\b\w/g, (c) => c.toUpperCase())} BDT ${amount.toLocaleString("en-US")} - ${senderName}`;
+  const html = transactionReceiptHtml({
+    senderName,
+    recipientName,
+    transactionType,
+    amount,
+    date,
+    description,
+    direction
+  });
+  const text = transactionReceiptText({
+    senderName,
+    recipientName,
+    transactionType,
+    amount,
+    date,
+    description
+  });
+  try {
+    if (!isEmailConfigured) {
+      console.log("\n\u{1F4E7} \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
+      console.log(`   \u{1F4E8} TRANSACTION NOTIFICATION`);
+      console.log(`   To: ${to}`);
+      console.log(`   From: ${senderName}`);
+      console.log(`   Subject: ${subject}`);
+      console.log(`   Amount: BDT ${amount.toLocaleString("en-US")}`);
+      console.log(`   Type: ${transactionType}`);
+      console.log("   \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n");
+      return true;
     }
-    async function sendTransactionReceipt(options) {
-      const { to, senderName, recipientName, transactionType, amount, date, description } = options;
-      const direction = ["INCOME", "BORROW", "LEND_REPAYMENT"].includes(transactionType) ? "received" : "sent";
-      const typeLabel = transactionType.replace(/_/g, " ").toLowerCase();
-      const subject = `${typeLabel.replace(/\b\w/g, (c) => c.toUpperCase())} BDT ${amount.toLocaleString("en-US")} - ${senderName}`;
-      const html = transactionReceiptHtml({
-        senderName,
-        recipientName,
-        transactionType,
-        amount,
-        date,
-        description,
-        direction
-      });
-      const text = transactionReceiptText({
-        senderName,
-        recipientName,
-        transactionType,
-        amount,
-        date,
-        description
-      });
-      try {
-        if (!isEmailConfigured) {
-          console.log("\n\u{1F4E7} \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550");
-          console.log(`   \u{1F4E8} TRANSACTION NOTIFICATION`);
-          console.log(`   To: ${to}`);
-          console.log(`   From: ${senderName}`);
-          console.log(`   Subject: ${subject}`);
-          console.log(`   Amount: BDT ${amount.toLocaleString("en-US")}`);
-          console.log(`   Type: ${transactionType}`);
-          console.log("   \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n");
-          return true;
-        }
-        await transporter.sendMail({
-          from: process.env.EMAIL_FROM || `Finance Tracker <noreply@financetracker.com>`,
-          to,
-          subject,
-          html,
-          text
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM || `Finance Tracker <noreply@financetracker.com>`,
+      to,
+      subject,
+      html,
+      text
+    });
+    return true;
+  } catch (error) {
+    console.error("Failed to send transaction receipt:", error);
+    return false;
+  }
+}
+function generateVerificationCode() {
+  return import_crypto.default.randomInt(1e5, 999999).toString();
+}
+
+// server/src/routes/auth.ts
+var router = (0, import_express.Router)();
+var SCHEMA3 = "finance_tracker";
+var CODE_EXPIRY_MINUTES = parseInt(process.env.VERIFICATION_CODE_EXPIRY_MINUTES || "15", 10);
+async function createVerificationCode(userId, purpose) {
+  await db.query(
+    `UPDATE ${SCHEMA3}.email_verifications
+     SET used = TRUE
+     WHERE user_id = $1 AND purpose = $2 AND used = FALSE`,
+    [userId, purpose]
+  );
+  const code = generateVerificationCode();
+  const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1e3);
+  const id = generateId("email_verifications");
+  await db.query(
+    `INSERT INTO ${SCHEMA3}.email_verifications (id, user_id, code, purpose, expires_at)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [id, userId, code, purpose, expiresAt]
+  );
+  return code;
+}
+var registerSchema = external_exports.object({
+  full_name: external_exports.string().min(1, "Full name is required").max(255),
+  email: external_exports.string().email("Invalid email address").max(255),
+  password: external_exports.string().min(8, "Password must be at least 8 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number"),
+  confirm_password: external_exports.string()
+}).refine((data) => data.password === data.confirm_password, {
+  message: "Passwords do not match",
+  path: ["confirm_password"]
+});
+router.post("/register", authLimiter, validateBody(registerSchema), async (req, res) => {
+  try {
+    const { full_name, email, password } = req.body;
+    const existing = await db.query(
+      `SELECT id, is_verified FROM ${SCHEMA3}.users WHERE email = $1`,
+      [email]
+    );
+    if (existing.rows.length > 0) {
+      const user2 = existing.rows[0];
+      if (user2.is_verified) {
+        res.status(409).json({
+          success: false,
+          error: { code: "EMAIL_EXISTS", message: "An account with this email already exists" }
         });
-        return true;
-      } catch (error) {
-        console.error("Failed to send transaction receipt:", error);
-        return false;
+        return;
       }
+      const passwordHash2 = await import_bcrypt.default.hash(password, 12);
+      await db.query(
+        `UPDATE ${SCHEMA3}.users SET password_hash = $1, updated_at = NOW() WHERE id = $2`,
+        [passwordHash2, user2.id]
+      );
+      const code2 = await createVerificationCode(user2.id, "registration");
+      await sendVerificationCode(email, code2, "registration");
+      res.status(200).json({
+        success: true,
+        data: {
+          message: "Account already pending verification. A new code has been sent.",
+          user_id: user2.id,
+          email
+        }
+      });
+      return;
     }
-    function generateVerificationCode() {
-      return crypto_1.default.randomInt(1e5, 999999).toString();
-    }
+    const passwordHash = await import_bcrypt.default.hash(password, 12);
+    const userId = generateId("users");
+    const result = await db.query(
+      `INSERT INTO ${SCHEMA3}.users (id, full_name, email, password_hash, is_verified)
+       VALUES ($1, $2, $3, $4, FALSE)
+       RETURNING id, full_name, email`,
+      [userId, full_name, email, passwordHash]
+    );
+    const user = result.rows[0];
+    const code = await createVerificationCode(user.id, "registration");
+    await sendVerificationCode(email, code, "registration");
+    res.status(201).json({
+      success: true,
+      data: {
+        message: "Account created. Please check your email for a verification code.",
+        user_id: user.id,
+        email
+      }
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
+    });
   }
 });
-
-// server/dist/routes/auth.js
-var require_auth2 = __commonJS({
-  "server/dist/routes/auth.js"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var bcrypt_1 = __importDefault2(require("bcrypt"));
-    var zod_1 = require_zod();
-    var connection_1 = require_connection();
-    var seed_1 = require_seed();
-    var auth_12 = require_auth();
-    var validation_1 = require_validation();
-    var rateLimit_12 = require_rateLimit();
-    var lockout_1 = require_lockout();
-    var email_1 = require_email();
-    var id_1 = require_id();
-    var token_1 = require_token();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    var CODE_EXPIRY_MINUTES = parseInt(process.env.VERIFICATION_CODE_EXPIRY_MINUTES || "15", 10);
-    async function createVerificationCode(userId, purpose) {
-      await connection_1.db.query(`UPDATE ${SCHEMA}.email_verifications
-     SET used = TRUE
-     WHERE user_id = $1 AND purpose = $2 AND used = FALSE`, [userId, purpose]);
-      const code = (0, email_1.generateVerificationCode)();
-      const expiresAt = new Date(Date.now() + CODE_EXPIRY_MINUTES * 60 * 1e3);
-      const id = (0, id_1.generateId)("email_verifications");
-      await connection_1.db.query(`INSERT INTO ${SCHEMA}.email_verifications (id, user_id, code, purpose, expires_at)
-     VALUES ($1, $2, $3, $4, $5)`, [id, userId, code, purpose, expiresAt]);
-      return code;
+var verifyEmailSchema = external_exports.object({
+  email: external_exports.string().email(),
+  code: external_exports.string().length(6, "Code must be 6 digits")
+});
+router.post("/verify-email", sensitiveLimiter, validateBody(verifyEmailSchema), async (req, res) => {
+  try {
+    const { email, code } = req.body;
+    const userResult = await db.query(
+      `SELECT id, is_verified FROM ${SCHEMA3}.users WHERE email = $1`,
+      [email]
+    );
+    if (userResult.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_CODE", message: "Invalid verification code" }
+      });
+      return;
     }
-    var registerSchema = zod_1.z.object({
-      full_name: zod_1.z.string().min(1, "Full name is required").max(255),
-      email: zod_1.z.string().email("Invalid email address").max(255),
-      password: zod_1.z.string().min(8, "Password must be at least 8 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number"),
-      confirm_password: zod_1.z.string()
-    }).refine((data) => data.password === data.confirm_password, {
-      message: "Passwords do not match",
-      path: ["confirm_password"]
-    });
-    router.post("/register", rateLimit_12.authLimiter, (0, validation_1.validateBody)(registerSchema), async (req, res) => {
-      try {
-        const { full_name, email, password } = req.body;
-        const existing = await connection_1.db.query(`SELECT id, is_verified FROM ${SCHEMA}.users WHERE email = $1`, [email]);
-        if (existing.rows.length > 0) {
-          const user2 = existing.rows[0];
-          if (user2.is_verified) {
-            res.status(409).json({
-              success: false,
-              error: { code: "EMAIL_EXISTS", message: "An account with this email already exists" }
-            });
-            return;
-          }
-          const passwordHash2 = await bcrypt_1.default.hash(password, 12);
-          await connection_1.db.query(`UPDATE ${SCHEMA}.users SET password_hash = $1, updated_at = NOW() WHERE id = $2`, [passwordHash2, user2.id]);
-          const code2 = await createVerificationCode(user2.id, "registration");
-          await (0, email_1.sendVerificationCode)(email, code2, "registration");
-          res.status(200).json({
-            success: true,
-            data: {
-              message: "Account already pending verification. A new code has been sent.",
-              user_id: user2.id,
-              email
-            }
-          });
-          return;
-        }
-        const passwordHash = await bcrypt_1.default.hash(password, 12);
-        const userId = (0, id_1.generateId)("users");
-        const result = await connection_1.db.query(`INSERT INTO ${SCHEMA}.users (id, full_name, email, password_hash, is_verified)
-       VALUES ($1, $2, $3, $4, FALSE)
-       RETURNING id, full_name, email`, [userId, full_name, email, passwordHash]);
-        const user = result.rows[0];
-        const code = await createVerificationCode(user.id, "registration");
-        await (0, email_1.sendVerificationCode)(email, code, "registration");
-        res.status(201).json({
-          success: true,
-          data: {
-            message: "Account created. Please check your email for a verification code.",
-            user_id: user.id,
-            email
-          }
-        });
-      } catch (error) {
-        console.error("Registration error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
-      }
-    });
-    var verifyEmailSchema = zod_1.z.object({
-      email: zod_1.z.string().email(),
-      code: zod_1.z.string().length(6, "Code must be 6 digits")
-    });
-    router.post("/verify-email", rateLimit_12.sensitiveLimiter, (0, validation_1.validateBody)(verifyEmailSchema), async (req, res) => {
-      try {
-        const { email, code } = req.body;
-        const userResult = await connection_1.db.query(`SELECT id, is_verified FROM ${SCHEMA}.users WHERE email = $1`, [email]);
-        if (userResult.rows.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "INVALID_CODE", message: "Invalid verification code" }
-          });
-          return;
-        }
-        const user = userResult.rows[0];
-        if (user.is_verified) {
-          (0, token_1.setTokenCookie)(res, (0, token_1.signToken)(user.id));
-          res.status(200).json({
-            success: true,
-            data: { message: "Email already verified. You are logged in.", user_id: user.id }
-          });
-          return;
-        }
-        const codeResult = await connection_1.db.query(`SELECT id FROM ${SCHEMA}.email_verifications
+    const user = userResult.rows[0];
+    if (user.is_verified) {
+      setTokenCookie(res, signToken(user.id));
+      res.status(200).json({
+        success: true,
+        data: { message: "Email already verified. You are logged in.", user_id: user.id }
+      });
+      return;
+    }
+    const codeResult = await db.query(
+      `SELECT id FROM ${SCHEMA3}.email_verifications
        WHERE user_id = $1 AND code = $2 AND purpose = 'registration'
-         AND used = FALSE AND expires_at > NOW()`, [user.id, code]);
-        if (codeResult.rows.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "INVALID_CODE", message: "Invalid or expired verification code" }
-          });
-          return;
-        }
-        await connection_1.db.query(`UPDATE ${SCHEMA}.users
+         AND used = FALSE AND expires_at > NOW()`,
+      [user.id, code]
+    );
+    if (codeResult.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_CODE", message: "Invalid or expired verification code" }
+      });
+      return;
+    }
+    await db.query(
+      `UPDATE ${SCHEMA3}.users
        SET is_verified = TRUE, updated_at = NOW()
-       WHERE id = $1`, [user.id]);
-        await connection_1.db.query(`UPDATE ${SCHEMA}.email_verifications
+       WHERE id = $1`,
+      [user.id]
+    );
+    await db.query(
+      `UPDATE ${SCHEMA3}.email_verifications
        SET used = TRUE
-       WHERE id = $1`, [codeResult.rows[0].id]);
-        await (0, seed_1.seedDefaultCategories)(user.id);
-        (0, token_1.setTokenCookie)(res, (0, token_1.signToken)(user.id));
-        res.json({
-          success: true,
-          data: {
-            message: "Email verified successfully!",
-            user_id: user.id
-          }
-        });
-      } catch (error) {
-        console.error("Email verification error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
+       WHERE id = $1`,
+      [codeResult.rows[0].id]
+    );
+    await seedDefaultCategories(user.id);
+    setTokenCookie(res, signToken(user.id));
+    res.json({
+      success: true,
+      data: {
+        message: "Email verified successfully!",
+        user_id: user.id
       }
     });
-    var resendVerificationSchema = zod_1.z.object({
-      email: zod_1.z.string().email()
+  } catch (error) {
+    console.error("Email verification error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
     });
-    router.post("/resend-verification", rateLimit_12.sensitiveLimiter, (0, validation_1.validateBody)(resendVerificationSchema), async (req, res) => {
-      try {
-        const { email } = req.body;
-        const userResult = await connection_1.db.query(`SELECT id, is_verified FROM ${SCHEMA}.users WHERE email = $1`, [email]);
-        if (userResult.rows.length === 0) {
-          res.json({
-            success: true,
-            data: { message: "If an account with this email exists, a verification code has been sent." }
-          });
-          return;
+  }
+});
+var resendVerificationSchema = external_exports.object({
+  email: external_exports.string().email()
+});
+router.post("/resend-verification", sensitiveLimiter, validateBody(resendVerificationSchema), async (req, res) => {
+  try {
+    const { email } = req.body;
+    const userResult = await db.query(
+      `SELECT id, is_verified FROM ${SCHEMA3}.users WHERE email = $1`,
+      [email]
+    );
+    if (userResult.rows.length === 0) {
+      res.json({
+        success: true,
+        data: { message: "If an account with this email exists, a verification code has been sent." }
+      });
+      return;
+    }
+    const user = userResult.rows[0];
+    if (user.is_verified) {
+      res.json({
+        success: true,
+        data: { message: "Email already verified. You can log in." }
+      });
+      return;
+    }
+    const code = await createVerificationCode(user.id, "registration");
+    await sendVerificationCode(email, code, "registration");
+    res.json({
+      success: true,
+      data: { message: "A new verification code has been sent to your email." }
+    });
+  } catch (error) {
+    console.error("Resend verification error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
+    });
+  }
+});
+var loginSchema = external_exports.object({
+  email: external_exports.string().email("Invalid email address"),
+  password: external_exports.string().min(1, "Password is required")
+});
+router.post("/login", authLimiter, validateBody(loginSchema), async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const ipAddress = req.ip;
+    const lockStatus = await isAccountLocked(email);
+    if (lockStatus.locked) {
+      const minutes = Math.ceil((lockStatus.remainingSeconds || 0) / 60);
+      res.status(423).json({
+        success: false,
+        error: {
+          code: "ACCOUNT_LOCKED",
+          message: `Account is locked due to too many failed attempts. Try again in ${minutes} minute${minutes !== 1 ? "s" : ""}.`,
+          remainingSeconds: lockStatus.remainingSeconds
         }
-        const user = userResult.rows[0];
-        if (user.is_verified) {
-          res.json({
-            success: true,
-            data: { message: "Email already verified. You can log in." }
-          });
-          return;
+      });
+      return;
+    }
+    const result = await db.query(
+      `SELECT id, full_name, email, password_hash, is_verified, is_locked
+       FROM ${SCHEMA3}.users
+       WHERE email = $1`,
+      [email]
+    );
+    if (result.rows.length === 0) {
+      await recordFailedLogin(email, ipAddress);
+      res.status(401).json({
+        success: false,
+        error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" }
+      });
+      return;
+    }
+    const user = result.rows[0];
+    if (!user.is_verified) {
+      res.status(403).json({
+        success: false,
+        error: {
+          code: "EMAIL_NOT_VERIFIED",
+          message: "Please verify your email before logging in."
         }
-        const code = await createVerificationCode(user.id, "registration");
-        await (0, email_1.sendVerificationCode)(email, code, "registration");
-        res.json({
-          success: true,
-          data: { message: "A new verification code has been sent to your email." }
-        });
-      } catch (error) {
-        console.error("Resend verification error:", error);
-        res.status(500).json({
+      });
+      return;
+    }
+    const validPassword = await import_bcrypt.default.compare(password, user.password_hash);
+    if (!validPassword) {
+      const lockResult = await recordFailedLogin(email, ipAddress);
+      if (lockResult.locked) {
+        res.status(423).json({
           success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
-      }
-    });
-    var loginSchema = zod_1.z.object({
-      email: zod_1.z.string().email("Invalid email address"),
-      password: zod_1.z.string().min(1, "Password is required")
-    });
-    router.post("/login", rateLimit_12.authLimiter, (0, validation_1.validateBody)(loginSchema), async (req, res) => {
-      try {
-        const { email, password } = req.body;
-        const ipAddress = req.ip;
-        const lockStatus = await (0, lockout_1.isAccountLocked)(email);
-        if (lockStatus.locked) {
-          const minutes = Math.ceil((lockStatus.remainingSeconds || 0) / 60);
-          res.status(423).json({
-            success: false,
-            error: {
-              code: "ACCOUNT_LOCKED",
-              message: `Account is locked due to too many failed attempts. Try again in ${minutes} minute${minutes !== 1 ? "s" : ""}.`,
-              remainingSeconds: lockStatus.remainingSeconds
-            }
-          });
-          return;
-        }
-        const result = await connection_1.db.query(`SELECT id, full_name, email, password_hash, is_verified, is_locked
-       FROM ${SCHEMA}.users
-       WHERE email = $1`, [email]);
-        if (result.rows.length === 0) {
-          await (0, lockout_1.recordFailedLogin)(email, ipAddress);
-          res.status(401).json({
-            success: false,
-            error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" }
-          });
-          return;
-        }
-        const user = result.rows[0];
-        if (!user.is_verified) {
-          res.status(403).json({
-            success: false,
-            error: {
-              code: "EMAIL_NOT_VERIFIED",
-              message: "Please verify your email before logging in."
-            }
-          });
-          return;
-        }
-        const validPassword = await bcrypt_1.default.compare(password, user.password_hash);
-        if (!validPassword) {
-          const lockResult = await (0, lockout_1.recordFailedLogin)(email, ipAddress);
-          if (lockResult.locked) {
-            res.status(423).json({
-              success: false,
-              error: {
-                code: "ACCOUNT_LOCKED",
-                message: `Account locked for ${lockResult.lockDurationMinutes} minutes due to too many failed attempts.`,
-                lockDurationMinutes: lockResult.lockDurationMinutes
-              }
-            });
-          } else {
-            res.status(401).json({
-              success: false,
-              error: {
-                code: "INVALID_CREDENTIALS",
-                message: `Invalid email or password. ${lockResult.attemptsRemaining} attempt${lockResult.attemptsRemaining !== 1 ? "s" : ""} remaining.`,
-                attemptsRemaining: lockResult.attemptsRemaining
-              }
-            });
-          }
-          return;
-        }
-        await (0, lockout_1.resetFailedLogins)(email);
-        (0, token_1.setTokenCookie)(res, (0, token_1.signToken)(user.id));
-        res.json({
-          success: true,
-          data: {
-            id: user.id,
-            full_name: user.full_name,
-            email: user.email
+          error: {
+            code: "ACCOUNT_LOCKED",
+            message: `Account locked for ${lockResult.lockDurationMinutes} minutes due to too many failed attempts.`,
+            lockDurationMinutes: lockResult.lockDurationMinutes
           }
         });
-      } catch (error) {
-        console.error("Login error:", error);
-        res.status(500).json({
+      } else {
+        res.status(401).json({
           success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
-      }
-    });
-    var forgotPasswordSchema = zod_1.z.object({
-      email: zod_1.z.string().email()
-    });
-    router.post("/forgot-password", rateLimit_12.sensitiveLimiter, (0, validation_1.validateBody)(forgotPasswordSchema), async (req, res) => {
-      try {
-        const { email } = req.body;
-        const userResult = await connection_1.db.query(`SELECT id, is_verified FROM ${SCHEMA}.users WHERE email = $1`, [email]);
-        if (userResult.rows.length > 0 && userResult.rows[0].is_verified) {
-          const user = userResult.rows[0];
-          const code = await createVerificationCode(user.id, "password_reset");
-          await (0, email_1.sendVerificationCode)(email, code, "password_reset");
-        }
-        res.json({
-          success: true,
-          data: {
-            message: "If an account with this email exists, a password reset code has been sent."
+          error: {
+            code: "INVALID_CREDENTIALS",
+            message: `Invalid email or password. ${lockResult.attemptsRemaining} attempt${lockResult.attemptsRemaining !== 1 ? "s" : ""} remaining.`,
+            attemptsRemaining: lockResult.attemptsRemaining
           }
         });
-      } catch (error) {
-        console.error("Forgot password error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
+      }
+      return;
+    }
+    await resetFailedLogins(email);
+    setTokenCookie(res, signToken(user.id));
+    res.json({
+      success: true,
+      data: {
+        id: user.id,
+        full_name: user.full_name,
+        email: user.email
       }
     });
-    var resetPasswordSchema = zod_1.z.object({
-      email: zod_1.z.string().email(),
-      code: zod_1.z.string().length(6, "Code must be 6 digits"),
-      password: zod_1.z.string().min(8, "Password must be at least 8 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number"),
-      confirm_password: zod_1.z.string()
-    }).refine((data) => data.password === data.confirm_password, {
-      message: "Passwords do not match",
-      path: ["confirm_password"]
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
     });
-    router.post("/reset-password", rateLimit_12.sensitiveLimiter, (0, validation_1.validateBody)(resetPasswordSchema), async (req, res) => {
-      try {
-        const { email, code, password } = req.body;
-        const userResult = await connection_1.db.query(`SELECT id FROM ${SCHEMA}.users WHERE email = $1`, [email]);
-        if (userResult.rows.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "INVALID_CODE", message: "Invalid or expired reset code" }
-          });
-          return;
-        }
-        const user = userResult.rows[0];
-        const codeResult = await connection_1.db.query(`SELECT id FROM ${SCHEMA}.email_verifications
+  }
+});
+var forgotPasswordSchema = external_exports.object({
+  email: external_exports.string().email()
+});
+router.post("/forgot-password", sensitiveLimiter, validateBody(forgotPasswordSchema), async (req, res) => {
+  try {
+    const { email } = req.body;
+    const userResult = await db.query(
+      `SELECT id, is_verified FROM ${SCHEMA3}.users WHERE email = $1`,
+      [email]
+    );
+    if (userResult.rows.length > 0 && userResult.rows[0].is_verified) {
+      const user = userResult.rows[0];
+      const code = await createVerificationCode(user.id, "password_reset");
+      await sendVerificationCode(email, code, "password_reset");
+    }
+    res.json({
+      success: true,
+      data: {
+        message: "If an account with this email exists, a password reset code has been sent."
+      }
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
+    });
+  }
+});
+var resetPasswordSchema = external_exports.object({
+  email: external_exports.string().email(),
+  code: external_exports.string().length(6, "Code must be 6 digits"),
+  password: external_exports.string().min(8, "Password must be at least 8 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number"),
+  confirm_password: external_exports.string()
+}).refine((data) => data.password === data.confirm_password, {
+  message: "Passwords do not match",
+  path: ["confirm_password"]
+});
+router.post("/reset-password", sensitiveLimiter, validateBody(resetPasswordSchema), async (req, res) => {
+  try {
+    const { email, code, password } = req.body;
+    const userResult = await db.query(
+      `SELECT id FROM ${SCHEMA3}.users WHERE email = $1`,
+      [email]
+    );
+    if (userResult.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_CODE", message: "Invalid or expired reset code" }
+      });
+      return;
+    }
+    const user = userResult.rows[0];
+    const codeResult = await db.query(
+      `SELECT id FROM ${SCHEMA3}.email_verifications
        WHERE user_id = $1 AND code = $2 AND purpose = 'password_reset'
-         AND used = FALSE AND expires_at > NOW()`, [user.id, code]);
-        if (codeResult.rows.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "INVALID_CODE", message: "Invalid or expired reset code" }
-          });
-          return;
-        }
-        const passwordHash = await bcrypt_1.default.hash(password, 12);
-        await connection_1.db.query(`UPDATE ${SCHEMA}.users
+         AND used = FALSE AND expires_at > NOW()`,
+      [user.id, code]
+    );
+    if (codeResult.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_CODE", message: "Invalid or expired reset code" }
+      });
+      return;
+    }
+    const passwordHash = await import_bcrypt.default.hash(password, 12);
+    await db.query(
+      `UPDATE ${SCHEMA3}.users
        SET password_hash = $1,
            is_locked = FALSE,
            locked_until = NULL,
            failed_login_attempts = 0,
            updated_at = NOW()
-       WHERE id = $2`, [passwordHash, user.id]);
-        await connection_1.db.query(`UPDATE ${SCHEMA}.email_verifications SET used = TRUE WHERE id = $1`, [codeResult.rows[0].id]);
-        res.json({
-          success: true,
-          data: { message: "Password reset successfully. You can now log in with your new password." }
-        });
-      } catch (error) {
-        console.error("Reset password error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
-      }
+       WHERE id = $2`,
+      [passwordHash, user.id]
+    );
+    await db.query(
+      `UPDATE ${SCHEMA3}.email_verifications SET used = TRUE WHERE id = $1`,
+      [codeResult.rows[0].id]
+    );
+    res.json({
+      success: true,
+      data: { message: "Password reset successfully. You can now log in with your new password." }
     });
-    router.post("/logout", (_req, res) => {
-      (0, token_1.clearTokenCookie)(res);
-      res.json({ success: true });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
     });
-    router.get("/me", auth_12.requireAuth, async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT id, full_name, email, is_verified, default_currency, created_at
-       FROM ${SCHEMA}.users
-       WHERE id = $1`, [userId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "USER_NOT_FOUND", message: "User not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        console.error("Get user error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
-      }
-    });
-    var changePasswordSchema = zod_1.z.object({
-      current_password: zod_1.z.string().min(1, "Current password is required"),
-      new_password: zod_1.z.string().min(8, "Password must be at least 8 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number"),
-      confirm_password: zod_1.z.string()
-    }).refine((data) => data.new_password === data.confirm_password, {
-      message: "Passwords do not match",
-      path: ["confirm_password"]
-    });
-    router.post("/change-password", auth_12.requireAuth, rateLimit_12.sensitiveLimiter, (0, validation_1.validateBody)(changePasswordSchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { current_password, new_password } = req.body;
-        const result = await connection_1.db.query(`SELECT id, password_hash FROM ${SCHEMA}.users WHERE id = $1`, [userId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "USER_NOT_FOUND", message: "User not found" }
-          });
-          return;
-        }
-        const user = result.rows[0];
-        const validPassword = await bcrypt_1.default.compare(current_password, user.password_hash);
-        if (!validPassword) {
-          res.status(400).json({
-            success: false,
-            error: { code: "INVALID_PASSWORD", message: "Current password is incorrect" }
-          });
-          return;
-        }
-        const passwordHash = await bcrypt_1.default.hash(new_password, 12);
-        await connection_1.db.query(`UPDATE ${SCHEMA}.users SET password_hash = $1, updated_at = NOW() WHERE id = $2`, [passwordHash, userId]);
-        res.json({
-          success: true,
-          data: { message: "Password changed successfully" }
-        });
-      } catch (error) {
-        console.error("Change password error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
-        });
-      }
-    });
-    exports2.default = router;
   }
 });
+router.post("/logout", (_req, res) => {
+  clearTokenCookie(res);
+  res.json({ success: true });
+});
+router.get("/me", requireAuth, async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT id, full_name, email, is_verified, default_currency, created_at
+       FROM ${SCHEMA3}.users
+       WHERE id = $1`,
+      [userId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "USER_NOT_FOUND", message: "User not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("Get user error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
+    });
+  }
+});
+var changePasswordSchema = external_exports.object({
+  current_password: external_exports.string().min(1, "Current password is required"),
+  new_password: external_exports.string().min(8, "Password must be at least 8 characters").regex(/[A-Z]/, "Password must contain at least one uppercase letter").regex(/[a-z]/, "Password must contain at least one lowercase letter").regex(/[0-9]/, "Password must contain at least one number"),
+  confirm_password: external_exports.string()
+}).refine((data) => data.new_password === data.confirm_password, {
+  message: "Passwords do not match",
+  path: ["confirm_password"]
+});
+router.post("/change-password", requireAuth, sensitiveLimiter, validateBody(changePasswordSchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { current_password, new_password } = req.body;
+    const result = await db.query(
+      `SELECT id, password_hash FROM ${SCHEMA3}.users WHERE id = $1`,
+      [userId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "USER_NOT_FOUND", message: "User not found" }
+      });
+      return;
+    }
+    const user = result.rows[0];
+    const validPassword = await import_bcrypt.default.compare(current_password, user.password_hash);
+    if (!validPassword) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_PASSWORD", message: "Current password is incorrect" }
+      });
+      return;
+    }
+    const passwordHash = await import_bcrypt.default.hash(new_password, 12);
+    await db.query(
+      `UPDATE ${SCHEMA3}.users SET password_hash = $1, updated_at = NOW() WHERE id = $2`,
+      [passwordHash, userId]
+    );
+    res.json({
+      success: true,
+      data: { message: "Password changed successfully" }
+    });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "An unexpected error occurred" }
+    });
+  }
+});
+var auth_default = router;
 
-// server/dist/routes/accounts.js
-var require_accounts = __commonJS({
-  "server/dist/routes/accounts.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var zod_1 = require_zod();
-    var connection_1 = require_connection();
-    var auth_12 = require_auth();
-    var validation_1 = require_validation();
-    var id_1 = require_id();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    router.use(auth_12.requireAuth);
-    router.get("/", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT * FROM ${SCHEMA}.v_account_balances
+// server/src/routes/accounts.ts
+var import_express2 = __toESM(require_express2());
+var router2 = (0, import_express2.Router)();
+var SCHEMA4 = "finance_tracker";
+router2.use(requireAuth);
+router2.get("/", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT * FROM ${SCHEMA4}.v_account_balances
        WHERE user_id = $1
-       ORDER BY account_type, account_name`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("List accounts error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load accounts" }
-        });
-      }
+       ORDER BY account_type, account_name`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("List accounts error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load accounts" }
     });
-    router.get("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const accountId = req.params.id;
-        const result = await connection_1.db.query(`SELECT * FROM ${SCHEMA}.v_account_balances
-       WHERE user_id = $1 AND account_id = $2`, [userId, accountId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Account not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        console.error("Get account error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load account" }
-        });
-      }
+  }
+});
+router2.get("/:id", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const accountId = req.params.id;
+    const result = await db.query(
+      `SELECT * FROM ${SCHEMA4}.v_account_balances
+       WHERE user_id = $1 AND account_id = $2`,
+      [userId, accountId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Account not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("Get account error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load account" }
     });
-    var createAccountSchema = zod_1.z.object({
-      name: zod_1.z.string().min(1, "Name is required").max(255),
-      account_type: zod_1.z.enum(["BANK", "CASH", "MOBILE_WALLET", "OTHER"]),
-      currency: zod_1.z.string().min(2).max(3).default("BDT"),
-      opening_balance: zod_1.z.coerce.number().default(0),
-      opening_balance_date: zod_1.z.string().optional(),
-      notes: zod_1.z.string().optional()
-    });
-    router.post("/", (0, validation_1.validateBody)(createAccountSchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { name, account_type, currency, opening_balance, opening_balance_date, notes } = req.body;
-        const id = (0, id_1.generateId)("accounts");
-        const result = await connection_1.db.query(`INSERT INTO ${SCHEMA}.accounts (id, user_id, name, account_type, currency, opening_balance, opening_balance_date, notes)
+  }
+});
+var createAccountSchema = external_exports.object({
+  name: external_exports.string().min(1, "Name is required").max(255),
+  account_type: external_exports.enum(["BANK", "CASH", "MOBILE_WALLET", "OTHER"]),
+  currency: external_exports.string().min(2).max(3).default("BDT"),
+  opening_balance: external_exports.coerce.number().default(0),
+  opening_balance_date: external_exports.string().optional(),
+  notes: external_exports.string().optional()
+});
+router2.post("/", validateBody(createAccountSchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { name, account_type, currency, opening_balance, opening_balance_date, notes } = req.body;
+    const id = generateId("accounts");
+    const result = await db.query(
+      `INSERT INTO ${SCHEMA4}.accounts (id, user_id, name, account_type, currency, opening_balance, opening_balance_date, notes)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`, [id, userId, name, account_type, currency, opening_balance, opening_balance_date || (/* @__PURE__ */ new Date()).toISOString().split("T")[0], notes]);
-        res.status(201).json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        if (error.code === "23505") {
-          res.status(409).json({
-            success: false,
-            error: { code: "DUPLICATE", message: "An account with this name already exists" }
-          });
-          return;
-        }
-        console.error("Create account error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to create account" }
-        });
-      }
+       RETURNING *`,
+      [id, userId, name, account_type, currency, opening_balance, opening_balance_date || (/* @__PURE__ */ new Date()).toISOString().split("T")[0], notes]
+    );
+    res.status(201).json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    if (error.code === "23505") {
+      res.status(409).json({
+        success: false,
+        error: { code: "DUPLICATE", message: "An account with this name already exists" }
+      });
+      return;
+    }
+    console.error("Create account error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to create account" }
     });
-    var updateAccountSchema = zod_1.z.object({
-      name: zod_1.z.string().min(1).max(255).optional(),
-      account_type: zod_1.z.enum(["BANK", "CASH", "MOBILE_WALLET", "OTHER"]).optional(),
-      opening_balance: zod_1.z.coerce.number().optional(),
-      opening_balance_date: zod_1.z.string().optional(),
-      is_active: zod_1.z.boolean().optional(),
-      notes: zod_1.z.string().optional()
-    });
-    router.patch("/:id", (0, validation_1.validateBody)(updateAccountSchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const accountId = req.params.id;
-        const updates = req.body;
-        const ALLOWED_FIELDS = ["name", "account_type", "opening_balance", "opening_balance_date", "is_active", "notes"];
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
-        for (const [key, value] of Object.entries(updates)) {
-          if (!ALLOWED_FIELDS.includes(key))
-            continue;
-          fields.push(`${key} = $${paramIndex}`);
-          values.push(value);
-          paramIndex++;
-        }
-        if (fields.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "NO_UPDATES", message: "No fields to update" }
-          });
-          return;
-        }
-        fields.push(`updated_at = NOW()`);
-        values.push(userId, accountId);
-        const result = await connection_1.db.query(`UPDATE ${SCHEMA}.accounts
+  }
+});
+var updateAccountSchema = external_exports.object({
+  name: external_exports.string().min(1).max(255).optional(),
+  account_type: external_exports.enum(["BANK", "CASH", "MOBILE_WALLET", "OTHER"]).optional(),
+  opening_balance: external_exports.coerce.number().optional(),
+  opening_balance_date: external_exports.string().optional(),
+  is_active: external_exports.boolean().optional(),
+  notes: external_exports.string().optional()
+});
+router2.patch("/:id", validateBody(updateAccountSchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const accountId = req.params.id;
+    const updates = req.body;
+    const ALLOWED_FIELDS = ["name", "account_type", "opening_balance", "opening_balance_date", "is_active", "notes"];
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+    for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
+      fields.push(`${key} = $${paramIndex}`);
+      values.push(value);
+      paramIndex++;
+    }
+    if (fields.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "NO_UPDATES", message: "No fields to update" }
+      });
+      return;
+    }
+    fields.push(`updated_at = NOW()`);
+    values.push(userId, accountId);
+    const result = await db.query(
+      `UPDATE ${SCHEMA4}.accounts
        SET ${fields.join(", ")}
        WHERE user_id = $${paramIndex} AND id = $${paramIndex + 1}
-       RETURNING *`, values);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Account not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        console.error("Update account error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to update account" }
-        });
-      }
+       RETURNING *`,
+      values
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Account not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("Update account error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to update account" }
     });
-    router.delete("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const accountId = req.params.id;
-        const txResult = await connection_1.db.query(`SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`, [userId, accountId]);
-        const transferResult = await connection_1.db.query(`SELECT COUNT(*) as count FROM ${SCHEMA}.transaction_transfers tt
-       JOIN ${SCHEMA}.transactions t ON t.id = tt.transaction_id AND t.deleted_at IS NULL
-       WHERE t.user_id = $1 AND (tt.from_account_id = $2 OR tt.to_account_id = $2)`, [userId, accountId]);
-        const totalRefs = parseInt(txResult.rows[0].count) + parseInt(transferResult.rows[0].count);
-        if (totalRefs > 0) {
-          res.status(409).json({
-            success: false,
-            error: {
-              code: "ACCOUNT_HAS_TRANSACTIONS",
-              message: "Cannot delete an account with existing transactions or transfers. Deactivate it instead."
-            }
-          });
-          return;
+  }
+});
+router2.delete("/:id", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const accountId = req.params.id;
+    const txResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA4}.transactions
+       WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`,
+      [userId, accountId]
+    );
+    const transferResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA4}.transaction_transfers tt
+       JOIN ${SCHEMA4}.transactions t ON t.id = tt.transaction_id AND t.deleted_at IS NULL
+       WHERE t.user_id = $1 AND (tt.from_account_id = $2 OR tt.to_account_id = $2)`,
+      [userId, accountId]
+    );
+    const totalRefs = parseInt(txResult.rows[0].count) + parseInt(transferResult.rows[0].count);
+    if (totalRefs > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: "ACCOUNT_HAS_TRANSACTIONS",
+          message: "Cannot delete an account with existing transactions or transfers. Deactivate it instead."
         }
-        const result = await connection_1.db.query(`DELETE FROM ${SCHEMA}.accounts
+      });
+      return;
+    }
+    const result = await db.query(
+      `DELETE FROM ${SCHEMA4}.accounts
        WHERE user_id = $1 AND id = $2
-       RETURNING id`, [userId, accountId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Account not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: { id: result.rows[0].id } });
-      } catch (error) {
-        console.error("Delete account error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to delete account" }
-        });
-      }
+       RETURNING id`,
+      [userId, accountId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Account not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: { id: result.rows[0].id } });
+  } catch (error) {
+    console.error("Delete account error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to delete account" }
     });
-    router.get("/:id/transactions", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const accountId = req.params.id;
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 30;
-        const offset = (page - 1) * limit;
-        const countResult = await connection_1.db.query(`SELECT COUNT(*) as total FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`, [userId, accountId]);
-        const result = await connection_1.db.query(`SELECT t.*, p.name as person_name, c.name as category_name
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+  }
+});
+router2.get("/:id/transactions", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const accountId = req.params.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 30;
+    const offset = (page - 1) * limit;
+    const countResult = await db.query(
+      `SELECT COUNT(*) as total FROM ${SCHEMA4}.transactions
+       WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`,
+      [userId, accountId]
+    );
+    const result = await db.query(
+      `SELECT t.*, p.name as person_name, c.name as category_name
+       FROM ${SCHEMA4}.transactions t
+       LEFT JOIN ${SCHEMA4}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA4}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1 AND t.account_id = $2 AND t.deleted_at IS NULL
        ORDER BY t.transaction_date DESC, t.created_at DESC
-       LIMIT $3 OFFSET $4`, [userId, accountId, limit, offset]);
-        const total = parseInt(countResult.rows[0].total);
-        res.json({
-          success: true,
-          data: result.rows,
-          pagination: {
-            page,
-            limit,
-            total,
-            totalPages: Math.ceil(total / limit)
-          }
-        });
-      } catch (error) {
-        console.error("Get account transactions error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load transactions" }
-        });
+       LIMIT $3 OFFSET $4`,
+      [userId, accountId, limit, offset]
+    );
+    const total = parseInt(countResult.rows[0].total);
+    res.json({
+      success: true,
+      data: result.rows,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
       }
     });
-    exports2.default = router;
+  } catch (error) {
+    console.error("Get account transactions error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load transactions" }
+    });
   }
 });
+var accounts_default = router2;
 
-// server/dist/routes/people.js
-var require_people = __commonJS({
-  "server/dist/routes/people.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var zod_1 = require_zod();
-    var connection_1 = require_connection();
-    var auth_12 = require_auth();
-    var validation_1 = require_validation();
-    var id_1 = require_id();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    router.use(auth_12.requireAuth);
-    router.get("/", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT p.*,
+// server/src/routes/people.ts
+var import_express3 = __toESM(require_express2());
+var router3 = (0, import_express3.Router)();
+var SCHEMA5 = "finance_tracker";
+router3.use(requireAuth);
+router3.get("/", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT p.*,
               COALESCE(pb.amount_they_owe_you, 0) AS amount_they_owe_you,
               COALESCE(pb.amount_you_owe_them, 0) AS amount_you_owe_them
-       FROM ${SCHEMA}.people p
-       LEFT JOIN ${SCHEMA}.v_person_balances pb ON pb.user_id = p.user_id AND pb.person_id = p.id
+       FROM ${SCHEMA5}.people p
+       LEFT JOIN ${SCHEMA5}.v_person_balances pb ON pb.user_id = p.user_id AND pb.person_id = p.id
        WHERE p.user_id = $1 AND p.is_active = TRUE
-       ORDER BY p.name`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("List people error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load people" }
-        });
-      }
+       ORDER BY p.name`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("List people error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load people" }
     });
-    router.get("/:id/summary", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const personId = req.params.id;
-        const personResult = await connection_1.db.query(`SELECT p.*,
+  }
+});
+router3.get("/:id/summary", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.params.id;
+    const personResult = await db.query(
+      `SELECT p.*,
               COALESCE(pb.amount_they_owe_you, 0) AS amount_they_owe_you,
               COALESCE(pb.amount_you_owe_them, 0) AS amount_you_owe_them,
               COALESCE(pb.total_lent, 0) AS total_lent,
               COALESCE(pb.total_lent_repaid, 0) AS total_lent_repaid,
               COALESCE(pb.total_borrowed, 0) AS total_borrowed,
               COALESCE(pb.total_borrow_repaid, 0) AS total_borrow_repaid
-       FROM ${SCHEMA}.people p
-       LEFT JOIN ${SCHEMA}.v_person_balances pb ON pb.user_id = p.user_id AND pb.person_id = p.id
-       WHERE p.user_id = $1 AND p.id = $2`, [userId, personId]);
-        if (personResult.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Person not found" }
-          });
-          return;
-        }
-        const txCount = await connection_1.db.query(`SELECT COUNT(*) as total FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`, [userId, personId]);
-        const loanCount = await connection_1.db.query(`SELECT COUNT(*) as total FROM ${SCHEMA}.loans
-       WHERE user_id = $1 AND person_id = $2`, [userId, personId]);
-        res.json({
-          success: true,
-          data: {
-            ...personResult.rows[0],
-            transaction_count: parseInt(txCount.rows[0].total),
-            loan_count: parseInt(loanCount.rows[0].total)
-          }
-        });
-      } catch (error) {
-        console.error("Person summary error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load person summary" }
-        });
+       FROM ${SCHEMA5}.people p
+       LEFT JOIN ${SCHEMA5}.v_person_balances pb ON pb.user_id = p.user_id AND pb.person_id = p.id
+       WHERE p.user_id = $1 AND p.id = $2`,
+      [userId, personId]
+    );
+    if (personResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Person not found" }
+      });
+      return;
+    }
+    const txCount = await db.query(
+      `SELECT COUNT(*) as total FROM ${SCHEMA5}.transactions
+       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`,
+      [userId, personId]
+    );
+    const loanCount = await db.query(
+      `SELECT COUNT(*) as total FROM ${SCHEMA5}.loans
+       WHERE user_id = $1 AND person_id = $2`,
+      [userId, personId]
+    );
+    res.json({
+      success: true,
+      data: {
+        ...personResult.rows[0],
+        transaction_count: parseInt(txCount.rows[0].total),
+        loan_count: parseInt(loanCount.rows[0].total)
       }
     });
-    router.get("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const personId = req.params.id;
-        const result = await connection_1.db.query(`SELECT p.*,
+  } catch (error) {
+    console.error("Person summary error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load person summary" }
+    });
+  }
+});
+router3.get("/:id", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.params.id;
+    const result = await db.query(
+      `SELECT p.*,
               COALESCE(pb.amount_they_owe_you, 0) AS amount_they_owe_you,
               COALESCE(pb.amount_you_owe_them, 0) AS amount_you_owe_them,
               COALESCE(pb.total_lent, 0) AS total_lent,
               COALESCE(pb.total_lent_repaid, 0) AS total_lent_repaid,
               COALESCE(pb.total_borrowed, 0) AS total_borrowed,
               COALESCE(pb.total_borrow_repaid, 0) AS total_borrow_repaid
-       FROM ${SCHEMA}.people p
-       LEFT JOIN ${SCHEMA}.v_person_balances pb ON pb.user_id = p.user_id AND pb.person_id = p.id
-       WHERE p.user_id = $1 AND p.id = $2`, [userId, personId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Person not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        console.error("Get person error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load person" }
-        });
-      }
+       FROM ${SCHEMA5}.people p
+       LEFT JOIN ${SCHEMA5}.v_person_balances pb ON pb.user_id = p.user_id AND pb.person_id = p.id
+       WHERE p.user_id = $1 AND p.id = $2`,
+      [userId, personId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Person not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("Get person error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load person" }
     });
-    var createPersonSchema = zod_1.z.object({
-      name: zod_1.z.string().min(1, "Name is required").max(255),
-      phone: zod_1.z.string().max(50).optional(),
-      email: zod_1.z.string().email().optional().or(zod_1.z.literal("")),
-      notes: zod_1.z.string().optional()
-    });
-    router.post("/", (0, validation_1.validateBody)(createPersonSchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { name, phone, email, notes } = req.body;
-        const id = (0, id_1.generateId)("people");
-        const result = await connection_1.db.query(`INSERT INTO ${SCHEMA}.people (id, user_id, name, phone, email, notes)
+  }
+});
+var createPersonSchema = external_exports.object({
+  name: external_exports.string().min(1, "Name is required").max(255),
+  phone: external_exports.string().max(50).optional(),
+  email: external_exports.string().email().optional().or(external_exports.literal("")),
+  notes: external_exports.string().optional()
+});
+router3.post("/", validateBody(createPersonSchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { name, phone, email, notes } = req.body;
+    const id = generateId("people");
+    const result = await db.query(
+      `INSERT INTO ${SCHEMA5}.people (id, user_id, name, phone, email, notes)
        VALUES ($1, $2, $3, NULLIF($4, ''), $5, $6)
-       RETURNING *`, [id, userId, name, phone || null, email || null, notes || null]);
-        res.status(201).json({
-          success: true,
-          data: { ...result.rows[0], amount_they_owe_you: 0, amount_you_owe_them: 0 }
-        });
-      } catch (error) {
-        console.error("Create person error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to create person" }
-        });
-      }
+       RETURNING *`,
+      [id, userId, name, phone || null, email || null, notes || null]
+    );
+    res.status(201).json({
+      success: true,
+      data: { ...result.rows[0], amount_they_owe_you: 0, amount_you_owe_them: 0 }
     });
-    var updatePersonSchema = zod_1.z.object({
-      name: zod_1.z.string().min(1).max(255).optional(),
-      phone: zod_1.z.string().max(50).optional().nullable(),
-      email: zod_1.z.string().optional().nullable(),
-      notes: zod_1.z.string().optional().nullable(),
-      is_active: zod_1.z.boolean().optional()
+  } catch (error) {
+    console.error("Create person error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to create person" }
     });
-    router.patch("/:id", (0, validation_1.validateBody)(updatePersonSchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const personId = req.params.id;
-        const updates = req.body;
-        const ALLOWED_FIELDS = ["name", "phone", "email", "notes", "is_active"];
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
-        for (const [key, value] of Object.entries(updates)) {
-          if (!ALLOWED_FIELDS.includes(key))
-            continue;
-          fields.push(`${key} = $${paramIndex}`);
-          values.push(value);
-          paramIndex++;
-        }
-        if (fields.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "NO_UPDATES", message: "No fields to update" }
-          });
-          return;
-        }
-        fields.push(`updated_at = NOW()`);
-        values.push(userId, personId);
-        const result = await connection_1.db.query(`UPDATE ${SCHEMA}.people
+  }
+});
+var updatePersonSchema = external_exports.object({
+  name: external_exports.string().min(1).max(255).optional(),
+  phone: external_exports.string().max(50).optional().nullable(),
+  email: external_exports.string().optional().nullable(),
+  notes: external_exports.string().optional().nullable(),
+  is_active: external_exports.boolean().optional()
+});
+router3.patch("/:id", validateBody(updatePersonSchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.params.id;
+    const updates = req.body;
+    const ALLOWED_FIELDS = ["name", "phone", "email", "notes", "is_active"];
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+    for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
+      fields.push(`${key} = $${paramIndex}`);
+      values.push(value);
+      paramIndex++;
+    }
+    if (fields.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "NO_UPDATES", message: "No fields to update" }
+      });
+      return;
+    }
+    fields.push(`updated_at = NOW()`);
+    values.push(userId, personId);
+    const result = await db.query(
+      `UPDATE ${SCHEMA5}.people
        SET ${fields.join(", ")}
        WHERE user_id = $${paramIndex} AND id = $${paramIndex + 1}
-       RETURNING *`, values);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Person not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        console.error("Update person error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to update person" }
-        });
-      }
+       RETURNING *`,
+      values
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Person not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("Update person error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to update person" }
     });
-    router.delete("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const personId = req.params.id;
-        const balanceResult = await connection_1.db.query(`SELECT * FROM ${SCHEMA}.v_person_balances
-       WHERE user_id = $1 AND person_id = $2`, [userId, personId]);
-        if (balanceResult.rows.length > 0) {
-          const b = balanceResult.rows[0];
-          if (parseFloat(b.amount_they_owe_you) > 0 || parseFloat(b.amount_you_owe_them) > 0) {
-            res.status(409).json({
-              success: false,
-              error: {
-                code: "OUTSTANDING_BALANCE",
-                message: "Cannot delete a person with outstanding balances. Set them inactive instead."
-              }
-            });
-            return;
+  }
+});
+router3.delete("/:id", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.params.id;
+    const balanceResult = await db.query(
+      `SELECT * FROM ${SCHEMA5}.v_person_balances
+       WHERE user_id = $1 AND person_id = $2`,
+      [userId, personId]
+    );
+    if (balanceResult.rows.length > 0) {
+      const b = balanceResult.rows[0];
+      if (parseFloat(b.amount_they_owe_you) > 0 || parseFloat(b.amount_you_owe_them) > 0) {
+        res.status(409).json({
+          success: false,
+          error: {
+            code: "OUTSTANDING_BALANCE",
+            message: "Cannot delete a person with outstanding balances. Set them inactive instead."
           }
-        }
-        const result = await connection_1.db.query(`UPDATE ${SCHEMA}.people SET is_active = FALSE, updated_at = NOW()
-       WHERE user_id = $1 AND id = $2
-       RETURNING id`, [userId, personId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Person not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: { id: result.rows[0].id } });
-      } catch (error) {
-        console.error("Delete person error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to delete person" }
         });
+        return;
       }
+    }
+    const txResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA5}.transactions
+       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`,
+      [userId, personId]
+    );
+    if (parseInt(txResult.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: "PERSON_HAS_TRANSACTIONS",
+          message: "Cannot delete a person with existing transactions. Set them inactive instead."
+        }
+      });
+      return;
+    }
+    const loanResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA5}.loans
+       WHERE user_id = $1 AND person_id = $2`,
+      [userId, personId]
+    );
+    if (parseInt(loanResult.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: "PERSON_HAS_LOANS",
+          message: "Cannot delete a person with existing loans. Set them inactive instead."
+        }
+      });
+      return;
+    }
+    const result = await db.query(
+      `UPDATE ${SCHEMA5}.people SET is_active = FALSE, updated_at = NOW()
+       WHERE user_id = $1 AND id = $2
+       RETURNING id`,
+      [userId, personId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Person not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: { id: result.rows[0].id } });
+  } catch (error) {
+    console.error("Delete person error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to delete person" }
     });
-    router.get("/:id/transactions", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const personId = req.params.id;
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 30;
-        const offset = (page - 1) * limit;
-        const countResult = await connection_1.db.query(`SELECT COUNT(*) as total FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`, [userId, personId]);
-        const result = await connection_1.db.query(`SELECT t.*, a.name as account_name, c.name as category_name
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+  }
+});
+router3.get("/:id/transactions", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.params.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 30;
+    const offset = (page - 1) * limit;
+    const countResult = await db.query(
+      `SELECT COUNT(*) as total FROM ${SCHEMA5}.transactions
+       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`,
+      [userId, personId]
+    );
+    const result = await db.query(
+      `SELECT t.*, a.name as account_name, c.name as category_name
+       FROM ${SCHEMA5}.transactions t
+       LEFT JOIN ${SCHEMA5}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA5}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
        ORDER BY t.transaction_date DESC, t.created_at DESC
-       LIMIT $3 OFFSET $4`, [userId, personId, limit, offset]);
-        const total = parseInt(countResult.rows[0].total);
-        res.json({
-          success: true,
-          data: result.rows,
-          pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
-        });
-      } catch (error) {
-        console.error("Get person transactions error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load transactions" }
-        });
-      }
+       LIMIT $3 OFFSET $4`,
+      [userId, personId, limit, offset]
+    );
+    const total = parseInt(countResult.rows[0].total);
+    res.json({
+      success: true,
+      data: result.rows,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
     });
-    exports2.default = router;
+  } catch (error) {
+    console.error("Get person transactions error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load transactions" }
+    });
   }
 });
+var people_default = router3;
 
-// server/dist/routes/categories.js
-var require_categories = __commonJS({
-  "server/dist/routes/categories.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var zod_1 = require_zod();
-    var connection_1 = require_connection();
-    var auth_12 = require_auth();
-    var validation_1 = require_validation();
-    var id_1 = require_id();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    router.use(auth_12.requireAuth);
-    router.get("/", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT * FROM ${SCHEMA}.categories
-       WHERE user_id = $1 AND is_active = TRUE
-       ORDER BY type, name`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("List categories error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load categories" }
-        });
-      }
+// server/src/routes/categories.ts
+var import_express4 = __toESM(require_express2());
+var router4 = (0, import_express4.Router)();
+var SCHEMA6 = "finance_tracker";
+router4.use(requireAuth);
+router4.get("/", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT c.*, COUNT(t.id)::int AS usage_count
+       FROM ${SCHEMA6}.categories c
+       LEFT JOIN ${SCHEMA6}.transactions t ON t.category_id = c.id
+       WHERE c.user_id = $1 AND c.is_active = TRUE
+       GROUP BY c.id
+       ORDER BY c.type, c.name`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("List categories error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load categories" }
     });
-    var createCategorySchema = zod_1.z.object({
-      name: zod_1.z.string().min(1, "Name is required").max(255),
-      type: zod_1.z.enum(["INCOME", "EXPENSE"]),
-      icon: zod_1.z.string().max(50).optional(),
-      color: zod_1.z.string().max(7).optional()
-    });
-    router.post("/", (0, validation_1.validateBody)(createCategorySchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { name, type, icon, color } = req.body;
-        const id = (0, id_1.generateId)("categories");
-        const result = await connection_1.db.query(`INSERT INTO ${SCHEMA}.categories (id, user_id, name, type, icon, color)
+  }
+});
+var createCategorySchema = external_exports.object({
+  name: external_exports.string().min(1, "Name is required").max(255),
+  type: external_exports.enum(["INCOME", "EXPENSE"]),
+  icon: external_exports.string().max(50).optional(),
+  color: external_exports.string().max(7).optional()
+});
+router4.post("/", validateBody(createCategorySchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { name, type, icon, color } = req.body;
+    const id = generateId("categories");
+    const result = await db.query(
+      `INSERT INTO ${SCHEMA6}.categories (id, user_id, name, type, icon, color)
        VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING *`, [id, userId, name, type, icon || null, color || null]);
-        res.status(201).json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        if (error.code === "23505") {
-          res.status(409).json({
-            success: false,
-            error: { code: "DUPLICATE", message: "A category with this name and type already exists" }
-          });
-          return;
-        }
-        console.error("Create category error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to create category" }
-        });
-      }
+       RETURNING *`,
+      [id, userId, name, type, icon || null, color || null]
+    );
+    res.status(201).json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    if (error.code === "23505") {
+      res.status(409).json({
+        success: false,
+        error: { code: "DUPLICATE", message: "A category with this name and type already exists" }
+      });
+      return;
+    }
+    console.error("Create category error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to create category" }
     });
-    var updateCategorySchema = zod_1.z.object({
-      name: zod_1.z.string().min(1).max(255).optional(),
-      icon: zod_1.z.string().max(50).optional().nullable(),
-      color: zod_1.z.string().max(7).optional().nullable(),
-      is_active: zod_1.z.boolean().optional()
-    });
-    router.patch("/:id", (0, validation_1.validateBody)(updateCategorySchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const categoryId = req.params.id;
-        const updates = req.body;
-        const ALLOWED_FIELDS = ["name", "icon", "color", "is_active"];
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
-        for (const [key, value] of Object.entries(updates)) {
-          if (!ALLOWED_FIELDS.includes(key))
-            continue;
-          fields.push(`${key} = $${paramIndex}`);
-          values.push(value);
-          paramIndex++;
-        }
-        if (fields.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "NO_UPDATES", message: "No fields to update" }
-          });
-          return;
-        }
-        fields.push(`updated_at = NOW()`);
-        values.push(userId, categoryId);
-        const result = await connection_1.db.query(`UPDATE ${SCHEMA}.categories
+  }
+});
+var updateCategorySchema = external_exports.object({
+  name: external_exports.string().min(1).max(255).optional(),
+  icon: external_exports.string().max(50).optional().nullable(),
+  color: external_exports.string().max(7).optional().nullable(),
+  is_active: external_exports.boolean().optional()
+});
+router4.patch("/:id", validateBody(updateCategorySchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const categoryId = req.params.id;
+    const updates = req.body;
+    const ALLOWED_FIELDS = ["name", "icon", "color", "is_active"];
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+    for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
+      fields.push(`${key} = $${paramIndex}`);
+      values.push(value);
+      paramIndex++;
+    }
+    if (fields.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "NO_UPDATES", message: "No fields to update" }
+      });
+      return;
+    }
+    fields.push(`updated_at = NOW()`);
+    values.push(userId, categoryId);
+    const result = await db.query(
+      `UPDATE ${SCHEMA6}.categories
        SET ${fields.join(", ")}
        WHERE user_id = $${paramIndex} AND id = $${paramIndex + 1}
-       RETURNING *`, values);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Category not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        console.error("Update category error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to update category" }
-        });
-      }
+       RETURNING *`,
+      values
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Category not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("Update category error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to update category" }
     });
-    router.delete("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const categoryId = req.params.id;
-        const result = await connection_1.db.query(`UPDATE ${SCHEMA}.categories SET is_active = FALSE, updated_at = NOW()
+  }
+});
+router4.delete("/:id", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const categoryId = req.params.id;
+    const txResult = await db.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA6}.transactions
+       WHERE user_id = $1 AND category_id = $2 AND deleted_at IS NULL`,
+      [userId, categoryId]
+    );
+    if (parseInt(txResult.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: "CATEGORY_HAS_TRANSACTIONS",
+          message: "Cannot delete a category with existing transactions. Set it inactive instead."
+        }
+      });
+      return;
+    }
+    const result = await db.query(
+      `UPDATE ${SCHEMA6}.categories SET is_active = FALSE, updated_at = NOW()
        WHERE user_id = $1 AND id = $2
-       RETURNING id`, [userId, categoryId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Category not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: { id: result.rows[0].id } });
-      } catch (error) {
-        console.error("Delete category error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to delete category" }
-        });
-      }
+       RETURNING id`,
+      [userId, categoryId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Category not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: { id: result.rows[0].id } });
+  } catch (error) {
+    console.error("Delete category error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to delete category" }
     });
-    exports2.default = router;
   }
 });
+var categories_default = router4;
 
-// server/dist/services/voucher.js
-var require_voucher = __commonJS({
-  "server/dist/services/voucher.js"(exports2) {
-    "use strict";
-    var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
-      return mod && mod.__esModule ? mod : { "default": mod };
-    };
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.formatBDT = void 0;
-    exports2.numberToWords = numberToWords;
-    exports2.generateVoucherPDF = generateVoucherPDF;
-    exports2.generateVoucherBuffer = generateVoucherBuffer;
-    var pdfkit_1 = __importDefault2(require("pdfkit"));
-    var COLORS = {
-      primary: "#2563eb",
-      // Brand blue
-      success: "#16a34a",
-      // Green
-      danger: "#dc2626",
-      // Red
-      warning: "#d97706",
-      // Amber
-      gray: "#6b7280",
-      // Slate
-      lightGray: "#e2e8f0",
-      // Border gray
-      darkGray: "#1e293b",
-      // Text dark
-      bgLight: "#f8fafc",
-      // Table row background
-      white: "#ffffff",
-      accentDark: "#0f172a"
-    };
-    var formatBDT = (amount) => {
-      const num = typeof amount === "number" ? amount : parseFloat(String(amount || 0));
-      if (isNaN(num))
-        return "BDT 0.00";
-      return `BDT ${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    };
-    exports2.formatBDT = formatBDT;
-    function numberToWords(amount) {
-      const num = typeof amount === "number" ? amount : parseFloat(String(amount || 0));
-      if (isNaN(num) || num === 0)
-        return "Zero BDT Only";
-      const units = [
-        "",
-        "One",
-        "Two",
-        "Three",
-        "Four",
-        "Five",
-        "Six",
-        "Seven",
-        "Eight",
-        "Nine",
-        "Ten",
-        "Eleven",
-        "Twelve",
-        "Thirteen",
-        "Fourteen",
-        "Fifteen",
-        "Sixteen",
-        "Seventeen",
-        "Eighteen",
-        "Nineteen"
-      ];
-      const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
-      const convertGroup = (n) => {
-        let groupStr = "";
-        if (n >= 100) {
-          groupStr += `${units[Math.floor(n / 100)]} Hundred `;
-          n %= 100;
-        }
-        if (n >= 20) {
-          groupStr += `${tens[Math.floor(n / 10)]} `;
-          n %= 10;
-        }
-        if (n > 0) {
-          groupStr += `${units[n]} `;
-        }
-        return groupStr.trim();
-      };
-      const integerPart = Math.floor(Math.abs(num));
-      const decimalPart = Math.round((Math.abs(num) - integerPart) * 100);
-      if (integerPart === 0 && decimalPart === 0)
-        return "Zero BDT Only";
-      let result = "";
-      let current = integerPart;
-      const crore = Math.floor(current / 1e7);
-      current %= 1e7;
-      const lakh = Math.floor(current / 1e5);
-      current %= 1e5;
-      const thousand = Math.floor(current / 1e3);
-      current %= 1e3;
-      const remainder = current;
-      if (crore > 0)
-        result += `${convertGroup(crore)} Crore `;
-      if (lakh > 0)
-        result += `${convertGroup(lakh)} Lakh `;
-      if (thousand > 0)
-        result += `${convertGroup(thousand)} Thousand `;
-      if (remainder > 0)
-        result += `${convertGroup(remainder)} `;
-      result = result.trim() + " BDT";
-      if (decimalPart > 0) {
-        result += ` and ${convertGroup(decimalPart)} Paisa`;
-      }
-      return `${result} Only`;
-    }
-    var TYPE_TITLES = {
-      INCOME: {
-        receipt: "MONEY RECEIPT",
-        invoice: "INCOME INVOICE",
-        voucher: "CREDIT VOUCHER"
-      },
-      EXPENSE: {
-        receipt: "PAYMENT RECEIPT",
-        invoice: "EXPENSE INVOICE",
-        voucher: "DEBIT VOUCHER"
-      },
-      TRANSFER: {
-        receipt: "TRANSFER RECEIPT",
-        invoice: "TRANSFER STATEMENT",
-        voucher: "TRANSFER VOUCHER"
-      },
-      LEND: {
-        receipt: "LENDING RECEIPT",
-        invoice: "LOAN DISBURSEMENT INVOICE",
-        voucher: "LENDING VOUCHER"
-      },
-      LEND_REPAYMENT: {
-        receipt: "LOAN REPAYMENT RECEIPT",
-        invoice: "REPAYMENT SETTLEMENT",
-        voucher: "REPAYMENT VOUCHER"
-      },
-      BORROW: {
-        receipt: "BORROWING RECEIPT",
-        invoice: "BORROWING INVOICE",
-        voucher: "CREDIT VOUCHER"
-      },
-      BORROW_REPAYMENT: {
-        receipt: "REPAYMENT RECEIPT",
-        invoice: "DEBT SETTLEMENT INVOICE",
-        voucher: "DEBT REPAYMENT VOUCHER"
-      },
-      ADJUSTMENT: {
-        receipt: "ADJUSTMENT RECEIPT",
-        invoice: "ADJUSTMENT STATEMENT",
-        voucher: "JOURNAL VOUCHER"
-      }
-    };
-    var TYPE_COLORS = {
-      INCOME: COLORS.success,
-      EXPENSE: COLORS.danger,
-      TRANSFER: COLORS.primary,
-      LEND: COLORS.warning,
-      LEND_REPAYMENT: COLORS.success,
-      BORROW: COLORS.primary,
-      BORROW_REPAYMENT: COLORS.warning,
-      ADJUSTMENT: COLORS.gray
-    };
-    function generateVoucherPDF(data, voucherType = "voucher") {
-      const doc = new pdfkit_1.default({
-        size: "A4",
-        margin: 0,
-        bufferPages: true,
-        autoFirstPage: true,
-        info: {
-          Title: `${data.id.toUpperCase()} - ${voucherType.toUpperCase()}`,
-          Author: data.user_name || "Balqen",
-          Subject: `Balqen Financial Document`,
-          Creator: "Balqen"
-        }
-      });
-      const numAmount = typeof data.amount === "number" ? data.amount : parseFloat(String(data.amount || 0));
-      const typeColor = TYPE_COLORS[data.transaction_type] || COLORS.primary;
-      const docTitle = TYPE_TITLES[data.transaction_type] && TYPE_TITLES[data.transaction_type][voucherType] || `${data.transaction_type.replace("_", " ")} ${voucherType.toUpperCase()}`;
-      const formattedAmount = (0, exports2.formatBDT)(numAmount);
-      const wordsAmount = numberToWords(numAmount);
-      const pageWidth = doc.page.width;
-      const pageHeight = doc.page.height;
-      const contentWidth = pageWidth - 90;
-      doc.rect(0, 0, pageWidth, 8).fill(typeColor);
-      doc.font("Helvetica-Bold").fontSize(18).fillColor(COLORS.darkGray).text("BALQEN", 45, 28);
-      doc.font("Helvetica").fontSize(9).fillColor(COLORS.gray).text("Personal & Business Financial Ledger", 45, 48);
-      doc.font("Helvetica-Bold").fontSize(16).fillColor(typeColor).text(docTitle, 45, 30, { align: "right", width: contentWidth });
-      const badgeText = voucherType.toUpperCase();
-      const badgeWidth = 70;
-      const badgeHeight = 18;
-      const badgeX = pageWidth - 45 - badgeWidth;
-      const badgeY = 50;
-      doc.roundedRect(badgeX, badgeY, badgeWidth, badgeHeight, 3).fill(typeColor);
-      doc.font("Helvetica-Bold").fontSize(8).fillColor(COLORS.white).text(badgeText, badgeX, badgeY + 5, { width: badgeWidth, align: "center" });
-      doc.moveTo(45, 78).lineTo(pageWidth - 45, 78).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
-      const metaY = 90;
-      const colW = contentWidth / 3;
-      doc.font("Helvetica-Bold").fontSize(8).fillColor(COLORS.gray).text("DOCUMENT NO", 45, metaY);
-      doc.font("Helvetica-Bold").fontSize(11).fillColor(COLORS.darkGray).text(data.id.toUpperCase(), 45, metaY + 12);
-      const rawDate = data.transaction_date instanceof Date ? data.transaction_date : new Date(data.transaction_date || Date.now());
-      const validDate = isNaN(rawDate.getTime()) ? /* @__PURE__ */ new Date() : rawDate;
-      const dateFormatted = validDate.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric"
-      });
-      doc.font("Helvetica-Bold").fontSize(8).fillColor(COLORS.gray).text("TRANSACTION DATE", 45 + colW, metaY);
-      doc.font("Helvetica-Bold").fontSize(11).fillColor(COLORS.darkGray).text(dateFormatted, 45 + colW, metaY + 12);
-      doc.font("Helvetica-Bold").fontSize(8).fillColor(COLORS.gray).text("ACCOUNT HOLDER", 45 + colW * 2, metaY);
-      doc.font("Helvetica-Bold").fontSize(11).fillColor(COLORS.darkGray).text(data.user_name || "Authorized User", 45 + colW * 2, metaY + 12);
-      const cardY = 130;
-      const cardH = 72;
-      doc.roundedRect(45, cardY, contentWidth, cardH, 6).fillAndStroke(COLORS.bgLight, COLORS.lightGray);
-      doc.font("Helvetica-Bold").fontSize(9).fillColor(COLORS.gray).text("TOTAL TRANSACTION AMOUNT", 60, cardY + 12);
-      doc.font("Helvetica-Bold").fontSize(22).fillColor(typeColor).text(formattedAmount, 60, cardY + 26);
-      doc.font("Helvetica-Oblique").fontSize(9).fillColor(COLORS.darkGray).text(`In Words: ${wordsAmount}`, 60, cardY + 53, { width: contentWidth - 30 });
-      let currentY = cardY + cardH + 18;
-      if (data.transaction_type === "TRANSFER" && (data.from_account_name || data.to_account_name)) {
-        doc.font("Helvetica-Bold").fontSize(11).fillColor(COLORS.darkGray).text("Transfer Flow", 45, currentY);
-        currentY += 16;
-        const flowBoxW = (contentWidth - 60) / 2;
-        const flowBoxH = 40;
-        doc.roundedRect(45, currentY, flowBoxW, flowBoxH, 4).fillAndStroke(COLORS.bgLight, COLORS.lightGray);
-        doc.font("Helvetica-Bold").fontSize(8).fillColor(COLORS.gray).text("SOURCE (FROM)", 55, currentY + 7);
-        doc.font("Helvetica-Bold").fontSize(10).fillColor(COLORS.darkGray).text(data.from_account_name || "Source Account", 55, currentY + 20);
-        const arrowCenterX = 45 + flowBoxW + 30;
-        const arrowY = currentY + flowBoxH / 2;
-        doc.moveTo(arrowCenterX - 18, arrowY).lineTo(arrowCenterX + 18, arrowY).strokeColor(typeColor).lineWidth(2).stroke();
-        doc.moveTo(arrowCenterX + 12, arrowY - 4).lineTo(arrowCenterX + 18, arrowY).lineTo(arrowCenterX + 12, arrowY + 4).stroke();
-        const toX = 45 + flowBoxW + 60;
-        doc.roundedRect(toX, currentY, flowBoxW, flowBoxH, 4).fillAndStroke(COLORS.bgLight, COLORS.lightGray);
-        doc.font("Helvetica-Bold").fontSize(8).fillColor(COLORS.gray).text("DESTINATION (TO)", toX + 10, currentY + 7);
-        doc.font("Helvetica-Bold").fontSize(10).fillColor(COLORS.darkGray).text(data.to_account_name || "Destination Account", toX + 10, currentY + 20);
-        currentY += flowBoxH + 18;
-      }
-      doc.font("Helvetica-Bold").fontSize(11).fillColor(COLORS.darkGray).text("Transaction Summary", 45, currentY);
-      currentY += 16;
-      const tableRows = [
-        { label: "Transaction ID", value: data.id },
-        { label: "Transaction Type", value: data.transaction_type.replace(/_/g, " ") },
-        { label: "Category", value: data.category_name || "General / Uncategorized" },
-        { label: "Account", value: data.account_name || (data.from_account_name ? `${data.from_account_name} -> ${data.to_account_name}` : "-") }
-      ];
-      if (data.person_name) {
-        const roleLabel = ["LEND", "LEND_REPAYMENT"].includes(data.transaction_type) ? "Associated Person (Borrower/Lender)" : "Associated Person (Lender/Borrower)";
-        tableRows.push({ label: roleLabel, value: data.person_name });
-      }
-      if (data.reference) {
-        tableRows.push({ label: "Reference / Invoice #", value: data.reference });
-      }
-      if (data.description) {
-        tableRows.push({ label: "Notes / Description", value: data.description });
-      }
-      const rowHeight = 24;
-      tableRows.forEach((row, index) => {
-        const isEven = index % 2 === 0;
-        if (isEven) {
-          doc.rect(45, currentY, contentWidth, rowHeight).fill(COLORS.bgLight);
-        }
-        doc.font("Helvetica-Bold").fontSize(9).fillColor(COLORS.gray).text(row.label, 55, currentY + 7, { width: 170 });
-        doc.font("Helvetica").fontSize(9).fillColor(COLORS.darkGray).text(row.value || "-", 230, currentY + 7, { width: contentWidth - 195 });
-        currentY += rowHeight;
-      });
-      doc.moveTo(45, currentY).lineTo(pageWidth - 45, currentY).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
-      const sigY = pageHeight - 140;
-      const sigBoxW = 160;
-      const leftSigX = 55;
-      const rightSigX = pageWidth - 45 - sigBoxW;
-      doc.moveTo(leftSigX, sigY + 35).lineTo(leftSigX + sigBoxW, sigY + 35).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
-      doc.font("Helvetica").fontSize(8).fillColor(COLORS.gray).text("Prepared By / Account Owner", leftSigX, sigY + 40, { width: sigBoxW, align: "center" });
-      doc.font("Helvetica-Bold").fontSize(9).fillColor(COLORS.darkGray).text(data.user_name || "Authorized User", leftSigX, sigY + 20, { width: sigBoxW, align: "center" });
-      doc.moveTo(rightSigX, sigY + 35).lineTo(rightSigX + sigBoxW, sigY + 35).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
-      doc.font("Helvetica").fontSize(8).fillColor(COLORS.gray).text("Authorized Signature / Seal", rightSigX, sigY + 40, { width: sigBoxW, align: "center" });
-      const footerY = pageHeight - 65;
-      doc.moveTo(45, footerY).lineTo(pageWidth - 45, footerY).strokeColor(COLORS.lightGray).lineWidth(1).stroke();
-      const generatedDate = (/* @__PURE__ */ new Date()).toLocaleString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: true
-      });
-      doc.font("Helvetica").fontSize(8).fillColor(COLORS.gray).text(`Generated by Balqen on ${generatedDate} | Document ID: ${data.id.toUpperCase()}`, 45, footerY + 10, { width: contentWidth, align: "center" });
-      doc.font("Helvetica").fontSize(7).fillColor(COLORS.gray).text("This is a verified computer-generated document and is valid without physical seal.", 45, footerY + 22, { width: contentWidth, align: "center" });
-      doc.rect(0, pageHeight - 6, pageWidth, 6).fill(typeColor);
-      return doc;
-    }
-    async function generateVoucherBuffer(data, voucherType = "voucher") {
-      return new Promise((resolve, reject) => {
-        try {
-          const doc = generateVoucherPDF(data, voucherType);
-          const chunks = [];
-          doc.on("data", (chunk) => chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)));
-          doc.on("end", () => resolve(Buffer.concat(chunks)));
-          doc.on("error", (err) => reject(err));
-          doc.end();
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }
-  }
+// server/src/routes/transactions.ts
+var import_express5 = __toESM(require_express2());
+var router5 = (0, import_express5.Router)();
+var SCHEMA7 = "finance_tracker";
+router5.use(requireAuth);
+var listTransactionsQuery = external_exports.object({
+  page: external_exports.coerce.number().int().min(1).default(1),
+  limit: external_exports.coerce.number().int().min(1).max(100).default(30),
+  from: external_exports.string().optional(),
+  to: external_exports.string().optional(),
+  account_id: external_exports.string().optional(),
+  person_id: external_exports.string().optional(),
+  type: external_exports.string().optional(),
+  category_id: external_exports.string().optional(),
+  search: external_exports.string().optional(),
+  sort: external_exports.enum(["date_asc", "date_desc"]).default("date_desc")
 });
-
-// server/dist/routes/transactions.js
-var require_transactions = __commonJS({
-  "server/dist/routes/transactions.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var zod_1 = require_zod();
-    var connection_1 = require_connection();
-    var auth_12 = require_auth();
-    var validation_1 = require_validation();
-    var id_1 = require_id();
-    var voucher_1 = require_voucher();
-    var email_1 = require_email();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    router.use(auth_12.requireAuth);
-    var listTransactionsQuery = zod_1.z.object({
-      page: zod_1.z.coerce.number().int().min(1).default(1),
-      limit: zod_1.z.coerce.number().int().min(1).max(100).default(30),
-      from: zod_1.z.string().optional(),
-      to: zod_1.z.string().optional(),
-      account_id: zod_1.z.string().optional(),
-      person_id: zod_1.z.string().optional(),
-      type: zod_1.z.string().optional(),
-      category_id: zod_1.z.string().optional(),
-      search: zod_1.z.string().optional(),
-      sort: zod_1.z.enum(["date_asc", "date_desc"]).default("date_desc")
-    });
-    router.get("/", (0, validation_1.validateQuery)(listTransactionsQuery), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { page, limit, from, to, account_id, person_id, type, category_id, search, sort } = req.query;
-        const offset = (page - 1) * limit;
-        const conditions = ["t.user_id = $1", "t.deleted_at IS NULL"];
-        const values = [userId];
-        let paramIndex = 2;
-        if (from) {
-          conditions.push(`t.transaction_date >= $${paramIndex}`);
-          values.push(from);
-          paramIndex++;
-        }
-        if (to) {
-          conditions.push(`t.transaction_date <= $${paramIndex}`);
-          values.push(to);
-          paramIndex++;
-        }
-        if (account_id) {
-          conditions.push(`t.account_id = $${paramIndex}`);
-          values.push(account_id);
-          paramIndex++;
-        }
-        if (person_id) {
-          conditions.push(`t.person_id = $${paramIndex}`);
-          values.push(person_id);
-          paramIndex++;
-        }
-        if (type) {
-          conditions.push(`t.transaction_type = $${paramIndex}`);
-          values.push(type);
-          paramIndex++;
-        }
-        if (category_id) {
-          conditions.push(`t.category_id = $${paramIndex}`);
-          values.push(category_id);
-          paramIndex++;
-        }
-        if (search) {
-          conditions.push(`(t.description ILIKE $${paramIndex} OR t.reference ILIKE $${paramIndex})`);
-          values.push(`%${search}%`);
-          paramIndex++;
-        }
-        const whereClause = conditions.join(" AND ");
-        const orderClause = sort === "date_asc" ? "t.transaction_date ASC, t.created_at ASC" : "t.transaction_date DESC, t.created_at DESC";
-        const countResult = await connection_1.db.query(`SELECT COUNT(*) as total
-       FROM ${SCHEMA}.transactions t
-       WHERE ${whereClause}`, values);
-        const dataValues = [...values, limit, offset];
-        const result = await connection_1.db.query(`SELECT t.*,
+router5.get("/", validateQuery(listTransactionsQuery), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const { page, limit, from, to, account_id, person_id, type, category_id, search, sort } = req.query;
+    const offset = (page - 1) * limit;
+    const conditions = ["t.user_id = $1", "t.deleted_at IS NULL"];
+    const values = [userId];
+    let paramIndex = 2;
+    if (from) {
+      conditions.push(`t.transaction_date >= $${paramIndex}`);
+      values.push(from);
+      paramIndex++;
+    }
+    if (to) {
+      conditions.push(`t.transaction_date <= $${paramIndex}`);
+      values.push(to);
+      paramIndex++;
+    }
+    if (account_id) {
+      conditions.push(`t.account_id = $${paramIndex}`);
+      values.push(account_id);
+      paramIndex++;
+    }
+    if (person_id) {
+      conditions.push(`t.person_id = $${paramIndex}`);
+      values.push(person_id);
+      paramIndex++;
+    }
+    if (type) {
+      conditions.push(`t.transaction_type = $${paramIndex}`);
+      values.push(type);
+      paramIndex++;
+    }
+    if (category_id) {
+      conditions.push(`t.category_id = $${paramIndex}`);
+      values.push(category_id);
+      paramIndex++;
+    }
+    if (search) {
+      conditions.push(`(t.description ILIKE $${paramIndex} OR t.reference ILIKE $${paramIndex})`);
+      values.push(`%${search}%`);
+      paramIndex++;
+    }
+    const whereClause = conditions.join(" AND ");
+    const orderClause = sort === "date_asc" ? "t.transaction_date ASC, t.created_at ASC" : "t.transaction_date DESC, t.created_at DESC";
+    const countResult = await db.query(
+      `SELECT COUNT(*) as total
+       FROM ${SCHEMA7}.transactions t
+       WHERE ${whereClause}`,
+      values
+    );
+    const dataValues = [...values, limit, offset];
+    const result = await db.query(
+      `SELECT t.*,
               a.name as account_name,
               p.name as person_name,
               c.name as category_name
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+       FROM ${SCHEMA7}.transactions t
+       LEFT JOIN ${SCHEMA7}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA7}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA7}.categories c ON c.id = t.category_id
        WHERE ${whereClause}
        ORDER BY ${orderClause}
-       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`, dataValues);
-        const total = parseInt(countResult.rows[0].total);
-        res.json({
-          success: true,
-          data: result.rows,
-          pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
-        });
-      } catch (error) {
-        console.error("List transactions error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load transactions" }
-        });
-      }
+       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
+      dataValues
+    );
+    const total = parseInt(countResult.rows[0].total);
+    res.json({
+      success: true,
+      data: result.rows,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
     });
-    router.get("/export", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const format = req.query.format || "json";
-        const from = req.query.from;
-        const to = req.query.to;
-        const type = req.query.type;
-        const conditions = ["t.user_id = $1", "t.deleted_at IS NULL"];
-        const values = [userId];
-        let paramIndex = 2;
-        if (from) {
-          conditions.push(`t.transaction_date >= $${paramIndex}`);
-          values.push(from);
-          paramIndex++;
-        }
-        if (to) {
-          conditions.push(`t.transaction_date <= $${paramIndex}`);
-          values.push(to);
-          paramIndex++;
-        }
-        if (type) {
-          conditions.push(`t.transaction_type = $${paramIndex}`);
-          values.push(type);
-          paramIndex++;
-        }
-        const result = await connection_1.db.query(`SELECT t.transaction_date, t.transaction_type, t.amount,
+  } catch (error) {
+    console.error("List transactions error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load transactions" }
+    });
+  }
+});
+router5.get("/export", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const format = req.query.format || "json";
+    const from = req.query.from;
+    const to = req.query.to;
+    const type = req.query.type;
+    const conditions = ["t.user_id = $1", "t.deleted_at IS NULL"];
+    const values = [userId];
+    let paramIndex = 2;
+    if (from) {
+      conditions.push(`t.transaction_date >= $${paramIndex}`);
+      values.push(from);
+      paramIndex++;
+    }
+    if (to) {
+      conditions.push(`t.transaction_date <= $${paramIndex}`);
+      values.push(to);
+      paramIndex++;
+    }
+    if (type) {
+      conditions.push(`t.transaction_type = $${paramIndex}`);
+      values.push(type);
+      paramIndex++;
+    }
+    const result = await db.query(
+      `SELECT t.transaction_date, t.transaction_type, t.amount,
               a.name AS account_name, p.name AS person_name,
               c.name AS category_name, t.description, t.reference,
               t.created_at
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+       FROM ${SCHEMA7}.transactions t
+       LEFT JOIN ${SCHEMA7}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA7}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA7}.categories c ON c.id = t.category_id
        WHERE ${conditions.join(" AND ")}
-       ORDER BY t.transaction_date ASC, t.created_at ASC`, values);
-        if (format === "csv") {
-          const headers = ["Date", "Type", "Amount", "Account", "Person", "Category", "Description", "Reference"];
-          const rows = result.rows.map((r) => [
-            r.transaction_date,
-            r.transaction_type,
-            r.amount,
-            r.account_name || "",
-            r.person_name || "",
-            r.category_name || "",
-            r.description || "",
-            r.reference || ""
-          ]);
-          const csv = [headers.join(","), ...rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))].join("\n");
-          res.setHeader("Content-Type", "text/csv");
-          res.setHeader("Content-Disposition", 'attachment; filename="transactions.csv"');
-          res.send(csv);
-        } else {
-          res.json({ success: true, data: result.rows });
-        }
-      } catch (error) {
-        console.error("Export transactions error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to export transactions" }
-        });
-      }
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
+      values
+    );
+    if (format === "csv") {
+      const headers = ["Date", "Type", "Amount", "Account", "Person", "Category", "Description", "Reference"];
+      const rows = result.rows.map((r) => [
+        r.transaction_date,
+        r.transaction_type,
+        r.amount,
+        r.account_name || "",
+        r.person_name || "",
+        r.category_name || "",
+        r.description || "",
+        r.reference || ""
+      ]);
+      const csv = [headers.join(","), ...rows.map(
+        (row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(",")
+      )].join("\n");
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", 'attachment; filename="transactions.csv"');
+      res.send(csv);
+    } else {
+      res.json({ success: true, data: result.rows });
+    }
+  } catch (error) {
+    console.error("Export transactions error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to export transactions" }
     });
-    router.get("/:id/voucher", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const txId = req.params.id;
-        const voucherType = req.query.type || "voucher";
-        const txResult = await connection_1.db.query(`SELECT t.*,
+  }
+});
+router5.get("/:id/voucher", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const txId = req.params.id;
+    const txResult = await db.query(
+      `SELECT t.*,
               a.name as account_name,
               p.name as person_name,
               c.name as category_name
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
-       WHERE t.id = $1 AND t.user_id = $2 AND t.deleted_at IS NULL`, [txId, userId]);
-        if (txResult.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Transaction not found" }
-          });
-          return;
-        }
-        const tx = txResult.rows[0];
-        const userResult = await connection_1.db.query(`SELECT full_name, email FROM ${SCHEMA}.users WHERE id = $1`, [userId]);
-        const user = userResult.rows[0] || { full_name: "User", email: "" };
-        let fromAccountName = null;
-        let toAccountName = null;
-        if (tx.transaction_type === "TRANSFER") {
-          const ttResult = await connection_1.db.query(`SELECT fa.name as from_name, ta.name as to_name
-         FROM ${SCHEMA}.transaction_transfers tt
-         JOIN ${SCHEMA}.accounts fa ON fa.id = tt.from_account_id
-         JOIN ${SCHEMA}.accounts ta ON ta.id = tt.to_account_id
-         WHERE tt.transaction_id = $1`, [txId]);
-          if (ttResult.rows.length > 0) {
-            fromAccountName = ttResult.rows[0].from_name;
-            toAccountName = ttResult.rows[0].to_name;
-          }
-        }
-        const pdfBuffer = await (0, voucher_1.generateVoucherBuffer)({
-          id: tx.id,
-          transaction_type: tx.transaction_type,
-          transaction_date: tx.transaction_date,
-          amount: parseFloat(tx.amount),
-          description: tx.description,
-          reference: tx.reference,
-          account_name: tx.account_name,
-          person_name: tx.person_name,
-          category_name: tx.category_name,
-          user_name: user.full_name,
-          user_email: user.email,
-          from_account_name: fromAccountName,
-          to_account_name: toAccountName
-        }, voucherType);
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", `attachment; filename="${voucherType}-${tx.id}.pdf"`);
-        res.setHeader("Content-Length", pdfBuffer.length);
-        res.send(pdfBuffer);
-      } catch (error) {
-        console.error("Generate voucher error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to generate voucher" }
-        });
+       FROM ${SCHEMA7}.transactions t
+       LEFT JOIN ${SCHEMA7}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA7}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA7}.categories c ON c.id = t.category_id
+       WHERE t.id = $1 AND t.user_id = $2 AND t.deleted_at IS NULL`,
+      [txId, userId]
+    );
+    if (txResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Transaction not found" }
+      });
+      return;
+    }
+    const tx = txResult.rows[0];
+    const userResult = await db.query(
+      `SELECT full_name, email FROM ${SCHEMA7}.users WHERE id = $1`,
+      [userId]
+    );
+    const user = userResult.rows[0] || { full_name: "User", email: "" };
+    let fromAccountName = null;
+    let toAccountName = null;
+    if (tx.transaction_type === "TRANSFER") {
+      const ttResult = await db.query(
+        `SELECT fa.name as from_name, ta.name as to_name
+         FROM ${SCHEMA7}.transaction_transfers tt
+         JOIN ${SCHEMA7}.accounts fa ON fa.id = tt.from_account_id
+         JOIN ${SCHEMA7}.accounts ta ON ta.id = tt.to_account_id
+         WHERE tt.transaction_id = $1`,
+        [txId]
+      );
+      if (ttResult.rows.length > 0) {
+        fromAccountName = ttResult.rows[0].from_name;
+        toAccountName = ttResult.rows[0].to_name;
+      }
+    }
+    res.json({
+      success: true,
+      data: {
+        id: tx.id,
+        transaction_type: tx.transaction_type,
+        transaction_date: tx.transaction_date,
+        amount: parseFloat(tx.amount),
+        description: tx.description,
+        reference: tx.reference,
+        account_name: tx.account_name,
+        person_name: tx.person_name,
+        category_name: tx.category_name,
+        user_name: user.full_name,
+        user_email: user.email,
+        from_account_name: fromAccountName,
+        to_account_name: toAccountName
       }
     });
-    router.get("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const txId = req.params.id;
-        const result = await connection_1.db.query(`SELECT t.*,
+  } catch (error) {
+    console.error("Get voucher report error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to generate voucher report data" }
+    });
+  }
+});
+router5.get("/:id", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const txId = req.params.id;
+    const result = await db.query(
+      `SELECT t.*,
               a.name as account_name,
               p.name as person_name,
               c.name as category_name
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
-       WHERE t.id = $1 AND t.user_id = $2 AND t.deleted_at IS NULL`, [txId, userId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Transaction not found" }
-          });
-          return;
-        }
-        let transfer = null;
-        if (result.rows[0].transaction_type === "TRANSFER") {
-          const transferResult = await connection_1.db.query(`SELECT tt.*,
+       FROM ${SCHEMA7}.transactions t
+       LEFT JOIN ${SCHEMA7}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA7}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA7}.categories c ON c.id = t.category_id
+       WHERE t.id = $1 AND t.user_id = $2 AND t.deleted_at IS NULL`,
+      [txId, userId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Transaction not found" }
+      });
+      return;
+    }
+    let transfer = null;
+    if (result.rows[0].transaction_type === "TRANSFER") {
+      const transferResult = await db.query(
+        `SELECT tt.*,
                 fa.name as from_account_name,
                 ta.name as to_account_name
-         FROM ${SCHEMA}.transaction_transfers tt
-         JOIN ${SCHEMA}.accounts fa ON fa.id = tt.from_account_id
-         JOIN ${SCHEMA}.accounts ta ON ta.id = tt.to_account_id
-         WHERE tt.transaction_id = $1`, [txId]);
-          transfer = transferResult.rows[0] || null;
-        }
-        res.json({
-          success: true,
-          data: { ...result.rows[0], transfer }
-        });
-      } catch (error) {
-        console.error("Get transaction error:", error);
-        res.status(500).json({
+         FROM ${SCHEMA7}.transaction_transfers tt
+         JOIN ${SCHEMA7}.accounts fa ON fa.id = tt.from_account_id
+         JOIN ${SCHEMA7}.accounts ta ON ta.id = tt.to_account_id
+         WHERE tt.transaction_id = $1`,
+        [txId]
+      );
+      transfer = transferResult.rows[0] || null;
+    }
+    res.json({
+      success: true,
+      data: { ...result.rows[0], transfer }
+    });
+  } catch (error) {
+    console.error("Get transaction error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load transaction" }
+    });
+  }
+});
+var createTransactionSchema = external_exports.object({
+  transaction_type: external_exports.enum([
+    "INCOME",
+    "EXPENSE",
+    "TRANSFER",
+    "LEND",
+    "LEND_REPAYMENT",
+    "BORROW",
+    "BORROW_REPAYMENT",
+    "ADJUSTMENT"
+  ]),
+  transaction_date: external_exports.string().min(1, "Date is required"),
+  amount: external_exports.coerce.number().positive("Amount must be greater than zero"),
+  account_id: external_exports.string().optional().nullable(),
+  person_id: external_exports.string().optional().nullable(),
+  category_id: external_exports.string().optional().nullable(),
+  loan_id: external_exports.string().optional().nullable(),
+  description: external_exports.string().optional().nullable(),
+  reference: external_exports.string().optional().nullable(),
+  to_account_id: external_exports.string().optional().nullable(),
+  send_receipt: external_exports.boolean().optional().default(false)
+});
+router5.post("/", validateBody(createTransactionSchema), async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const {
+      transaction_type,
+      transaction_date,
+      amount,
+      account_id,
+      person_id,
+      category_id,
+      loan_id,
+      description,
+      reference,
+      to_account_id,
+      send_receipt
+    } = req.body;
+    const validationErrors = [];
+    if (transaction_type !== "ADJUSTMENT" && !account_id) {
+      validationErrors.push("Account is required");
+    }
+    if (["LEND", "LEND_REPAYMENT", "BORROW", "BORROW_REPAYMENT"].includes(transaction_type) && !person_id) {
+      validationErrors.push("Person is required for lending/borrowing transactions");
+    }
+    if (transaction_type === "TRANSFER" && !to_account_id) {
+      validationErrors.push("Destination account is required for transfers");
+    }
+    if (transaction_type === "TRANSFER" && account_id && to_account_id && account_id === to_account_id) {
+      validationErrors.push("Source and destination accounts cannot be the same");
+    }
+    if (validationErrors.length > 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: validationErrors.join("; ") }
+      });
+      return;
+    }
+    if (account_id) {
+      const acc = await client.query(
+        `SELECT id FROM ${SCHEMA7}.accounts WHERE id = $1 AND user_id = $2`,
+        [account_id, userId]
+      );
+      if (acc.rows.length === 0) {
+        res.status(400).json({
           success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load transaction" }
+          error: { code: "INVALID_ACCOUNT", message: "Account not found" }
         });
+        return;
       }
-    });
-    var createTransactionSchema = zod_1.z.object({
-      transaction_type: zod_1.z.enum([
-        "INCOME",
-        "EXPENSE",
-        "TRANSFER",
-        "LEND",
-        "LEND_REPAYMENT",
-        "BORROW",
-        "BORROW_REPAYMENT",
-        "ADJUSTMENT"
-      ]),
-      transaction_date: zod_1.z.string().min(1, "Date is required"),
-      amount: zod_1.z.coerce.number().positive("Amount must be greater than zero"),
-      account_id: zod_1.z.string().optional(),
-      person_id: zod_1.z.string().optional(),
-      category_id: zod_1.z.string().optional(),
-      loan_id: zod_1.z.string().optional(),
-      description: zod_1.z.string().optional(),
-      reference: zod_1.z.string().optional(),
-      to_account_id: zod_1.z.string().optional(),
-      send_receipt: zod_1.z.boolean().optional().default(false)
-    });
-    router.post("/", (0, validation_1.validateBody)(createTransactionSchema), async (req, res) => {
-      const client = await connection_1.db.getClient();
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { transaction_type, transaction_date, amount, account_id, person_id, category_id, loan_id, description, reference, to_account_id, send_receipt } = req.body;
-        const validationErrors = [];
-        if (transaction_type !== "ADJUSTMENT" && !account_id) {
-          validationErrors.push("Account is required");
-        }
-        if (["LEND", "LEND_REPAYMENT", "BORROW", "BORROW_REPAYMENT"].includes(transaction_type) && !person_id) {
-          validationErrors.push("Person is required for lending/borrowing transactions");
-        }
-        if (transaction_type === "TRANSFER" && !to_account_id) {
-          validationErrors.push("Destination account is required for transfers");
-        }
-        if (transaction_type === "TRANSFER" && account_id && to_account_id && account_id === to_account_id) {
-          validationErrors.push("Source and destination accounts cannot be the same");
-        }
-        if (validationErrors.length > 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "VALIDATION_ERROR", message: validationErrors.join("; ") }
-          });
-          return;
-        }
-        if (account_id) {
-          const acc = await client.query(`SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [account_id, userId]);
-          if (acc.rows.length === 0) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_ACCOUNT", message: "Account not found" }
-            });
-            return;
-          }
-        }
-        if (to_account_id) {
-          const acc = await client.query(`SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [to_account_id, userId]);
-          if (acc.rows.length === 0) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_ACCOUNT", message: "Destination account not found" }
-            });
-            return;
-          }
-        }
-        if (person_id) {
-          const p = await client.query(`SELECT id FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2 AND is_active = TRUE`, [person_id, userId]);
-          if (p.rows.length === 0) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_PERSON", message: "Person not found" }
-            });
-            return;
-          }
-        }
-        if (category_id) {
-          const expectedType = transaction_type === "INCOME" ? "INCOME" : "EXPENSE";
-          const c = await client.query(`SELECT id, type FROM ${SCHEMA}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`, [category_id, userId]);
-          if (c.rows.length === 0) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_CATEGORY", message: "Category not found" }
-            });
-            return;
-          }
-          if (["INCOME", "EXPENSE"].includes(transaction_type) && c.rows[0].type !== expectedType) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_CATEGORY", message: `Category type '${c.rows[0].type}' does not match transaction type '${transaction_type}'` }
-            });
-            return;
-          }
-        }
-        await client.query("BEGIN");
-        const txId = (0, id_1.generateId)("transactions");
-        const txResult = await client.query(`INSERT INTO ${SCHEMA}.transactions
+    }
+    if (to_account_id) {
+      const acc = await client.query(
+        `SELECT id FROM ${SCHEMA7}.accounts WHERE id = $1 AND user_id = $2`,
+        [to_account_id, userId]
+      );
+      if (acc.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: "INVALID_ACCOUNT", message: "Destination account not found" }
+        });
+        return;
+      }
+    }
+    if (person_id) {
+      const p = await client.query(
+        `SELECT id FROM ${SCHEMA7}.people WHERE id = $1 AND user_id = $2 AND is_active = TRUE`,
+        [person_id, userId]
+      );
+      if (p.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: "INVALID_PERSON", message: "Person not found" }
+        });
+        return;
+      }
+    }
+    if (category_id) {
+      const expectedType = transaction_type === "INCOME" ? "INCOME" : "EXPENSE";
+      const c = await client.query(
+        `SELECT id, type FROM ${SCHEMA7}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`,
+        [category_id, userId]
+      );
+      if (c.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: "INVALID_CATEGORY", message: "Category not found" }
+        });
+        return;
+      }
+      if (["INCOME", "EXPENSE"].includes(transaction_type) && c.rows[0].type !== expectedType) {
+        res.status(400).json({
+          success: false,
+          error: { code: "INVALID_CATEGORY", message: `Category type '${c.rows[0].type}' does not match transaction type '${transaction_type}'` }
+        });
+        return;
+      }
+    }
+    await client.query("BEGIN");
+    const txId = generateId("transactions");
+    let linkedLoanId = loan_id || null;
+    if ((transaction_type === "LEND" || transaction_type === "BORROW") && !linkedLoanId) {
+      const loanId = generateId("loans");
+      const loanDirection = transaction_type === "LEND" ? "LENT" : "BORROWED";
+      await client.query(
+        `INSERT INTO ${SCHEMA7}.loans
+         (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, description, source)
+         VALUES ($1, $2, $3, $4, $5, 0, $6, $7, 'AUTO')`,
+        [loanId, userId, person_id || null, loanDirection, amount, transaction_date, description || null]
+      );
+      linkedLoanId = loanId;
+    }
+    const txResult = await client.query(
+      `INSERT INTO ${SCHEMA7}.transactions
        (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, category_id, loan_id, description, reference)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-       RETURNING *`, [txId, userId, transaction_type, transaction_date, amount, account_id || null, person_id || null, category_id || null, loan_id || null, description || null, reference || null]);
-        const tx = txResult.rows[0];
-        if (transaction_type === "TRANSFER" && account_id && to_account_id) {
-          const tfrId = (0, id_1.generateId)("transaction_transfers");
-          await client.query(`INSERT INTO ${SCHEMA}.transaction_transfers (id, transaction_id, from_account_id, to_account_id, amount)
-         VALUES ($1, $2, $3, $4, $5)`, [tfrId, tx.id, account_id, to_account_id, amount]);
-        }
-        if (transaction_type === "LEND_REPAYMENT" || transaction_type === "BORROW_REPAYMENT") {
-          if (loan_id) {
-            const lreId = (0, id_1.generateId)("loan_repayments");
-            await client.query(`INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
-           VALUES ($1, $2, $3, $4, $5, $6)`, [lreId, loan_id, tx.id, amount, transaction_date, description || null]);
+       RETURNING *`,
+      [txId, userId, transaction_type, transaction_date, amount, account_id || null, person_id || null, category_id || null, linkedLoanId, description || null, reference || null]
+    );
+    const tx = txResult.rows[0];
+    if (transaction_type === "TRANSFER" && account_id && to_account_id) {
+      const tfrId = generateId("transaction_transfers");
+      await client.query(
+        `INSERT INTO ${SCHEMA7}.transaction_transfers (id, transaction_id, from_account_id, to_account_id, amount)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [tfrId, tx.id, account_id, to_account_id, amount]
+      );
+    }
+    if (transaction_type === "LEND_REPAYMENT" || transaction_type === "BORROW_REPAYMENT") {
+      if (loan_id) {
+        const lreId = generateId("loan_repayments");
+        await client.query(
+          `INSERT INTO ${SCHEMA7}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [lreId, loan_id, tx.id, amount, transaction_date, description || null]
+        );
+        const checkResult = await client.query(
+          `SELECT l.principal_amount, l.interest_amount, l.status,
+                  COALESCE(SUM(lr.amount), 0) as total_repaid
+           FROM ${SCHEMA7}.loans l
+           LEFT JOIN ${SCHEMA7}.loan_repayments lr ON lr.loan_id = l.id
+           LEFT JOIN ${SCHEMA7}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+           WHERE l.id = $1
+           GROUP BY l.id`,
+          [loan_id]
+        );
+        if (checkResult.rows.length > 0) {
+          const lData = checkResult.rows[0];
+          const totalDue = parseFloat(lData.principal_amount) + parseFloat(lData.interest_amount);
+          const totalRepaid = parseFloat(lData.total_repaid);
+          if (totalRepaid >= totalDue && (lData.status === "ACTIVE" || lData.status === "OVERDUE")) {
+            await client.query(
+              `UPDATE ${SCHEMA7}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
+              [loan_id]
+            );
           }
         }
-        await client.query("COMMIT");
-        res.status(201).json({ success: true, data: tx });
-        if (send_receipt && person_id && ["LEND", "BORROW", "LEND_REPAYMENT", "BORROW_REPAYMENT"].includes(transaction_type)) {
-          (async () => {
-            try {
-              const personResult = await connection_1.db.query(`SELECT name, email FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2`, [person_id, userId]);
-              const person = personResult.rows[0];
-              if (!person || !person.email)
-                return;
-              const userResult = await connection_1.db.query(`SELECT full_name FROM ${SCHEMA}.users WHERE id = $1`, [userId]);
-              const userName = userResult.rows[0]?.full_name || "User";
-              await (0, email_1.sendTransactionReceipt)({
-                to: person.email,
-                senderName: userName,
-                recipientName: person.name,
-                transactionType: tx.transaction_type,
-                amount: parseFloat(tx.amount),
-                date: tx.transaction_date,
-                description: tx.description
-              });
-            } catch (err) {
-              console.error("Failed to send transaction receipt:", err);
-            }
-          })();
-        }
-      } catch (error) {
-        await client.query("ROLLBACK");
-        console.error("Create transaction error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to create transaction" }
-        });
-      } finally {
-        client.release();
       }
-    });
-    var updateTransactionSchema = zod_1.z.object({
-      transaction_date: zod_1.z.string().optional(),
-      amount: zod_1.z.coerce.number().positive().optional(),
-      account_id: zod_1.z.string().optional().nullable(),
-      person_id: zod_1.z.string().optional().nullable(),
-      category_id: zod_1.z.string().optional().nullable(),
-      description: zod_1.z.string().optional().nullable(),
-      reference: zod_1.z.string().optional().nullable()
-    });
-    router.patch("/:id", (0, validation_1.validateBody)(updateTransactionSchema), async (req, res) => {
-      const client = await connection_1.db.getClient();
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const txId = req.params.id;
-        const existing = await client.query(`SELECT * FROM ${SCHEMA}.transactions
-       WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`, [txId, userId]);
-        if (existing.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Transaction not found" }
+    }
+    await client.query("COMMIT");
+    res.status(201).json({ success: true, data: tx });
+    if (send_receipt && person_id && ["LEND", "BORROW", "LEND_REPAYMENT", "BORROW_REPAYMENT"].includes(transaction_type)) {
+      (async () => {
+        try {
+          const personResult = await db.query(
+            `SELECT name, email FROM ${SCHEMA7}.people WHERE id = $1 AND user_id = $2`,
+            [person_id, userId]
+          );
+          const person = personResult.rows[0];
+          if (!person || !person.email) return;
+          const userResult = await db.query(
+            `SELECT full_name FROM ${SCHEMA7}.users WHERE id = $1`,
+            [userId]
+          );
+          const userName = userResult.rows[0]?.full_name || "User";
+          await sendTransactionReceipt({
+            to: person.email,
+            senderName: userName,
+            recipientName: person.name,
+            transactionType: tx.transaction_type,
+            amount: parseFloat(tx.amount),
+            date: tx.transaction_date,
+            description: tx.description
           });
-          return;
+        } catch (err) {
+          console.error("Failed to send transaction receipt:", err);
         }
-        const updates = req.body;
-        if (updates.account_id) {
-          const acc = await client.query(`SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [updates.account_id, userId]);
-          if (acc.rows.length === 0) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_ACCOUNT", message: "Account not found" }
-            });
-            return;
-          }
-        }
-        if (updates.person_id) {
-          const p = await client.query(`SELECT id FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2 AND is_active = TRUE`, [updates.person_id, userId]);
-          if (p.rows.length === 0) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_PERSON", message: "Person not found" }
-            });
-            return;
-          }
-        }
-        if (updates.category_id) {
-          const c = await client.query(`SELECT id FROM ${SCHEMA}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`, [updates.category_id, userId]);
-          if (c.rows.length === 0) {
-            res.status(400).json({
-              success: false,
-              error: { code: "INVALID_CATEGORY", message: "Category not found" }
-            });
-            return;
-          }
-        }
-        const ALLOWED_FIELDS = ["transaction_date", "amount", "account_id", "person_id", "category_id", "description", "reference"];
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
-        for (const [key, value] of Object.entries(updates)) {
-          if (!ALLOWED_FIELDS.includes(key))
-            continue;
-          fields.push(`${key} = $${paramIndex}`);
-          values.push(value);
-          paramIndex++;
-        }
-        if (fields.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "NO_UPDATES", message: "No fields to update" }
-          });
-          return;
-        }
-        fields.push(`updated_at = NOW()`);
-        values.push(txId, userId);
-        const result = await client.query(`UPDATE ${SCHEMA}.transactions
+      })();
+    }
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Create transaction error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to create transaction" }
+    });
+  } finally {
+    client.release();
+  }
+});
+var updateTransactionSchema = external_exports.object({
+  transaction_date: external_exports.string().optional(),
+  amount: external_exports.coerce.number().positive().optional(),
+  account_id: external_exports.string().optional().nullable(),
+  person_id: external_exports.string().optional().nullable(),
+  category_id: external_exports.string().optional().nullable(),
+  description: external_exports.string().optional().nullable(),
+  reference: external_exports.string().optional().nullable()
+});
+router5.patch("/:id", validateBody(updateTransactionSchema), async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const txId = req.params.id;
+    const existing = await client.query(
+      `SELECT * FROM ${SCHEMA7}.transactions
+       WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
+      [txId, userId]
+    );
+    if (existing.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Transaction not found" }
+      });
+      return;
+    }
+    const updates = req.body;
+    if (updates.account_id) {
+      const acc = await client.query(
+        `SELECT id FROM ${SCHEMA7}.accounts WHERE id = $1 AND user_id = $2`,
+        [updates.account_id, userId]
+      );
+      if (acc.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: "INVALID_ACCOUNT", message: "Account not found" }
+        });
+        return;
+      }
+    }
+    if (updates.person_id) {
+      const p = await client.query(
+        `SELECT id FROM ${SCHEMA7}.people WHERE id = $1 AND user_id = $2 AND is_active = TRUE`,
+        [updates.person_id, userId]
+      );
+      if (p.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: "INVALID_PERSON", message: "Person not found" }
+        });
+        return;
+      }
+    }
+    if (updates.category_id) {
+      const c = await client.query(
+        `SELECT id FROM ${SCHEMA7}.categories WHERE id = $1 AND user_id = $2 AND is_active = TRUE`,
+        [updates.category_id, userId]
+      );
+      if (c.rows.length === 0) {
+        res.status(400).json({
+          success: false,
+          error: { code: "INVALID_CATEGORY", message: "Category not found" }
+        });
+        return;
+      }
+    }
+    const ALLOWED_FIELDS = ["transaction_date", "amount", "account_id", "person_id", "category_id", "description", "reference"];
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+    for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
+      fields.push(`${key} = $${paramIndex}`);
+      values.push(value);
+      paramIndex++;
+    }
+    if (fields.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "NO_UPDATES", message: "No fields to update" }
+      });
+      return;
+    }
+    fields.push(`updated_at = NOW()`);
+    values.push(txId, userId);
+    const result = await client.query(
+      `UPDATE ${SCHEMA7}.transactions
        SET ${fields.join(", ")}
        WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
-       RETURNING *`, values);
-        const tx = existing.rows[0];
-        if ((tx.transaction_type === "LEND_REPAYMENT" || tx.transaction_type === "BORROW_REPAYMENT") && req.body.amount !== void 0) {
-          const newAmount = parseFloat(req.body.amount);
-          const oldAmount = parseFloat(tx.amount);
-          if (newAmount !== oldAmount) {
-            await client.query(`UPDATE ${SCHEMA}.loan_repayments SET amount = $1 WHERE transaction_id = $2`, [newAmount, txId]);
-            if (tx.loan_id) {
-              const loanResult = await client.query(`SELECT l.*,
+       RETURNING *`,
+      values
+    );
+    const tx = existing.rows[0];
+    if ((tx.transaction_type === "LEND_REPAYMENT" || tx.transaction_type === "BORROW_REPAYMENT") && req.body.amount !== void 0) {
+      const newAmount = parseFloat(req.body.amount);
+      const oldAmount = parseFloat(tx.amount);
+      if (newAmount !== oldAmount) {
+        await client.query(
+          `UPDATE ${SCHEMA7}.loan_repayments SET amount = $1 WHERE transaction_id = $2`,
+          [newAmount, txId]
+        );
+        if (tx.loan_id) {
+          const loanResult = await client.query(
+            `SELECT l.*,
                     COALESCE(lr.total_repaid, 0) AS total_repaid
-             FROM ${SCHEMA}.loans l
+             FROM ${SCHEMA7}.loans l
              LEFT JOIN (
                SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
-               FROM ${SCHEMA}.loan_repayments lr2
-               INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+               FROM ${SCHEMA7}.loan_repayments lr2
+               INNER JOIN ${SCHEMA7}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
                GROUP BY lr2.loan_id
              ) lr ON lr.loan_id = l.id
-             WHERE l.id = $1`, [tx.loan_id]);
-              if (loanResult.rows.length > 0) {
-                const loan = loanResult.rows[0];
-                const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
-                const totalRepaid = parseFloat(loan.total_repaid || "0");
-                if (loan.status === "PAID" && totalRepaid < totalDue) {
-                  await client.query(`UPDATE ${SCHEMA}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`, [tx.loan_id]);
-                }
-                if (loan.status === "ACTIVE" && totalRepaid >= totalDue) {
-                  await client.query(`UPDATE ${SCHEMA}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`, [tx.loan_id]);
-                }
-              }
+             WHERE l.id = $1`,
+            [tx.loan_id]
+          );
+          if (loanResult.rows.length > 0) {
+            const loan = loanResult.rows[0];
+            const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+            const totalRepaid = parseFloat(loan.total_repaid || "0");
+            if (loan.status === "PAID" && totalRepaid < totalDue) {
+              await client.query(
+                `UPDATE ${SCHEMA7}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`,
+                [tx.loan_id]
+              );
+            }
+            if ((loan.status === "ACTIVE" || loan.status === "OVERDUE") && totalRepaid >= totalDue) {
+              await client.query(
+                `UPDATE ${SCHEMA7}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
+                [tx.loan_id]
+              );
             }
           }
         }
-        await client.query("COMMIT");
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        await client.query("ROLLBACK");
-        console.error("Update transaction error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to update transaction" }
-        });
-      } finally {
-        client.release();
       }
+    }
+    await client.query("COMMIT");
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Update transaction error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to update transaction" }
     });
-    router.delete("/:id", async (req, res) => {
-      const client = await connection_1.db.getClient();
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const txId = req.params.id;
-        const existing = await client.query(`SELECT * FROM ${SCHEMA}.transactions
-       WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`, [txId, userId]);
-        if (existing.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Transaction not found" }
-          });
-          return;
-        }
-        await client.query("BEGIN");
-        await client.query(`UPDATE ${SCHEMA}.transactions SET deleted_at = NOW(), updated_at = NOW()
-       WHERE id = $1`, [txId]);
-        const tx = existing.rows[0];
-        if (tx.transaction_type === "LEND_REPAYMENT" || tx.transaction_type === "BORROW_REPAYMENT") {
-          await client.query(`DELETE FROM ${SCHEMA}.loan_repayments WHERE transaction_id = $1`, [txId]);
-          if (tx.loan_id) {
-            const loanResult = await client.query(`SELECT l.*,
+  } finally {
+    client.release();
+  }
+});
+router5.delete("/:id", async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const txId = req.params.id;
+    const existing = await client.query(
+      `SELECT * FROM ${SCHEMA7}.transactions
+       WHERE id = $1 AND user_id = $2 AND deleted_at IS NULL`,
+      [txId, userId]
+    );
+    if (existing.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Transaction not found" }
+      });
+      return;
+    }
+    await client.query("BEGIN");
+    await client.query(
+      `UPDATE ${SCHEMA7}.transactions SET deleted_at = NOW(), updated_at = NOW()
+       WHERE id = $1`,
+      [txId]
+    );
+    const tx = existing.rows[0];
+    if (tx.transaction_type === "LEND_REPAYMENT" || tx.transaction_type === "BORROW_REPAYMENT") {
+      await client.query(
+        `DELETE FROM ${SCHEMA7}.loan_repayments WHERE transaction_id = $1`,
+        [txId]
+      );
+      if (tx.loan_id) {
+        const loanResult = await client.query(
+          `SELECT l.*,
                   COALESCE(lr.total_repaid, 0) AS total_repaid
-           FROM ${SCHEMA}.loans l
+           FROM ${SCHEMA7}.loans l
            LEFT JOIN (
              SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
-             FROM ${SCHEMA}.loan_repayments lr2
-             INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+             FROM ${SCHEMA7}.loan_repayments lr2
+             INNER JOIN ${SCHEMA7}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
              WHERE lr2.loan_id = $1
              GROUP BY lr2.loan_id
            ) lr ON lr.loan_id = l.id
-           WHERE l.id = $1`, [tx.loan_id]);
-            if (loanResult.rows.length > 0) {
-              const loan = loanResult.rows[0];
-              const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
-              const totalRepaid = parseFloat(loan.total_repaid || "0");
-              if (loan.status === "PAID" && totalRepaid < totalDue) {
-                await client.query(`UPDATE ${SCHEMA}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`, [tx.loan_id]);
-              }
-            }
+           WHERE l.id = $1`,
+          [tx.loan_id]
+        );
+        if (loanResult.rows.length > 0) {
+          const loan = loanResult.rows[0];
+          const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+          const totalRepaid = parseFloat(loan.total_repaid || "0");
+          if (loan.status === "PAID" && totalRepaid < totalDue) {
+            await client.query(
+              `UPDATE ${SCHEMA7}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`,
+              [tx.loan_id]
+            );
           }
         }
-        await client.query("COMMIT");
-        res.json({ success: true, data: { id: txId } });
-      } catch (error) {
-        await client.query("ROLLBACK");
-        console.error("Delete transaction error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to delete transaction" }
-        });
-      } finally {
-        client.release();
       }
+    }
+    if (tx.transaction_type === "LEND" || tx.transaction_type === "BORROW") {
+      if (tx.loan_id) {
+        const repayTxs = await client.query(
+          `SELECT id FROM ${SCHEMA7}.transactions
+           WHERE loan_id = $1 AND transaction_type IN ('LEND_REPAYMENT', 'BORROW_REPAYMENT')
+             AND deleted_at IS NULL`,
+          [tx.loan_id]
+        );
+        for (const repayTx of repayTxs.rows) {
+          await client.query(
+            `UPDATE ${SCHEMA7}.transactions SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1`,
+            [repayTx.id]
+          );
+        }
+        await client.query(
+          `DELETE FROM ${SCHEMA7}.loan_repayments WHERE loan_id = $1`,
+          [tx.loan_id]
+        );
+        await client.query(
+          `DELETE FROM ${SCHEMA7}.loans WHERE id = $1`,
+          [tx.loan_id]
+        );
+      }
+    }
+    await client.query("COMMIT");
+    res.json({ success: true, data: { id: txId } });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Delete transaction error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to delete transaction" }
     });
-    exports2.default = router;
+  } finally {
+    client.release();
   }
 });
+var transactions_default = router5;
 
-// server/dist/routes/loans.js
-var require_loans = __commonJS({
-  "server/dist/routes/loans.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var zod_1 = require_zod();
-    var connection_1 = require_connection();
-    var auth_12 = require_auth();
-    var validation_1 = require_validation();
-    var id_1 = require_id();
-    var voucher_1 = require_voucher();
-    var email_1 = require_email();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    router.use(auth_12.requireAuth);
-    async function markOverdueLoans(userId) {
-      await connection_1.db.query(`UPDATE ${SCHEMA}.loans
+// server/src/routes/loans.ts
+var import_express6 = __toESM(require_express2());
+var router6 = (0, import_express6.Router)();
+var SCHEMA8 = "finance_tracker";
+router6.use(requireAuth);
+async function markOverdueLoans(userId) {
+  await db.query(
+    `UPDATE ${SCHEMA8}.loans
      SET status = 'OVERDUE', updated_at = NOW()
      WHERE user_id = $1 AND status = 'ACTIVE'
-       AND due_date IS NOT NULL AND due_date < CURRENT_DATE`, [userId]);
-    }
-    router.get("/", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        await markOverdueLoans(userId);
-        const result = await connection_1.db.query(`SELECT l.*,
+       AND due_date IS NOT NULL AND due_date < CURRENT_DATE`,
+    [userId]
+  );
+  await db.query(
+    `UPDATE ${SCHEMA8}.loans
+     SET status = 'ACTIVE', updated_at = NOW()
+     WHERE user_id = $1 AND status = 'OVERDUE'
+       AND (due_date IS NULL OR due_date >= CURRENT_DATE)`,
+    [userId]
+  );
+}
+router6.get("/", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    await markOverdueLoans(userId);
+    const result = await db.query(
+      `SELECT l.*,
               p.name as person_name,
               COALESCE(lr.total_repaid, 0) AS total_repaid,
               (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
-       FROM ${SCHEMA}.loans l
-       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
+       FROM ${SCHEMA8}.loans l
+       LEFT JOIN ${SCHEMA8}.people p ON p.id = l.person_id
        LEFT JOIN (
          SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments lr2
-         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         FROM ${SCHEMA8}.loan_repayments lr2
+         INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
          GROUP BY lr2.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1
-       ORDER BY l.status = 'ACTIVE' DESC, l.start_date DESC`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("List loans error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load loans" }
-        });
-      }
+       ORDER BY l.status = 'ACTIVE' DESC, l.start_date DESC`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("List loans error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load loans" }
     });
-    router.get("/orphaned", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT l.id, l.direction, l.principal_amount, l.interest_amount,
-              l.start_date, l.status, l.description,
-              p.name AS person_name
-       FROM ${SCHEMA}.loans l
-       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
-       WHERE l.user_id = $1
-         AND NOT EXISTS (
-           SELECT 1 FROM ${SCHEMA}.transactions t
-           WHERE t.loan_id = l.id
-             AND t.transaction_type IN ('LEND', 'BORROW')
-             AND t.deleted_at IS NULL
-         )
-       ORDER BY l.start_date ASC`, [userId]);
-        res.json({
-          success: true,
-          data: {
-            count: result.rows.length,
-            loans: result.rows
-          }
-        });
-      } catch (error) {
-        console.error("Find orphaned loans error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to find orphaned loans" }
-        });
-      }
-    });
-    router.post("/fix-orphaned", async (req, res) => {
-      const client = await connection_1.db.getClient();
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { account_id } = req.body;
-        if (!account_id) {
-          res.status(400).json({
-            success: false,
-            error: { code: "VALIDATION_ERROR", message: "account_id is required to create missing transactions" }
-          });
-          return;
-        }
-        const accCheck = await client.query(`SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [account_id, userId]);
-        if (accCheck.rows.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "INVALID_ACCOUNT", message: "Account not found" }
-          });
-          return;
-        }
-        await client.query("BEGIN");
-        const orphans = await client.query(`SELECT l.id, l.direction, l.principal_amount, l.start_date, l.description, l.person_id
-       FROM ${SCHEMA}.loans l
-       WHERE l.user_id = $1
-         AND NOT EXISTS (
-           SELECT 1 FROM ${SCHEMA}.transactions t
-           WHERE t.loan_id = l.id
-             AND t.transaction_type IN ('LEND', 'BORROW')
-             AND t.deleted_at IS NULL
-         )
-       ORDER BY l.start_date ASC`, [userId]);
-        const fixed = [];
-        for (const loan of orphans.rows) {
-          const txType = loan.direction === "LENT" ? "LEND" : "BORROW";
-          const txId = (0, id_1.generateId)("transactions");
-          await client.query(`INSERT INTO ${SCHEMA}.transactions
-         (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [txId, userId, txType, loan.start_date, loan.principal_amount, account_id, loan.person_id, loan.id, loan.description || "Backfilled from loan"]);
-          fixed.push(loan.id);
-        }
-        await client.query("COMMIT");
-        res.json({
-          success: true,
-          data: {
-            fixed_count: fixed.length,
-            fixed_loan_ids: fixed
-          }
-        });
-      } catch (error) {
-        await client.query("ROLLBACK");
-        console.error("Fix orphaned loans error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to fix orphaned loans" }
-        });
-      } finally {
-        client.release();
-      }
-    });
-    router.get("/:id/voucher", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const loanId = req.params.id;
-        const voucherType = req.query.type || "voucher";
-        const loanResult = await connection_1.db.query(`SELECT l.*,
-              p.name as person_name,
-              COALESCE(lr.total_repaid, 0) AS total_repaid,
-              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
-       FROM ${SCHEMA}.loans l
-       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
-       LEFT JOIN (
-         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments lr2
-         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
-         GROUP BY lr2.loan_id
-       ) lr ON lr.loan_id = l.id
-       WHERE l.id = $1 AND l.user_id = $2`, [loanId, userId]);
-        if (loanResult.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Loan not found" }
-          });
-          return;
-        }
-        const loan = loanResult.rows[0];
-        const userResult = await connection_1.db.query(`SELECT full_name, email FROM ${SCHEMA}.users WHERE id = $1`, [userId]);
-        const user = userResult.rows[0] || { full_name: "User", email: "" };
-        const direction = loan.direction === "LENT" ? "Lend" : "Borrow";
-        const label = loan.direction === "LENT" ? `Loan ${direction} to ${loan.person_name || "Unknown"}` : `Loan ${direction} from ${loan.person_name || "Unknown"}`;
-        const voucherData = {
-          id: loan.id,
-          transaction_type: loan.direction === "LENT" ? "LEND" : "BORROW",
-          transaction_date: loan.start_date,
-          amount: parseFloat(loan.principal_amount),
-          description: loan.description || label,
-          reference: `Interest: BDT ${parseFloat(loan.interest_amount).toLocaleString("en-US", { minimumFractionDigits: 2 })} | Repaid: BDT ${parseFloat(loan.total_repaid).toLocaleString("en-US", { minimumFractionDigits: 2 })} | Remaining: BDT ${parseFloat(loan.remaining_amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
-          account_name: null,
-          person_name: loan.person_name,
-          category_name: `Loan (${loan.status})`,
-          user_name: user.full_name,
-          user_email: user.email
-        };
-        const pdfBuffer = await (0, voucher_1.generateVoucherBuffer)(voucherData, voucherType);
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", `attachment; filename="loan-${loan.id}.pdf"`);
-        res.setHeader("Content-Length", pdfBuffer.length);
-        res.send(pdfBuffer);
-      } catch (error) {
-        console.error("Generate loan voucher error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to generate loan voucher" }
-        });
-      }
-    });
-    router.get("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const loanId = req.params.id;
-        const result = await connection_1.db.query(`SELECT l.*,
-              p.name as person_name,
-              COALESCE(lr.total_repaid, 0) AS total_repaid,
-              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
-       FROM ${SCHEMA}.loans l
-       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
-       LEFT JOIN (
-         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments lr2
-         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
-         GROUP BY lr2.loan_id
-       ) lr ON lr.loan_id = l.id
-       WHERE l.id = $1 AND l.user_id = $2`, [loanId, userId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Loan not found" }
-          });
-          return;
-        }
-        const repayments = await connection_1.db.query(`SELECT lr.*, t.transaction_date, t.account_id, a.name as account_name
-       FROM ${SCHEMA}.loan_repayments lr
-       INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       WHERE lr.loan_id = $1
-       ORDER BY lr.repayment_date DESC`, [loanId]);
-        res.json({
-          success: true,
-          data: {
-            ...result.rows[0],
-            repayments: repayments.rows
-          }
-        });
-      } catch (error) {
-        console.error("Get loan error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load loan" }
-        });
-      }
-    });
-    var createLoanSchema = zod_1.z.object({
-      person_id: zod_1.z.string().optional(),
-      direction: zod_1.z.enum(["BORROWED", "LENT"]),
-      principal_amount: zod_1.z.coerce.number().positive("Principal must be greater than zero"),
-      interest_amount: zod_1.z.coerce.number().min(0).default(0),
-      start_date: zod_1.z.string().min(1),
-      due_date: zod_1.z.string().optional().nullable(),
-      description: zod_1.z.string().optional(),
-      account_id: zod_1.z.string().optional(),
-      send_receipt: zod_1.z.boolean().optional().default(false)
-    });
-    router.post("/", (0, validation_1.validateBody)(createLoanSchema), async (req, res) => {
-      const client = await connection_1.db.getClient();
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description, account_id, send_receipt } = req.body;
-        const id = (0, id_1.generateId)("loans");
-        await client.query("BEGIN");
-        const result = await client.query(`INSERT INTO ${SCHEMA}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING *`, [id, userId, person_id || null, direction, principal_amount, interest_amount, start_date, due_date || null, description || null]);
-        let txId = null;
-        if (account_id) {
-          const txType = direction === "LENT" ? "LEND" : "BORROW";
-          txId = (0, id_1.generateId)("transactions");
-          await client.query(`INSERT INTO ${SCHEMA}.transactions
-         (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`, [txId, userId, txType, start_date, principal_amount, account_id, person_id || null, id, description || null]);
-        }
-        await client.query("COMMIT");
-        res.status(201).json({
-          success: true,
-          data: { ...result.rows[0], total_repaid: 0, remaining_amount: principal_amount + interest_amount, transaction_id: txId }
-        });
-        if (send_receipt && person_id) {
-          (async () => {
-            try {
-              const personResult = await connection_1.db.query(`SELECT name, email FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2`, [person_id, userId]);
-              const person = personResult.rows[0];
-              if (!person || !person.email)
-                return;
-              const userResult = await connection_1.db.query(`SELECT full_name FROM ${SCHEMA}.users WHERE id = $1`, [userId]);
-              const userName = userResult.rows[0]?.full_name || "User";
-              const txType = direction === "LENT" ? "LEND" : "BORROW";
-              await (0, email_1.sendTransactionReceipt)({
-                to: person.email,
-                senderName: userName,
-                recipientName: person.name,
-                transactionType: txType,
-                amount: principal_amount,
-                date: start_date,
-                description: description || null
-              });
-            } catch (err) {
-              console.error("Failed to send loan receipt:", err);
-            }
-          })();
-        }
-      } catch (error) {
-        await client.query("ROLLBACK");
-        console.error("Create loan error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to create loan" }
-        });
-      } finally {
-        client.release();
-      }
-    });
-    var updateLoanSchema = zod_1.z.object({
-      due_date: zod_1.z.string().optional().nullable(),
-      status: zod_1.z.enum(["ACTIVE", "PAID", "OVERDUE", "CANCELLED"]).optional(),
-      description: zod_1.z.string().optional().nullable()
-    });
-    router.patch("/:id", (0, validation_1.validateBody)(updateLoanSchema), async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const loanId = req.params.id;
-        const updates = req.body;
-        const ALLOWED_FIELDS = ["due_date", "status", "description"];
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
-        for (const [key, value] of Object.entries(updates)) {
-          if (!ALLOWED_FIELDS.includes(key))
-            continue;
-          fields.push(`${key} = $${paramIndex}`);
-          values.push(value);
-          paramIndex++;
-        }
-        if (fields.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "NO_UPDATES", message: "No fields to update" }
-          });
-          return;
-        }
-        fields.push(`updated_at = NOW()`);
-        values.push(loanId, userId);
-        const result = await connection_1.db.query(`UPDATE ${SCHEMA}.loans
-       SET ${fields.join(", ")}
-       WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
-       RETURNING *`, values);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Loan not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: result.rows[0] });
-      } catch (error) {
-        console.error("Update loan error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to update loan" }
-        });
-      }
-    });
-    router.delete("/:id", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const loanId = req.params.id;
-        const repayResult = await connection_1.db.query(`SELECT COUNT(*) as count FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`, [loanId]);
-        if (parseInt(repayResult.rows[0].count) > 0) {
-          res.status(409).json({
-            success: false,
-            error: {
-              code: "HAS_REPAYMENTS",
-              message: "Cannot delete a loan with existing repayments. Cancel it instead."
-            }
-          });
-          return;
-        }
-        const result = await connection_1.db.query(`DELETE FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2 RETURNING id`, [loanId, userId]);
-        if (result.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Loan not found" }
-          });
-          return;
-        }
-        res.json({ success: true, data: { id: loanId } });
-      } catch (error) {
-        console.error("Delete loan error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to delete loan" }
-        });
-      }
-    });
-    var createRepaymentSchema = zod_1.z.object({
-      amount: zod_1.z.coerce.number().positive("Amount must be greater than zero"),
-      repayment_date: zod_1.z.string().min(1),
-      account_id: zod_1.z.string(),
-      notes: zod_1.z.string().optional(),
-      send_receipt: zod_1.z.boolean().optional().default(false)
-    });
-    router.post("/:id/repayments", (0, validation_1.validateBody)(createRepaymentSchema), async (req, res) => {
-      const client = await connection_1.db.getClient();
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const loanId = req.params.id;
-        const { amount, repayment_date, account_id, notes, send_receipt } = req.body;
-        const loanResult = await client.query(`SELECT * FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`, [loanId, userId]);
-        if (loanResult.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Loan not found" }
-          });
-          return;
-        }
-        const loan = loanResult.rows[0];
-        if (loan.status !== "ACTIVE") {
-          res.status(400).json({
-            success: false,
-            error: { code: "LOAN_NOT_ACTIVE", message: `Cannot record repayment for a loan with status '${loan.status}'` }
-          });
-          return;
-        }
-        const accCheck = await client.query(`SELECT id FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [account_id, userId]);
-        if (accCheck.rows.length === 0) {
-          res.status(400).json({
-            success: false,
-            error: { code: "INVALID_ACCOUNT", message: "Account not found" }
-          });
-          return;
-        }
-        const repaidResult = await client.query(`SELECT COALESCE(SUM(lr.amount), 0) as total_repaid
-       FROM ${SCHEMA}.loan_repayments lr
-       INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
-       WHERE lr.loan_id = $1`, [loanId]);
-        const totalRepaid = parseFloat(repaidResult.rows[0].total_repaid);
-        const remaining = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount) - totalRepaid;
-        if (amount > remaining) {
-          res.status(400).json({
-            success: false,
-            error: {
-              code: "AMOUNT_EXCEEDS",
-              message: `Repayment amount (\u09F3${amount}) exceeds remaining balance (\u09F3${remaining})`
-            }
-          });
-          return;
-        }
-        await client.query("BEGIN");
-        const txType = loan.direction === "LENT" ? "LEND_REPAYMENT" : "BORROW_REPAYMENT";
-        const txId = (0, id_1.generateId)("transactions");
-        const txResult = await client.query(`INSERT INTO ${SCHEMA}.transactions
-       (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-       RETURNING *`, [txId, userId, txType, repayment_date, amount, account_id, loan.person_id, loanId, notes || null]);
-        const tx = txResult.rows[0];
-        const lreId = (0, id_1.generateId)("loan_repayments");
-        await client.query(`INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
-       VALUES ($1, $2, $3, $4, $5, $6)`, [lreId, loanId, tx.id, amount, repayment_date, notes || null]);
-        const newTotalRepaid = totalRepaid + amount;
-        const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
-        if (newTotalRepaid >= totalDue) {
-          await client.query(`UPDATE ${SCHEMA}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`, [loanId]);
-        }
-        await client.query("COMMIT");
-        res.status(201).json({ success: true, data: tx });
-        if (send_receipt && loan.person_id) {
-          (async () => {
-            try {
-              const personResult = await connection_1.db.query(`SELECT name, email FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2`, [loan.person_id, userId]);
-              const person = personResult.rows[0];
-              if (!person || !person.email)
-                return;
-              const userResult = await connection_1.db.query(`SELECT full_name FROM ${SCHEMA}.users WHERE id = $1`, [userId]);
-              const userName = userResult.rows[0]?.full_name || "User";
-              const repayTxType = loan.direction === "LENT" ? "LEND_REPAYMENT" : "BORROW_REPAYMENT";
-              await (0, email_1.sendTransactionReceipt)({
-                to: person.email,
-                senderName: userName,
-                recipientName: person.name,
-                transactionType: repayTxType,
-                amount,
-                date: repayment_date,
-                description: notes || null
-              });
-            } catch (err) {
-              console.error("Failed to send repayment receipt:", err);
-            }
-          })();
-        }
-      } catch (error) {
-        await client.query("ROLLBACK");
-        console.error("Create repayment error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to record repayment" }
-        });
-      } finally {
-        client.release();
-      }
-    });
-    router.get("/:id/repayments", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const loanId = req.params.id;
-        const loanCheck = await connection_1.db.query(`SELECT id FROM ${SCHEMA}.loans WHERE id = $1 AND user_id = $2`, [loanId, userId]);
-        if (loanCheck.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Loan not found" }
-          });
-          return;
-        }
-        const result = await connection_1.db.query(`SELECT lr.*, t.account_id, a.name as account_name
-       FROM ${SCHEMA}.loan_repayments lr
-       INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       WHERE lr.loan_id = $1
-       ORDER BY lr.repayment_date DESC`, [loanId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("List repayments error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load repayments" }
-        });
-      }
-    });
-    exports2.default = router;
   }
 });
-
-// server/dist/routes/dashboard.js
-var require_dashboard = __commonJS({
-  "server/dist/routes/dashboard.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var connection_1 = require_connection();
-    var auth_12 = require_auth();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    router.use(auth_12.requireAuth);
-    router.get("/summary", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const from = req.query.from;
-        const to = req.query.to;
-        const accountsResult = await connection_1.db.query(`SELECT account_id, account_name, account_type, currency, opening_balance, current_balance
-       FROM ${SCHEMA}.v_account_balances
-       WHERE user_id = $1
-       ORDER BY account_type, account_name`, [userId]);
-        const accounts = accountsResult.rows;
-        const totalAccountBalance = accounts.reduce((sum, a) => sum + parseFloat(a.current_balance), 0);
-        const peopleResult = await connection_1.db.query(`SELECT SUM(amount_they_owe_you) AS total_receivable,
-              SUM(amount_you_owe_them) AS total_payable
-       FROM ${SCHEMA}.v_person_balances
-       WHERE user_id = $1`, [userId]);
-        const totalReceivable = parseFloat(peopleResult.rows[0]?.total_receivable || "0");
-        const totalPayable = parseFloat(peopleResult.rows[0]?.total_payable || "0");
-        let dateCondition = "";
-        const values = [userId];
-        let paramIndex = 2;
-        if (from) {
-          dateCondition += ` AND transaction_date >= $${paramIndex}`;
-          values.push(from);
-          paramIndex++;
-        }
-        if (to) {
-          dateCondition += ` AND transaction_date <= $${paramIndex}`;
-          values.push(to);
-          paramIndex++;
-        }
-        const totalsResult = await connection_1.db.query(`SELECT
-         COALESCE(SUM(CASE WHEN transaction_type = 'INCOME' THEN amount ELSE 0 END), 0) AS total_income,
-         COALESCE(SUM(CASE WHEN transaction_type = 'EXPENSE' THEN amount ELSE 0 END), 0) AS total_expense
-       FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND deleted_at IS NULL ${dateCondition}`, values);
-        const totalIncome = parseFloat(totalsResult.rows[0].total_income);
-        const totalExpense = parseFloat(totalsResult.rows[0].total_expense);
-        const netPosition = totalAccountBalance + totalReceivable - totalPayable;
-        res.json({
-          success: true,
-          data: {
-            accounts,
-            totalAccountBalance,
-            totalReceivable,
-            totalPayable,
-            totalIncome,
-            totalExpense,
-            netPosition
-          }
-        });
-      } catch (error) {
-        console.error("Dashboard summary error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load dashboard summary" }
-        });
+router6.get("/orphaned", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT l.id, l.direction, l.principal_amount, l.interest_amount,
+              l.start_date, l.status, l.description,
+              p.name AS person_name
+       FROM ${SCHEMA8}.loans l
+       LEFT JOIN ${SCHEMA8}.people p ON p.id = l.person_id
+       WHERE l.user_id = $1
+         AND NOT EXISTS (
+           SELECT 1 FROM ${SCHEMA8}.transactions t
+           WHERE t.loan_id = l.id
+             AND t.transaction_type IN ('LEND', 'BORROW')
+             AND t.deleted_at IS NULL
+         )
+       ORDER BY l.start_date ASC`,
+      [userId]
+    );
+    res.json({
+      success: true,
+      data: {
+        count: result.rows.length,
+        loans: result.rows
       }
     });
-    router.get("/recent-transactions", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT t.*,
+  } catch (error) {
+    console.error("Find orphaned loans error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to find orphaned loans" }
+    });
+  }
+});
+router6.post("/fix-orphaned", async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const { account_id } = req.body;
+    if (!account_id) {
+      res.status(400).json({
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: "account_id is required to create missing transactions" }
+      });
+      return;
+    }
+    const accCheck = await client.query(
+      `SELECT id FROM ${SCHEMA8}.accounts WHERE id = $1 AND user_id = $2`,
+      [account_id, userId]
+    );
+    if (accCheck.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_ACCOUNT", message: "Account not found" }
+      });
+      return;
+    }
+    await client.query("BEGIN");
+    const orphans = await client.query(
+      `SELECT l.id, l.direction, l.principal_amount, l.start_date, l.description, l.person_id
+       FROM ${SCHEMA8}.loans l
+       WHERE l.user_id = $1
+         AND NOT EXISTS (
+           SELECT 1 FROM ${SCHEMA8}.transactions t
+           WHERE t.loan_id = l.id
+             AND t.transaction_type IN ('LEND', 'BORROW')
+             AND t.deleted_at IS NULL
+         )
+       ORDER BY l.start_date ASC`,
+      [userId]
+    );
+    const fixed = [];
+    for (const loan of orphans.rows) {
+      const txType = loan.direction === "LENT" ? "LEND" : "BORROW";
+      const txId = generateId("transactions");
+      await client.query(
+        `INSERT INTO ${SCHEMA8}.transactions
+         (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [txId, userId, txType, loan.start_date, loan.principal_amount, account_id, loan.person_id, loan.id, loan.description || "Backfilled from loan"]
+      );
+      fixed.push(loan.id);
+    }
+    await client.query("COMMIT");
+    res.json({
+      success: true,
+      data: {
+        fixed_count: fixed.length,
+        fixed_loan_ids: fixed
+      }
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Fix orphaned loans error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to fix orphaned loans" }
+    });
+  } finally {
+    client.release();
+  }
+});
+var addFundsSchema = external_exports.object({
+  amount: external_exports.coerce.number().positive("Amount must be greater than zero"),
+  account_id: external_exports.string().min(1, "Account is required"),
+  date: external_exports.string().optional(),
+  description: external_exports.string().optional()
+});
+router6.post("/:id/add-funds", validateBody(addFundsSchema), async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const { amount, account_id, date, description } = req.body;
+    const txDate = date || (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+    const loanResult = await client.query(
+      `SELECT * FROM ${SCHEMA8}.loans WHERE id = $1 AND user_id = $2`,
+      [loanId, userId]
+    );
+    if (loanResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Loan not found" }
+      });
+      return;
+    }
+    const loan = loanResult.rows[0];
+    if (loan.status !== "ACTIVE" && loan.status !== "OVERDUE") {
+      res.status(400).json({
+        success: false,
+        error: { code: "LOAN_NOT_ACTIVE", message: `Cannot add funds to a loan with status '${loan.status}'` }
+      });
+      return;
+    }
+    const accCheck = await client.query(
+      `SELECT id FROM ${SCHEMA8}.accounts WHERE id = $1 AND user_id = $2`,
+      [account_id, userId]
+    );
+    if (accCheck.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_ACCOUNT", message: "Account not found" }
+      });
+      return;
+    }
+    await client.query("BEGIN");
+    await client.query(
+      `UPDATE ${SCHEMA8}.loans
+       SET principal_amount = principal_amount + $1, updated_at = NOW()
+       WHERE id = $2`,
+      [amount, loanId]
+    );
+    const txType = loan.direction === "LENT" ? "LEND" : "BORROW";
+    const txId = generateId("transactions");
+    await client.query(
+      `INSERT INTO ${SCHEMA8}.transactions
+       (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      [txId, userId, txType, txDate, amount, account_id, loan.person_id, loanId, description || `Additional funds for loan`]
+    );
+    await client.query("COMMIT");
+    const updated = await db.query(
+      `SELECT l.*,
+              p.name as person_name,
+              COALESCE(lr.total_repaid, 0) AS total_repaid,
+              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
+       FROM ${SCHEMA8}.loans l
+       LEFT JOIN ${SCHEMA8}.people p ON p.id = l.person_id
+       LEFT JOIN (
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA8}.loan_repayments lr2
+         INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
+       ) lr ON lr.loan_id = l.id
+       WHERE l.id = $1`,
+      [loanId]
+    );
+    res.status(201).json({ success: true, data: updated.rows[0] });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Add funds error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to add funds to loan" }
+    });
+  } finally {
+    client.release();
+  }
+});
+router6.get("/:id/voucher", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const loanResult = await db.query(
+      `SELECT l.*,
+              p.name as person_name,
+              COALESCE(lr.total_repaid, 0) AS total_repaid,
+              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
+       FROM ${SCHEMA8}.loans l
+       LEFT JOIN ${SCHEMA8}.people p ON p.id = l.person_id
+       LEFT JOIN (
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA8}.loan_repayments lr2
+         INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
+       ) lr ON lr.loan_id = l.id
+       WHERE l.id = $1 AND l.user_id = $2`,
+      [loanId, userId]
+    );
+    if (loanResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Loan not found" }
+      });
+      return;
+    }
+    const loan = loanResult.rows[0];
+    const userResult = await db.query(
+      `SELECT full_name, email FROM ${SCHEMA8}.users WHERE id = $1`,
+      [userId]
+    );
+    const user = userResult.rows[0] || { full_name: "User", email: "" };
+    const direction = loan.direction === "LENT" ? "Lend" : "Borrow";
+    const label = loan.direction === "LENT" ? `Loan ${direction} to ${loan.person_name || "Unknown"}` : `Loan ${direction} from ${loan.person_name || "Unknown"}`;
+    const voucherData = {
+      id: loan.id,
+      transaction_type: loan.direction === "LENT" ? "LEND" : "BORROW",
+      transaction_date: loan.start_date,
+      amount: parseFloat(loan.principal_amount),
+      description: loan.description || label,
+      reference: `Interest: BDT ${parseFloat(loan.interest_amount).toLocaleString("en-US", { minimumFractionDigits: 2 })} | Repaid: BDT ${parseFloat(loan.total_repaid).toLocaleString("en-US", { minimumFractionDigits: 2 })} | Remaining: BDT ${parseFloat(loan.remaining_amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}`,
+      account_name: null,
+      person_name: loan.person_name,
+      category_name: `Loan (${loan.status})`,
+      user_name: user.full_name,
+      user_email: user.email
+    };
+    res.json({
+      success: true,
+      data: voucherData
+    });
+  } catch (error) {
+    console.error("Generate loan voucher error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to generate loan voucher report" }
+    });
+  }
+});
+router6.get("/:id", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const result = await db.query(
+      `SELECT l.*,
+              p.name as person_name,
+              COALESCE(lr.total_repaid, 0) AS total_repaid,
+              (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
+       FROM ${SCHEMA8}.loans l
+       LEFT JOIN ${SCHEMA8}.people p ON p.id = l.person_id
+       LEFT JOIN (
+         SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+         FROM ${SCHEMA8}.loan_repayments lr2
+         INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         GROUP BY lr2.loan_id
+       ) lr ON lr.loan_id = l.id
+       WHERE l.id = $1 AND l.user_id = $2`,
+      [loanId, userId]
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Loan not found" }
+      });
+      return;
+    }
+    const repayments = await db.query(
+      `SELECT lr.*, t.transaction_date, t.account_id, a.name as account_name
+       FROM ${SCHEMA8}.loan_repayments lr
+       INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+       LEFT JOIN ${SCHEMA8}.accounts a ON a.id = t.account_id
+       WHERE lr.loan_id = $1
+       ORDER BY lr.repayment_date DESC`,
+      [loanId]
+    );
+    const txHistory = await db.query(
+      `SELECT t.id, t.transaction_type, t.transaction_date, t.amount, t.description,
+              a.name as account_name
+       FROM ${SCHEMA8}.transactions t
+       LEFT JOIN ${SCHEMA8}.accounts a ON a.id = t.account_id
+       WHERE t.loan_id = $1 AND t.deleted_at IS NULL
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
+      [loanId]
+    );
+    res.json({
+      success: true,
+      data: {
+        ...result.rows[0],
+        repayments: repayments.rows,
+        transactions: txHistory.rows
+      }
+    });
+  } catch (error) {
+    console.error("Get loan error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load loan" }
+    });
+  }
+});
+var createLoanSchema = external_exports.object({
+  person_id: external_exports.string().optional(),
+  direction: external_exports.enum(["BORROWED", "LENT"]),
+  principal_amount: external_exports.coerce.number().positive("Principal must be greater than zero"),
+  interest_amount: external_exports.coerce.number().min(0).default(0),
+  start_date: external_exports.string().min(1),
+  due_date: external_exports.string().optional().nullable(),
+  description: external_exports.string().optional(),
+  account_id: external_exports.string().optional(),
+  send_receipt: external_exports.boolean().optional().default(false)
+});
+router6.post("/", validateBody(createLoanSchema), async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const { person_id, direction, principal_amount, interest_amount, start_date, due_date, description, account_id, send_receipt } = req.body;
+    const id = generateId("loans");
+    await client.query("BEGIN");
+    const result = await client.query(
+      `INSERT INTO ${SCHEMA8}.loans (id, user_id, person_id, direction, principal_amount, interest_amount, start_date, due_date, description, source)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'MANUAL')
+       RETURNING *`,
+      [id, userId, person_id || null, direction, principal_amount, interest_amount, start_date, due_date || null, description || null]
+    );
+    let txId = null;
+    if (account_id) {
+      const txType = direction === "LENT" ? "LEND" : "BORROW";
+      txId = generateId("transactions");
+      await client.query(
+        `INSERT INTO ${SCHEMA8}.transactions
+         (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [txId, userId, txType, start_date, principal_amount, account_id, person_id || null, id, description || null]
+      );
+    }
+    await client.query("COMMIT");
+    res.status(201).json({
+      success: true,
+      data: { ...result.rows[0], total_repaid: 0, remaining_amount: principal_amount + interest_amount, transaction_id: txId }
+    });
+    if (send_receipt && person_id) {
+      (async () => {
+        try {
+          const personResult = await db.query(
+            `SELECT name, email FROM ${SCHEMA8}.people WHERE id = $1 AND user_id = $2`,
+            [person_id, userId]
+          );
+          const person = personResult.rows[0];
+          if (!person || !person.email) return;
+          const userResult = await db.query(
+            `SELECT full_name FROM ${SCHEMA8}.users WHERE id = $1`,
+            [userId]
+          );
+          const userName = userResult.rows[0]?.full_name || "User";
+          const txType = direction === "LENT" ? "LEND" : "BORROW";
+          await sendTransactionReceipt({
+            to: person.email,
+            senderName: userName,
+            recipientName: person.name,
+            transactionType: txType,
+            amount: principal_amount,
+            date: start_date,
+            description: description || null
+          });
+        } catch (err) {
+          console.error("Failed to send loan receipt:", err);
+        }
+      })();
+    }
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Create loan error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to create loan" }
+    });
+  } finally {
+    client.release();
+  }
+});
+var updateLoanSchema = external_exports.object({
+  due_date: external_exports.string().optional().nullable(),
+  status: external_exports.enum(["ACTIVE", "PAID", "OVERDUE", "CANCELLED"]).optional(),
+  description: external_exports.string().optional().nullable()
+});
+router6.patch("/:id", validateBody(updateLoanSchema), async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const updates = req.body;
+    if (updates.status) {
+      const loanResult = await db.query(
+        `SELECT l.*, COALESCE(lr.total_repaid, 0) AS total_repaid
+         FROM ${SCHEMA8}.loans l
+         LEFT JOIN (
+           SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+           FROM ${SCHEMA8}.loan_repayments lr2
+           INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+           GROUP BY lr2.loan_id
+         ) lr ON lr.loan_id = l.id
+         WHERE l.id = $1 AND l.user_id = $2`,
+        [loanId, userId]
+      );
+      if (loanResult.rows.length > 0) {
+        const loan = loanResult.rows[0];
+        const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+        const totalRepaid = parseFloat(loan.total_repaid || "0");
+        const remaining = totalDue - totalRepaid;
+        if (updates.status === "PAID" && remaining > 0) {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: "LOAN_HAS_OUTSTANDING_BALANCE",
+              message: `Cannot mark this loan as PAID. Outstanding balance is \u09F3${remaining.toLocaleString("en-BD", { minimumFractionDigits: 2 })}. Record the remaining repayment first.`
+            }
+          });
+          return;
+        }
+        if (updates.status === "ACTIVE" && loan.status === "PAID") {
+          res.status(400).json({
+            success: false,
+            error: {
+              code: "CANNOT_REOPEN_PAID_LOAN",
+              message: "Cannot reopen a fully paid loan. Create a new loan record instead."
+            }
+          });
+          return;
+        }
+      }
+    }
+    const ALLOWED_FIELDS = ["due_date", "status", "description"];
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
+    for (const [key, value] of Object.entries(updates)) {
+      if (!ALLOWED_FIELDS.includes(key)) continue;
+      fields.push(`${key} = $${paramIndex}`);
+      values.push(value);
+      paramIndex++;
+    }
+    if (fields.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "NO_UPDATES", message: "No fields to update" }
+      });
+      return;
+    }
+    fields.push(`updated_at = NOW()`);
+    values.push(loanId, userId);
+    const result = await db.query(
+      `UPDATE ${SCHEMA8}.loans
+       SET ${fields.join(", ")}
+       WHERE id = $${paramIndex} AND user_id = $${paramIndex + 1}
+       RETURNING *`,
+      values
+    );
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Loan not found" }
+      });
+      return;
+    }
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error("Update loan error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to update loan" }
+    });
+  }
+});
+router6.delete("/:id", async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const loanCheck = await client.query(
+      `SELECT id, direction, status FROM ${SCHEMA8}.loans WHERE id = $1 AND user_id = $2`,
+      [loanId, userId]
+    );
+    if (loanCheck.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Loan not found" }
+      });
+      return;
+    }
+    const repaymentCheck = await client.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA8}.loan_repayments WHERE loan_id = $1`,
+      [loanId]
+    );
+    if (parseInt(repaymentCheck.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: "LOAN_HAS_REPAYMENTS",
+          message: "Cannot delete a loan with existing repayments. Set its status to CANCELLED instead."
+        }
+      });
+      return;
+    }
+    const txCheck = await client.query(
+      `SELECT COUNT(*) as count FROM ${SCHEMA8}.transactions
+       WHERE loan_id = $1 AND deleted_at IS NULL`,
+      [loanId]
+    );
+    if (parseInt(txCheck.rows[0].count) > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: "LOAN_HAS_TRANSACTIONS",
+          message: "Cannot delete a loan with linked transactions. Set its status to CANCELLED instead."
+        }
+      });
+      return;
+    }
+    await client.query("BEGIN");
+    const repayTxs = await client.query(
+      `SELECT id FROM ${SCHEMA8}.transactions
+       WHERE loan_id = $1 AND transaction_type IN ('LEND_REPAYMENT', 'BORROW_REPAYMENT')
+         AND deleted_at IS NULL`,
+      [loanId]
+    );
+    for (const tx of repayTxs.rows) {
+      await client.query(
+        `UPDATE ${SCHEMA8}.transactions SET deleted_at = NOW(), updated_at = NOW() WHERE id = $1`,
+        [tx.id]
+      );
+    }
+    await client.query(
+      `DELETE FROM ${SCHEMA8}.loan_repayments WHERE loan_id = $1`,
+      [loanId]
+    );
+    await client.query(
+      `UPDATE ${SCHEMA8}.transactions
+       SET deleted_at = NOW(), updated_at = NOW()
+       WHERE loan_id = $1 AND transaction_type IN ('LEND', 'BORROW')
+         AND deleted_at IS NULL`,
+      [loanId]
+    );
+    await client.query(
+      `DELETE FROM ${SCHEMA8}.loans WHERE id = $1 AND user_id = $2`,
+      [loanId, userId]
+    );
+    await client.query("COMMIT");
+    res.json({ success: true, data: { id: loanId } });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Delete loan error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to delete loan" }
+    });
+  } finally {
+    client.release();
+  }
+});
+var createRepaymentSchema = external_exports.object({
+  amount: external_exports.coerce.number().positive("Amount must be greater than zero"),
+  repayment_date: external_exports.string().min(1),
+  account_id: external_exports.string(),
+  notes: external_exports.string().optional(),
+  send_receipt: external_exports.boolean().optional().default(false)
+});
+router6.post("/:id/repayments", validateBody(createRepaymentSchema), async (req, res) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const { amount, repayment_date, account_id, notes, send_receipt } = req.body;
+    const loanResult = await client.query(
+      `SELECT * FROM ${SCHEMA8}.loans WHERE id = $1 AND user_id = $2`,
+      [loanId, userId]
+    );
+    if (loanResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Loan not found" }
+      });
+      return;
+    }
+    const loan = loanResult.rows[0];
+    if (loan.status !== "ACTIVE" && loan.status !== "OVERDUE") {
+      res.status(400).json({
+        success: false,
+        error: { code: "LOAN_NOT_ACTIVE", message: `Cannot record repayment for a loan with status '${loan.status}'` }
+      });
+      return;
+    }
+    const accCheck = await client.query(
+      `SELECT id FROM ${SCHEMA8}.accounts WHERE id = $1 AND user_id = $2`,
+      [account_id, userId]
+    );
+    if (accCheck.rows.length === 0) {
+      res.status(400).json({
+        success: false,
+        error: { code: "INVALID_ACCOUNT", message: "Account not found" }
+      });
+      return;
+    }
+    const repaidResult = await client.query(
+      `SELECT COALESCE(SUM(lr.amount), 0) as total_repaid
+       FROM ${SCHEMA8}.loan_repayments lr
+       INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+       WHERE lr.loan_id = $1`,
+      [loanId]
+    );
+    const totalRepaid = parseFloat(repaidResult.rows[0].total_repaid);
+    const remaining = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount) - totalRepaid;
+    if (amount > remaining) {
+      res.status(400).json({
+        success: false,
+        error: {
+          code: "AMOUNT_EXCEEDS",
+          message: `Repayment amount (\u09F3${amount}) exceeds remaining balance (\u09F3${remaining})`
+        }
+      });
+      return;
+    }
+    await client.query("BEGIN");
+    const txType = loan.direction === "LENT" ? "LEND_REPAYMENT" : "BORROW_REPAYMENT";
+    const txId = generateId("transactions");
+    const txResult = await client.query(
+      `INSERT INTO ${SCHEMA8}.transactions
+       (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, loan_id, description)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING *`,
+      [txId, userId, txType, repayment_date, amount, account_id, loan.person_id, loanId, notes || null]
+    );
+    const tx = txResult.rows[0];
+    const lreId = generateId("loan_repayments");
+    await client.query(
+      `INSERT INTO ${SCHEMA8}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [lreId, loanId, tx.id, amount, repayment_date, notes || null]
+    );
+    const newTotalRepaid = totalRepaid + amount;
+    const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+    if (newTotalRepaid >= totalDue) {
+      await client.query(
+        `UPDATE ${SCHEMA8}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
+        [loanId]
+      );
+    }
+    await client.query("COMMIT");
+    res.status(201).json({ success: true, data: tx });
+    if (send_receipt && loan.person_id) {
+      (async () => {
+        try {
+          const personResult = await db.query(
+            `SELECT name, email FROM ${SCHEMA8}.people WHERE id = $1 AND user_id = $2`,
+            [loan.person_id, userId]
+          );
+          const person = personResult.rows[0];
+          if (!person || !person.email) return;
+          const userResult = await db.query(
+            `SELECT full_name FROM ${SCHEMA8}.users WHERE id = $1`,
+            [userId]
+          );
+          const userName = userResult.rows[0]?.full_name || "User";
+          const repayTxType = loan.direction === "LENT" ? "LEND_REPAYMENT" : "BORROW_REPAYMENT";
+          await sendTransactionReceipt({
+            to: person.email,
+            senderName: userName,
+            recipientName: person.name,
+            transactionType: repayTxType,
+            amount,
+            date: repayment_date,
+            description: notes || null
+          });
+        } catch (err) {
+          console.error("Failed to send repayment receipt:", err);
+        }
+      })();
+    }
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Create repayment error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to record repayment" }
+    });
+  } finally {
+    client.release();
+  }
+});
+router6.get("/:id/repayments", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const loanId = req.params.id;
+    const loanCheck = await db.query(
+      `SELECT id FROM ${SCHEMA8}.loans WHERE id = $1 AND user_id = $2`,
+      [loanId, userId]
+    );
+    if (loanCheck.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Loan not found" }
+      });
+      return;
+    }
+    const result = await db.query(
+      `SELECT lr.*, t.account_id, a.name as account_name
+       FROM ${SCHEMA8}.loan_repayments lr
+       INNER JOIN ${SCHEMA8}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+       LEFT JOIN ${SCHEMA8}.accounts a ON a.id = t.account_id
+       WHERE lr.loan_id = $1
+       ORDER BY lr.repayment_date DESC`,
+      [loanId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("List repayments error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load repayments" }
+    });
+  }
+});
+var loans_default = router6;
+
+// server/src/routes/dashboard.ts
+var import_express7 = __toESM(require_express2());
+var router7 = (0, import_express7.Router)();
+var SCHEMA9 = "finance_tracker";
+router7.use(requireAuth);
+router7.get("/summary", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const from = req.query.from;
+    const to = req.query.to;
+    const accountsResult = await db.query(
+      `SELECT account_id, account_name, account_type, currency, opening_balance, current_balance
+       FROM ${SCHEMA9}.v_account_balances
+       WHERE user_id = $1
+       ORDER BY account_type, account_name`,
+      [userId]
+    );
+    const accounts = accountsResult.rows;
+    const totalAccountBalance = accounts.reduce(
+      (sum, a) => sum + parseFloat(a.current_balance),
+      0
+    );
+    const peopleResult = await db.query(
+      `SELECT SUM(amount_they_owe_you) AS total_receivable,
+              SUM(amount_you_owe_them) AS total_payable
+       FROM ${SCHEMA9}.v_person_balances
+       WHERE user_id = $1`,
+      [userId]
+    );
+    const totalReceivable = parseFloat(peopleResult.rows[0]?.total_receivable || "0");
+    const totalPayable = parseFloat(peopleResult.rows[0]?.total_payable || "0");
+    let dateCondition = "";
+    const values = [userId];
+    let paramIndex = 2;
+    if (from) {
+      dateCondition += ` AND transaction_date >= $${paramIndex}`;
+      values.push(from);
+      paramIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND transaction_date <= $${paramIndex}`;
+      values.push(to);
+      paramIndex++;
+    }
+    const totalsResult = await db.query(
+      `SELECT
+         COALESCE(SUM(CASE WHEN transaction_type = 'INCOME' THEN amount ELSE 0 END), 0) AS total_income,
+         COALESCE(SUM(CASE WHEN transaction_type = 'EXPENSE' THEN amount ELSE 0 END), 0) AS total_expense
+       FROM ${SCHEMA9}.transactions
+       WHERE user_id = $1 AND deleted_at IS NULL ${dateCondition}`,
+      values
+    );
+    const totalIncome = parseFloat(totalsResult.rows[0].total_income);
+    const totalExpense = parseFloat(totalsResult.rows[0].total_expense);
+    const netPosition = totalAccountBalance + totalReceivable - totalPayable;
+    res.json({
+      success: true,
+      data: {
+        accounts,
+        totalAccountBalance,
+        totalReceivable,
+        totalPayable,
+        totalIncome,
+        totalExpense,
+        netPosition
+      }
+    });
+  } catch (error) {
+    console.error("Dashboard summary error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load dashboard summary" }
+    });
+  }
+});
+router7.get("/recent-transactions", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT t.*,
               a.name as account_name,
               p.name as person_name,
               c.name as category_name
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+       FROM ${SCHEMA9}.transactions t
+       LEFT JOIN ${SCHEMA9}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA9}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA9}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1 AND t.deleted_at IS NULL
        ORDER BY t.transaction_date DESC, t.created_at DESC
-       LIMIT 10`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("Recent transactions error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load recent transactions" }
-        });
-      }
+       LIMIT 10`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("Recent transactions error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load recent transactions" }
     });
-    router.get("/people-summary", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT person_id, person_name, amount_they_owe_you, amount_you_owe_them
-       FROM ${SCHEMA}.v_person_balances
+  }
+});
+router7.get("/people-summary", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT person_id, person_name, amount_they_owe_you, amount_you_owe_them
+       FROM ${SCHEMA9}.v_person_balances
        WHERE user_id = $1
        ORDER BY GREATEST(amount_they_owe_you, amount_you_owe_them) DESC
-       LIMIT 10`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("People summary error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load people summary" }
-        });
-      }
+       LIMIT 10`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("People summary error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load people summary" }
     });
-    router.get("/loan-summary", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT l.id, l.direction, l.principal_amount, l.interest_amount,
+  }
+});
+router7.get("/loan-summary", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT l.id, l.direction, l.principal_amount, l.interest_amount,
               l.start_date, l.due_date, l.status, l.description,
               p.name as person_name,
               COALESCE(lr.total_repaid, 0) AS total_repaid,
               (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
-       FROM ${SCHEMA}.loans l
-       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
+       FROM ${SCHEMA9}.loans l
+       LEFT JOIN ${SCHEMA9}.people p ON p.id = l.person_id
        LEFT JOIN (
          SELECT lr.loan_id, SUM(lr.amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments lr
-         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+         FROM ${SCHEMA9}.loan_repayments lr
+         INNER JOIN ${SCHEMA9}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
          GROUP BY lr.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1 AND l.status = 'ACTIVE'
-       ORDER BY l.due_date ASC NULLS LAST, l.start_date DESC`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("Loan summary error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load loan summary" }
-        });
-      }
+       ORDER BY l.due_date ASC NULLS LAST, l.start_date DESC`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("Loan summary error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load loan summary" }
     });
-    router.get("/monthly-chart", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT
+  }
+});
+router7.get("/monthly-chart", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT
          TO_CHAR(transaction_date, 'YYYY-MM') AS month,
          COALESCE(SUM(CASE WHEN transaction_type = 'INCOME' THEN amount ELSE 0 END), 0) AS income,
          COALESCE(SUM(CASE WHEN transaction_type = 'EXPENSE' THEN amount ELSE 0 END), 0) AS expense
-       FROM ${SCHEMA}.transactions
+       FROM ${SCHEMA9}.transactions
        WHERE user_id = $1
          AND deleted_at IS NULL
          AND transaction_date >= CURRENT_DATE - INTERVAL '12 months'
          AND transaction_type IN ('INCOME', 'EXPENSE')
        GROUP BY TO_CHAR(transaction_date, 'YYYY-MM')
-       ORDER BY month ASC`, [userId]);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("Monthly chart error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load chart data" }
-        });
-      }
+       ORDER BY month ASC`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("Monthly chart error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load chart data" }
     });
-    router.get("/expense-by-category", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const from = req.query.from;
-        const to = req.query.to;
-        let dateCondition = "";
-        const values = [userId];
-        let paramIndex = 2;
-        if (from) {
-          dateCondition += ` AND t.transaction_date >= $${paramIndex}`;
-          values.push(from);
-          paramIndex++;
-        }
-        if (to) {
-          dateCondition += ` AND t.transaction_date <= $${paramIndex}`;
-          values.push(to);
-          paramIndex++;
-        }
-        const result = await connection_1.db.query(`SELECT COALESCE(c.name, 'Uncategorized') AS category_name,
+  }
+});
+router7.get("/expense-by-category", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const from = req.query.from;
+    const to = req.query.to;
+    let dateCondition = "";
+    const values = [userId];
+    let paramIndex = 2;
+    if (from) {
+      dateCondition += ` AND t.transaction_date >= $${paramIndex}`;
+      values.push(from);
+      paramIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND t.transaction_date <= $${paramIndex}`;
+      values.push(to);
+      paramIndex++;
+    }
+    const result = await db.query(
+      `SELECT COALESCE(c.name, 'Uncategorized') AS category_name,
               COALESCE(c.color, '#6366f1') AS color,
               COALESCE(SUM(t.amount), 0)::float AS total
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+       FROM ${SCHEMA9}.transactions t
+       LEFT JOIN ${SCHEMA9}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1
          AND t.deleted_at IS NULL
          AND t.transaction_type = 'EXPENSE'
          ${dateCondition}
        GROUP BY COALESCE(c.name, 'Uncategorized'), c.color
-       ORDER BY total DESC`, values);
-        res.json({ success: true, data: result.rows });
-      } catch (error) {
-        console.error("Expense by category error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to load expense breakdown" }
-        });
-      }
+       ORDER BY total DESC`,
+      values
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error("Expense by category error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to load expense breakdown" }
     });
-    exports2.default = router;
   }
 });
+var dashboard_default = router7;
 
-// server/dist/routes/reports.js
-var require_reports = __commonJS({
-  "server/dist/routes/reports.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    var express_12 = require_express2();
-    var connection_1 = require_connection();
-    var auth_12 = require_auth();
-    var router = (0, express_12.Router)();
-    var SCHEMA = "finance_tracker";
-    router.use(auth_12.requireAuth);
-    router.get("/income", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const from = req.query.from;
-        const to = req.query.to;
-        let dateCondition = "";
-        const values = [userId];
-        let paramIndex = 2;
-        if (from) {
-          dateCondition += ` AND t.transaction_date >= $${paramIndex}`;
-          values.push(from);
-          paramIndex++;
-        }
-        if (to) {
-          dateCondition += ` AND t.transaction_date <= $${paramIndex}`;
-          values.push(to);
-          paramIndex++;
-        }
-        const byCategory = await connection_1.db.query(`SELECT c.name AS category_name, SUM(t.amount) AS total
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+// server/src/routes/reports.ts
+var import_express8 = __toESM(require_express2());
+var router8 = (0, import_express8.Router)();
+var SCHEMA10 = "finance_tracker";
+router8.use(requireAuth);
+router8.get("/income", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const from = req.query.from;
+    const to = req.query.to;
+    let dateCondition = "";
+    const values = [userId];
+    let paramIndex = 2;
+    if (from) {
+      dateCondition += ` AND t.transaction_date >= $${paramIndex}`;
+      values.push(from);
+      paramIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND t.transaction_date <= $${paramIndex}`;
+      values.push(to);
+      paramIndex++;
+    }
+    const byCategory = await db.query(
+      `SELECT c.name AS category_name, SUM(t.amount) AS total
+       FROM ${SCHEMA10}.transactions t
+       LEFT JOIN ${SCHEMA10}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1 AND t.transaction_type = 'INCOME' AND t.deleted_at IS NULL ${dateCondition}
-       GROUP BY c.name ORDER BY total DESC`, values);
-        const byMonth = await connection_1.db.query(`SELECT TO_CHAR(t.transaction_date, 'YYYY-MM') AS month, SUM(t.amount) AS total
-       FROM ${SCHEMA}.transactions t
+       GROUP BY c.name ORDER BY total DESC`,
+      values
+    );
+    const byMonth = await db.query(
+      `SELECT TO_CHAR(t.transaction_date, 'YYYY-MM') AS month, SUM(t.amount) AS total
+       FROM ${SCHEMA10}.transactions t
        WHERE t.user_id = $1 AND t.transaction_type = 'INCOME' AND t.deleted_at IS NULL ${dateCondition}
-       GROUP BY month ORDER BY month ASC`, values);
-        const totalResult = await connection_1.db.query(`SELECT COALESCE(SUM(t.amount), 0) AS total
-       FROM ${SCHEMA}.transactions t
-       WHERE t.user_id = $1 AND t.transaction_type = 'INCOME' AND t.deleted_at IS NULL ${dateCondition}`, values);
-        res.json({
-          success: true,
-          data: {
-            total: parseFloat(totalResult.rows[0].total),
-            byCategory: byCategory.rows,
-            byMonth: byMonth.rows
-          }
-        });
-      } catch (error) {
-        console.error("Income report error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to generate income report" }
-        });
+       GROUP BY month ORDER BY month ASC`,
+      values
+    );
+    const totalResult = await db.query(
+      `SELECT COALESCE(SUM(t.amount), 0) AS total
+       FROM ${SCHEMA10}.transactions t
+       WHERE t.user_id = $1 AND t.transaction_type = 'INCOME' AND t.deleted_at IS NULL ${dateCondition}`,
+      values
+    );
+    const countResult = await db.query(
+      `SELECT COUNT(*)::int AS count
+       FROM ${SCHEMA10}.transactions t
+       WHERE t.user_id = $1 AND t.transaction_type = 'INCOME' AND t.deleted_at IS NULL ${dateCondition}`,
+      values
+    );
+    res.json({
+      success: true,
+      data: {
+        total: parseFloat(totalResult.rows[0].total),
+        count: countResult.rows[0].count,
+        byCategory: byCategory.rows,
+        byMonth: byMonth.rows
       }
     });
-    router.get("/expense", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const from = req.query.from;
-        const to = req.query.to;
-        let dateCondition = "";
-        const values = [userId];
-        let paramIndex = 2;
-        if (from) {
-          dateCondition += ` AND t.transaction_date >= $${paramIndex}`;
-          values.push(from);
-          paramIndex++;
-        }
-        if (to) {
-          dateCondition += ` AND t.transaction_date <= $${paramIndex}`;
-          values.push(to);
-          paramIndex++;
-        }
-        const byCategory = await connection_1.db.query(`SELECT c.name AS category_name, c.color, SUM(t.amount) AS total
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+  } catch (error) {
+    console.error("Income report error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to generate income report" }
+    });
+  }
+});
+router8.get("/expense", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const from = req.query.from;
+    const to = req.query.to;
+    let dateCondition = "";
+    const values = [userId];
+    let paramIndex = 2;
+    if (from) {
+      dateCondition += ` AND t.transaction_date >= $${paramIndex}`;
+      values.push(from);
+      paramIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND t.transaction_date <= $${paramIndex}`;
+      values.push(to);
+      paramIndex++;
+    }
+    const byCategory = await db.query(
+      `SELECT c.name AS category_name, c.color, SUM(t.amount) AS total
+       FROM ${SCHEMA10}.transactions t
+       LEFT JOIN ${SCHEMA10}.categories c ON c.id = t.category_id
        WHERE t.user_id = $1 AND t.transaction_type = 'EXPENSE' AND t.deleted_at IS NULL ${dateCondition}
-       GROUP BY c.name, c.color ORDER BY total DESC`, values);
-        const byAccount = await connection_1.db.query(`SELECT a.name AS account_name, SUM(t.amount) AS total
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
+       GROUP BY c.name, c.color ORDER BY total DESC`,
+      values
+    );
+    const byAccount = await db.query(
+      `SELECT a.name AS account_name, SUM(t.amount) AS total
+       FROM ${SCHEMA10}.transactions t
+       LEFT JOIN ${SCHEMA10}.accounts a ON a.id = t.account_id
        WHERE t.user_id = $1 AND t.transaction_type = 'EXPENSE' AND t.deleted_at IS NULL ${dateCondition}
-       GROUP BY a.name ORDER BY total DESC`, values);
-        const byMonth = await connection_1.db.query(`SELECT TO_CHAR(t.transaction_date, 'YYYY-MM') AS month, SUM(t.amount) AS total
-       FROM ${SCHEMA}.transactions t
+       GROUP BY a.name ORDER BY total DESC`,
+      values
+    );
+    const byMonth = await db.query(
+      `SELECT TO_CHAR(t.transaction_date, 'YYYY-MM') AS month, SUM(t.amount) AS total
+       FROM ${SCHEMA10}.transactions t
        WHERE t.user_id = $1 AND t.transaction_type = 'EXPENSE' AND t.deleted_at IS NULL ${dateCondition}
-       GROUP BY month ORDER BY month ASC`, values);
-        const totalResult = await connection_1.db.query(`SELECT COALESCE(SUM(t.amount), 0) AS total
-       FROM ${SCHEMA}.transactions t
-       WHERE t.user_id = $1 AND t.transaction_type = 'EXPENSE' AND t.deleted_at IS NULL ${dateCondition}`, values);
-        res.json({
-          success: true,
-          data: {
-            total: parseFloat(totalResult.rows[0].total),
-            byCategory: byCategory.rows,
-            byAccount: byAccount.rows,
-            byMonth: byMonth.rows
-          }
-        });
-      } catch (error) {
-        console.error("Expense report error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to generate expense report" }
-        });
+       GROUP BY month ORDER BY month ASC`,
+      values
+    );
+    const totalResult = await db.query(
+      `SELECT COALESCE(SUM(t.amount), 0) AS total
+       FROM ${SCHEMA10}.transactions t
+       WHERE t.user_id = $1 AND t.transaction_type = 'EXPENSE' AND t.deleted_at IS NULL ${dateCondition}`,
+      values
+    );
+    const countResult = await db.query(
+      `SELECT COUNT(*)::int AS count
+       FROM ${SCHEMA10}.transactions t
+       WHERE t.user_id = $1 AND t.transaction_type = 'EXPENSE' AND t.deleted_at IS NULL ${dateCondition}`,
+      values
+    );
+    res.json({
+      success: true,
+      data: {
+        total: parseFloat(totalResult.rows[0].total),
+        count: countResult.rows[0].count,
+        byCategory: byCategory.rows,
+        byAccount: byAccount.rows,
+        byMonth: byMonth.rows
       }
     });
-    router.get("/account-statement", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const accountId = req.query.account_id;
-        if (!accountId) {
-          res.status(400).json({
-            success: false,
-            error: { code: "VALIDATION_ERROR", message: "account_id is required" }
-          });
-          return;
-        }
-        const accResult = await connection_1.db.query(`SELECT * FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2`, [accountId, userId]);
-        if (accResult.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Account not found" }
-          });
-          return;
-        }
-        const account = accResult.rows[0];
-        const txResult = await connection_1.db.query(`SELECT t.*, p.name as person_name, c.name as category_name,
+  } catch (error) {
+    console.error("Expense report error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to generate expense report" }
+    });
+  }
+});
+router8.get("/account-statement", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const accountId = req.query.account_id;
+    if (!accountId) {
+      res.status(400).json({
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: "account_id is required" }
+      });
+      return;
+    }
+    const accResult = await db.query(
+      `SELECT * FROM ${SCHEMA10}.accounts WHERE id = $1 AND user_id = $2`,
+      [accountId, userId]
+    );
+    if (accResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Account not found" }
+      });
+      return;
+    }
+    const account = accResult.rows[0];
+    const from = req.query.from;
+    const to = req.query.to;
+    let dateCondition = "";
+    const txValues = [userId, accountId];
+    let txParamIndex = 3;
+    if (from) {
+      dateCondition += ` AND t.transaction_date >= $${txParamIndex}`;
+      txValues.push(from);
+      txParamIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND t.transaction_date <= $${txParamIndex}`;
+      txValues.push(to);
+      txParamIndex++;
+    }
+    let openingBalance = parseFloat(account.opening_balance || "0") || 0;
+    if (from) {
+      const priorResult = await db.query(
+        `SELECT
+            COALESCE(SUM(
               CASE
-                WHEN t.transaction_type = 'INCOME' THEN t.amount
-                WHEN t.transaction_type = 'EXPENSE' THEN -t.amount
-                WHEN t.transaction_type = 'LEND' THEN -t.amount
-                WHEN t.transaction_type = 'LEND_REPAYMENT' THEN t.amount
-                WHEN t.transaction_type = 'BORROW' THEN t.amount
-                WHEN t.transaction_type = 'BORROW_REPAYMENT' THEN -t.amount
-                WHEN t.transaction_type = 'TRANSFER' THEN
-                  CASE
-                    WHEN tt.from_account_id = $2 THEN -t.amount
-                    WHEN tt.to_account_id = $2 THEN t.amount
-                    ELSE 0
-                  END
+                WHEN t.transaction_type = 'INCOME'
+                  OR t.transaction_type = 'BORROW'
+                  OR t.transaction_type = 'LEND_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.to_account_id = $2)
+                  THEN t.amount
                 ELSE 0
-              END AS effect
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
-       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
-       LEFT JOIN ${SCHEMA}.transaction_transfers tt ON tt.transaction_id = t.id
+              END
+            ), 0) AS total_debit,
+            COALESCE(SUM(
+              CASE
+                WHEN t.transaction_type = 'EXPENSE'
+                  OR t.transaction_type = 'LEND'
+                  OR t.transaction_type = 'BORROW_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.from_account_id = $2)
+                  THEN t.amount
+                ELSE 0
+              END
+            ), 0) AS total_credit
+         FROM ${SCHEMA10}.transactions t
+         LEFT JOIN ${SCHEMA10}.transaction_transfers tt ON tt.transaction_id = t.id
+         WHERE t.user_id = $1
+           AND (t.account_id = $2
+                OR tt.from_account_id = $2
+                OR tt.to_account_id = $2)
+           AND t.deleted_at IS NULL
+           AND t.transaction_date < $3`,
+        [userId, accountId, from]
+      );
+      const prior = priorResult.rows[0];
+      openingBalance += (parseFloat(prior.total_debit) || 0) - (parseFloat(prior.total_credit) || 0);
+    }
+    const txResult = await db.query(
+      `SELECT t.*, p.name as person_name, c.name as category_name,
+              CASE
+                WHEN t.transaction_type = 'INCOME'
+                  OR t.transaction_type = 'BORROW'
+                  OR t.transaction_type = 'LEND_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.to_account_id = $2)
+                  THEN t.amount
+                ELSE 0
+              END AS debit,
+              CASE
+                WHEN t.transaction_type = 'EXPENSE'
+                  OR t.transaction_type = 'LEND'
+                  OR t.transaction_type = 'BORROW_REPAYMENT'
+                  OR (t.transaction_type = 'TRANSFER' AND tt.from_account_id = $2)
+                  THEN t.amount
+                ELSE 0
+              END AS credit
+       FROM ${SCHEMA10}.transactions t
+       LEFT JOIN ${SCHEMA10}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA10}.categories c ON c.id = t.category_id
+       LEFT JOIN ${SCHEMA10}.transaction_transfers tt ON tt.transaction_id = t.id
        WHERE t.user_id = $1
          AND (t.account_id = $2
               OR tt.from_account_id = $2
               OR tt.to_account_id = $2)
-         AND t.deleted_at IS NULL
-       ORDER BY t.transaction_date ASC, t.created_at ASC`, [userId, accountId]);
-        let runningBalance = parseFloat(account.opening_balance);
-        const transactions = txResult.rows.map((tx) => {
-          runningBalance += parseFloat(tx.effect);
-          return { ...tx, running_balance: runningBalance };
-        });
-        res.json({
-          success: true,
-          data: {
-            account,
-            openingBalance: parseFloat(account.opening_balance),
-            closingBalance: runningBalance,
-            transactions
-          }
-        });
-      } catch (error) {
-        console.error("Account statement error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to generate account statement" }
-        });
+         AND t.deleted_at IS NULL ${dateCondition}
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
+      txValues
+    );
+    let runningBalance = openingBalance;
+    const transactions = txResult.rows.map((tx) => {
+      runningBalance += (parseFloat(tx.debit) || 0) - (parseFloat(tx.credit) || 0);
+      return {
+        ...tx,
+        balance: runningBalance,
+        running_balance: runningBalance
+      };
+    });
+    res.json({
+      success: true,
+      data: {
+        account,
+        openingBalance,
+        closingBalance: runningBalance,
+        transactions
       }
     });
-    router.get("/person-statement", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const personId = req.query.person_id;
-        if (!personId) {
-          res.status(400).json({
-            success: false,
-            error: { code: "VALIDATION_ERROR", message: "person_id is required" }
-          });
-          return;
-        }
-        const pResult = await connection_1.db.query(`SELECT * FROM ${SCHEMA}.people WHERE id = $1 AND user_id = $2`, [personId, userId]);
-        if (pResult.rows.length === 0) {
-          res.status(404).json({
-            success: false,
-            error: { code: "NOT_FOUND", message: "Person not found" }
-          });
-          return;
-        }
-        const person = pResult.rows[0];
-        const txResult = await connection_1.db.query(`SELECT t.*, a.name as account_name
-       FROM ${SCHEMA}.transactions t
-       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
-       WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
-       ORDER BY t.transaction_date ASC, t.created_at ASC`, [userId, personId]);
-        const balanceResult = await connection_1.db.query(`SELECT * FROM ${SCHEMA}.v_person_balances
-       WHERE user_id = $1 AND person_id = $2`, [userId, personId]);
-        const balance = balanceResult.rows[0] || {
-          amount_they_owe_you: 0,
-          amount_you_owe_them: 0,
-          total_lent: 0,
-          total_lent_repaid: 0,
-          total_borrowed: 0,
-          total_borrow_repaid: 0
-        };
-        const loansResult = await connection_1.db.query(`SELECT l.*,
+  } catch (error) {
+    console.error("Account statement error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to generate account statement" }
+    });
+  }
+});
+router8.get("/person-statement", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.query.person_id;
+    if (!personId) {
+      res.status(400).json({
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: "person_id is required" }
+      });
+      return;
+    }
+    const pResult = await db.query(
+      `SELECT * FROM ${SCHEMA10}.people WHERE id = $1 AND user_id = $2`,
+      [personId, userId]
+    );
+    if (pResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: "NOT_FOUND", message: "Person not found" }
+      });
+      return;
+    }
+    const person = pResult.rows[0];
+    const from = req.query.from;
+    const to = req.query.to;
+    let dateCondition = "";
+    const txValues = [userId, personId];
+    let txParamIndex = 3;
+    if (from) {
+      dateCondition += ` AND t.transaction_date >= $${txParamIndex}`;
+      txValues.push(from);
+      txParamIndex++;
+    }
+    if (to) {
+      dateCondition += ` AND t.transaction_date <= $${txParamIndex}`;
+      txValues.push(to);
+      txParamIndex++;
+    }
+    const txResult = await db.query(
+      `SELECT t.*, a.name as account_name,
+              CASE
+                WHEN t.transaction_type IN ('LEND', 'BORROW_REPAYMENT') THEN t.amount
+                ELSE 0
+              END AS debit,
+              CASE
+                WHEN t.transaction_type IN ('BORROW', 'LEND_REPAYMENT') THEN t.amount
+                ELSE 0
+              END AS credit
+       FROM ${SCHEMA10}.transactions t
+       LEFT JOIN ${SCHEMA10}.accounts a ON a.id = t.account_id
+       WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL ${dateCondition}
+       ORDER BY t.transaction_date ASC, t.created_at ASC`,
+      txValues
+    );
+    let openingBalance = 0;
+    if (from) {
+      const priorResult = await db.query(
+        `SELECT
+            COALESCE(SUM(CASE WHEN t.transaction_type IN ('LEND', 'BORROW_REPAYMENT') THEN t.amount ELSE 0 END), 0) AS total_debit,
+            COALESCE(SUM(CASE WHEN t.transaction_type IN ('BORROW', 'LEND_REPAYMENT') THEN t.amount ELSE 0 END), 0) AS total_credit
+         FROM ${SCHEMA10}.transactions t
+         WHERE t.user_id = $1 AND t.person_id = $2 AND t.deleted_at IS NULL
+           AND t.transaction_date < $3`,
+        [userId, personId, from]
+      );
+      const prior = priorResult.rows[0];
+      openingBalance = parseFloat(prior.total_debit) - parseFloat(prior.total_credit);
+    }
+    let runningBalance = openingBalance;
+    const transactions = txResult.rows.map((tx) => {
+      runningBalance += (parseFloat(tx.debit) || 0) - (parseFloat(tx.credit) || 0);
+      return {
+        ...tx,
+        balance: runningBalance,
+        running_balance: runningBalance
+      };
+    });
+    const balanceResult = await db.query(
+      `SELECT * FROM ${SCHEMA10}.v_person_balances
+       WHERE user_id = $1 AND person_id = $2`,
+      [userId, personId]
+    );
+    const balance = balanceResult.rows[0] || {
+      amount_they_owe_you: 0,
+      amount_you_owe_them: 0,
+      total_lent: 0,
+      total_lent_repaid: 0,
+      total_borrowed: 0,
+      total_borrow_repaid: 0
+    };
+    const loansResult = await db.query(
+      `SELECT l.*,
               COALESCE(lr.total_repaid, 0) AS total_repaid,
               (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
-       FROM ${SCHEMA}.loans l
+       FROM ${SCHEMA10}.loans l
        LEFT JOIN (
          SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments lr2
-         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+         FROM ${SCHEMA10}.loan_repayments lr2
+         INNER JOIN ${SCHEMA10}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
          GROUP BY lr2.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1 AND l.person_id = $2
-       ORDER BY l.start_date DESC`, [userId, personId]);
-        res.json({
-          success: true,
-          data: {
-            person,
-            balance,
-            transactions: txResult.rows,
-            loans: loansResult.rows
-          }
-        });
-      } catch (error) {
-        console.error("Person statement error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to generate person statement" }
-        });
+       ORDER BY l.start_date DESC`,
+      [userId, personId]
+    );
+    res.json({
+      success: true,
+      data: {
+        person,
+        balance,
+        openingBalance,
+        transactions,
+        loans: loansResult.rows
       }
     });
-    router.get("/loan", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const result = await connection_1.db.query(`SELECT l.*,
+  } catch (error) {
+    console.error("Person statement error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to generate person statement" }
+    });
+  }
+});
+router8.get("/loan", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT l.*,
               p.name as person_name,
               COALESCE(lr.total_repaid, 0) AS total_repaid,
               (l.principal_amount + l.interest_amount - COALESCE(lr.total_repaid, 0)) AS remaining_amount
-       FROM ${SCHEMA}.loans l
-       LEFT JOIN ${SCHEMA}.people p ON p.id = l.person_id
+       FROM ${SCHEMA10}.loans l
+       LEFT JOIN ${SCHEMA10}.people p ON p.id = l.person_id
        LEFT JOIN (
          SELECT lr.loan_id, SUM(lr.amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments lr
-         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+         FROM ${SCHEMA10}.loan_repayments lr
+         INNER JOIN ${SCHEMA10}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
          GROUP BY lr.loan_id
        ) lr ON lr.loan_id = l.id
        WHERE l.user_id = $1
-       ORDER BY l.start_date DESC`, [userId]);
-        const summary = await connection_1.db.query(`SELECT
+       ORDER BY l.start_date DESC`,
+      [userId]
+    );
+    const summary = await db.query(
+      `SELECT
          COUNT(*) FILTER (WHERE status = 'ACTIVE') AS active_count,
          SUM(principal_amount + interest_amount) FILTER (WHERE status = 'ACTIVE') AS total_active_principal,
          SUM(COALESCE(lr.total_repaid, 0)) FILTER (WHERE status = 'ACTIVE') AS total_active_repaid,
          COUNT(*) FILTER (WHERE status = 'OVERDUE') AS overdue_count
-       FROM ${SCHEMA}.loans l
+       FROM ${SCHEMA10}.loans l
        LEFT JOIN (
          SELECT lr.loan_id, SUM(lr.amount) as total_repaid
-         FROM ${SCHEMA}.loan_repayments lr
-         INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+         FROM ${SCHEMA10}.loan_repayments lr
+         INNER JOIN ${SCHEMA10}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
          GROUP BY lr.loan_id
        ) lr ON lr.loan_id = l.id
-       WHERE l.user_id = $1`, [userId]);
-        res.json({
-          success: true,
-          data: {
-            loans: result.rows,
-            summary: summary.rows[0]
-          }
-        });
-      } catch (error) {
-        console.error("Loan report error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to generate loan report" }
-        });
+       WHERE l.user_id = $1`,
+      [userId]
+    );
+    res.json({
+      success: true,
+      data: {
+        loans: result.rows,
+        summary: summary.rows[0]
       }
     });
-    router.get("/financial-position", async (req, res) => {
-      try {
-        const userId = (0, auth_12.getUserId)(req);
-        const accounts = await connection_1.db.query(`SELECT SUM(current_balance) AS total FROM ${SCHEMA}.v_account_balances WHERE user_id = $1`, [userId]);
-        const people = await connection_1.db.query(`SELECT SUM(amount_they_owe_you) AS total_receivable, SUM(amount_you_owe_them) AS total_payable
-       FROM ${SCHEMA}.v_person_balances WHERE user_id = $1`, [userId]);
-        const loans = await connection_1.db.query(`SELECT
-         SUM(CASE WHEN direction = 'BORROWED' AND status = 'ACTIVE' THEN principal_amount + interest_amount ELSE 0 END) AS total_borrowed,
-         SUM(CASE WHEN direction = 'LENT' AND status = 'ACTIVE' THEN principal_amount + interest_amount ELSE 0 END) AS total_lent
-       FROM ${SCHEMA}.loans
-       WHERE user_id = $1`, [userId]);
-        const totalCash = parseFloat(accounts.rows[0]?.total || "0");
-        const totalReceivable = parseFloat(people.rows[0]?.total_receivable || "0");
-        const totalPayable = parseFloat(people.rows[0]?.total_payable || "0");
-        const totalBorrowed = parseFloat(loans.rows[0]?.total_borrowed || "0");
-        const totalLent = parseFloat(loans.rows[0]?.total_lent || "0");
-        const netPosition = totalCash + totalReceivable - totalPayable;
-        res.json({
-          success: true,
-          data: {
-            totalCash,
-            totalReceivable,
-            totalPayable,
-            netPosition,
-            loanSummary: {
-              totalBorrowed,
-              totalLent
-            }
-          }
-        });
-      } catch (error) {
-        console.error("Financial position error:", error);
-        res.status(500).json({
-          success: false,
-          error: { code: "SERVER_ERROR", message: "Failed to calculate financial position" }
-        });
-      }
+  } catch (error) {
+    console.error("Loan report error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to generate loan report" }
     });
-    exports2.default = router;
   }
 });
+router8.get("/financial-position", async (req, res) => {
+  try {
+    const userId = getUserId(req);
+    const accounts = await db.query(
+      `SELECT SUM(current_balance) AS total FROM ${SCHEMA10}.v_account_balances WHERE user_id = $1`,
+      [userId]
+    );
+    const people = await db.query(
+      `SELECT SUM(amount_they_owe_you) AS total_receivable, SUM(amount_you_owe_them) AS total_payable
+       FROM ${SCHEMA10}.v_person_balances WHERE user_id = $1`,
+      [userId]
+    );
+    const loans = await db.query(
+      `SELECT
+         SUM(CASE WHEN direction = 'BORROWED' AND status = 'ACTIVE' THEN principal_amount + interest_amount ELSE 0 END) AS total_borrowed,
+         SUM(CASE WHEN direction = 'LENT' AND status = 'ACTIVE' THEN principal_amount + interest_amount ELSE 0 END) AS total_lent
+       FROM ${SCHEMA10}.loans
+       WHERE user_id = $1`,
+      [userId]
+    );
+    const totalCash = parseFloat(accounts.rows[0]?.total || "0");
+    const totalReceivable = parseFloat(people.rows[0]?.total_receivable || "0");
+    const totalPayable = parseFloat(people.rows[0]?.total_payable || "0");
+    const totalBorrowed = parseFloat(loans.rows[0]?.total_borrowed || "0");
+    const totalLent = parseFloat(loans.rows[0]?.total_lent || "0");
+    const netPosition = totalCash + totalReceivable - totalPayable;
+    res.json({
+      success: true,
+      data: {
+        totalCash,
+        totalReceivable,
+        totalPayable,
+        netPosition,
+        loanSummary: {
+          totalBorrowed,
+          totalLent
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Financial position error:", error);
+    res.status(500).json({
+      success: false,
+      error: { code: "SERVER_ERROR", message: "Failed to calculate financial position" }
+    });
+  }
+});
+var reports_default = router8;
 
-// server/dist/app.js
-var __importDefault = exports && exports.__importDefault || function(mod) {
-  return mod && mod.__esModule ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require_express2());
-var cookie_parser_1 = __importDefault(require_cookie_parser());
-var compression_1 = __importDefault(require_compression());
-var helmet_1 = __importDefault(require_helmet());
-var cors_1 = __importDefault(require_lib3());
-var path_1 = __importDefault(require("path"));
-var dotenv_1 = __importDefault(require_main());
-dotenv_1.default.config();
-var rateLimit_1 = require_rateLimit();
-var auth_1 = __importDefault(require_auth2());
-var accounts_1 = __importDefault(require_accounts());
-var people_1 = __importDefault(require_people());
-var categories_1 = __importDefault(require_categories());
-var transactions_1 = __importDefault(require_transactions());
-var loans_1 = __importDefault(require_loans());
-var dashboard_1 = __importDefault(require_dashboard());
-var reports_1 = __importDefault(require_reports());
-var app = (0, express_1.default)();
+// server/src/app.ts
+import_dotenv3.default.config();
+var app = (0, import_express9.default)();
 var PORT = parseInt(process.env.PORT || "3001", 10);
 var isProduction = process.env.NODE_ENV === "production";
-app.use((0, helmet_1.default)({
+app.use(helmet({
   contentSecurityPolicy: isProduction ? void 0 : false
 }));
-app.use((0, compression_1.default)());
+app.use((0, import_compression.default)());
 var allowedOrigins = [
   process.env.CORS_ORIGIN,
   process.env.FRONTEND_URL,
   "http://localhost:5173",
   "http://localhost:3001"
 ].filter(Boolean);
-app.use((0, cors_1.default)({
+app.use((0, import_cors.default)({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -54477,23 +54612,32 @@ app.use((0, cors_1.default)({
   },
   credentials: true
 }));
-app.use(express_1.default.json({ limit: "1mb" }));
-app.use(express_1.default.urlencoded({ extended: true }));
-app.use((0, cookie_parser_1.default)());
-app.use("/api/auth", auth_1.default);
-app.use("/api/accounts", rateLimit_1.apiLimiter, accounts_1.default);
-app.use("/api/people", rateLimit_1.apiLimiter, people_1.default);
-app.use("/api/categories", rateLimit_1.apiLimiter, categories_1.default);
-app.use("/api/transactions", rateLimit_1.apiLimiter, transactions_1.default);
-app.use("/api/loans", rateLimit_1.apiLimiter, loans_1.default);
-app.use("/api/dashboard", rateLimit_1.apiLimiter, dashboard_1.default);
-app.use("/api/reports", rateLimit_1.apiLimiter, reports_1.default);
+app.use(import_express9.default.json({ limit: "1mb" }));
+app.use(import_express9.default.urlencoded({ extended: true }));
+app.use((0, import_cookie_parser.default)());
+app.use("/api", (_req, res, next) => {
+  res.set({
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+    "Pragma": "no-cache",
+    "Expires": "0",
+    "Surrogate-Control": "no-store"
+  });
+  next();
+});
+app.use("/api/auth", auth_default);
+app.use("/api/accounts", apiLimiter, accounts_default);
+app.use("/api/people", apiLimiter, people_default);
+app.use("/api/categories", apiLimiter, categories_default);
+app.use("/api/transactions", apiLimiter, transactions_default);
+app.use("/api/loans", apiLimiter, loans_default);
+app.use("/api/dashboard", apiLimiter, dashboard_default);
+app.use("/api/reports", apiLimiter, reports_default);
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok", timestamp: (/* @__PURE__ */ new Date()).toISOString() } });
 });
 if (isProduction) {
-  const clientBuildPath = path_1.default.resolve(__dirname, "../../client/dist");
-  app.use(express_1.default.static(clientBuildPath, {
+  const clientBuildPath = import_path.default.resolve(__dirname, "../../client/dist");
+  app.use(import_express9.default.static(clientBuildPath, {
     maxAge: "1y",
     // Cache static assets for 1 year
     immutable: true,
@@ -54507,7 +54651,7 @@ if (isProduction) {
         error: { code: "NOT_FOUND", message: `Route ${req.method} ${req.path} not found` }
       });
     } else {
-      res.sendFile(path_1.default.join(clientBuildPath, "index.html"), (err) => {
+      res.sendFile(import_path.default.join(clientBuildPath, "index.html"), (err) => {
         if (err) {
           console.error("Failed to serve index.html:", err);
           res.status(500).json({
@@ -54535,7 +54679,7 @@ if (require.main === module) {
     console.log(`   Environment: ${process.env.NODE_ENV || "development"}`);
   });
 }
-exports.default = app;
+var app_default = app;
 /*! Bundled license information:
 
 depd/index.js:

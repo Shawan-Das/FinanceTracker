@@ -1358,27 +1358,45 @@ export default function ReportsPage() {
                   </div>
                   <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <div className="text-center p-2 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Debit</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">You gave them</span>
                       <span className="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
                         {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.debit), 0) || 0)}
                       </span>
+                      <span className="text-[9px] text-slate-400">Lent + repaid to them</span>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-rose-50/60 dark:bg-rose-950/20">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Total Credit</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">They gave you</span>
                       <span className="text-xs sm:text-sm font-extrabold text-rose-600 dark:text-rose-400 font-mono">
                         {formatCurrency(personStatement.transactions?.reduce((s: number, t: any) => s + toNum(t.credit), 0) || 0)}
                       </span>
+                      <span className="text-[9px] text-slate-400">Borrowed + repaid by them</span>
                     </div>
                     <div className="text-center p-2 rounded-lg bg-slate-100/60 dark:bg-slate-800/40">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Net Balance</span>
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Net Position</span>
                       {(() => {
-                        const bal = toNum(personStatement.balance?.amount_they_owe_you) - toNum(personStatement.balance?.amount_you_owe_them);
-                        const isDr = bal >= 0;
-                        return (
-                          <span className={`text-xs sm:text-sm font-extrabold font-mono ${isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                            {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
-                          </span>
-                        );
+                        const theyOweYou = toNum(personStatement.balance?.amount_they_owe_you);
+                        const youOweThem = toNum(personStatement.balance?.amount_you_owe_them);
+                        if (theyOweYou > 0) {
+                          return (
+                            <>
+                              <span className="text-xs sm:text-sm font-extrabold font-mono text-emerald-600 dark:text-emerald-400">
+                                {formatCurrency(theyOweYou)}
+                              </span>
+                              <span className="text-[9px] text-emerald-600 dark:text-emerald-400 block">they owe you</span>
+                            </>
+                          );
+                        } else if (youOweThem > 0) {
+                          return (
+                            <>
+                              <span className="text-xs sm:text-sm font-extrabold font-mono text-rose-600 dark:text-rose-400">
+                                {formatCurrency(youOweThem)}
+                              </span>
+                              <span className="text-[9px] text-rose-600 dark:text-rose-400 block">you owe them</span>
+                            </>
+                          );
+                        } else {
+                          return <span className="text-xs sm:text-sm font-extrabold font-mono text-slate-500">Settled</span>;
+                        }
                       })()}
                     </div>
                   </div>
@@ -1393,9 +1411,9 @@ export default function ReportsPage() {
                             <th className="p-3 w-[100px]">Date</th>
                             <th className="p-3">Particulars</th>
                             <th className="p-3 w-[130px]">Type</th>
-                            <th className="p-3 w-[120px] text-right">Debit (৳)</th>
-                            <th className="p-3 w-[120px] text-right">Credit (৳)</th>
-                            <th className="p-3 w-[140px] text-right">Balance</th>
+                            <th className="p-3 w-[120px] text-right" title="Money you lent OR repaid to them">You Gave (৳)</th>
+                            <th className="p-3 w-[120px] text-right" title="Money they gave you (borrowed) OR they repaid you">They Gave (৳)</th>
+                            <th className="p-3 w-[140px] text-right">Net Balance</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
@@ -1479,9 +1497,18 @@ export default function ReportsPage() {
                                   )}
                                 </td>
                                 <td className="p-3 text-right font-extrabold font-mono">
-                                  <span className={isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
-                                    {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
-                                  </span>
+                                  {bal === 0 ? (
+                                    <span className="text-slate-400">Settled</span>
+                                  ) : (
+                                    <>
+                                      <span className={isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
+                                        {formatCurrency(Math.abs(bal))}
+                                      </span>
+                                      <span className={`text-[9px] ml-1 ${isDr ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                        {isDr ? 'they owe' : 'you owe'}
+                                      </span>
+                                    </>
+                                  )}
                                 </td>
                               </tr>
                             );
@@ -1500,13 +1527,23 @@ export default function ReportsPage() {
                             </td>
                             <td className="p-3 text-right">
                               {(() => {
-                                const bal = toNum(personStatement.balance?.amount_they_owe_you) - toNum(personStatement.balance?.amount_you_owe_them);
-                                const isDr = bal >= 0;
-                                return (
-                                  <span className={`font-extrabold font-mono text-sm ${isDr ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                                    {formatCurrency(Math.abs(bal))} {isDr ? 'Dr' : 'Cr'}
-                                  </span>
-                                );
+                                const theyOweYou = toNum(personStatement.balance?.amount_they_owe_you);
+                                const youOweThem = toNum(personStatement.balance?.amount_you_owe_them);
+                                if (theyOweYou > 0) {
+                                  return (
+                                    <span className="font-extrabold font-mono text-sm text-emerald-600 dark:text-emerald-400">
+                                      {formatCurrency(theyOweYou)} they owe
+                                    </span>
+                                  );
+                                } else if (youOweThem > 0) {
+                                  return (
+                                    <span className="font-extrabold font-mono text-sm text-rose-600 dark:text-rose-400">
+                                      {formatCurrency(youOweThem)} you owe
+                                    </span>
+                                  );
+                                } else {
+                                  return <span className="font-extrabold font-mono text-sm text-slate-500">All Settled</span>;
+                                }
                               })()}
                             </td>
                           </tr>

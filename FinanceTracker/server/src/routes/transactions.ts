@@ -479,6 +479,46 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
       linkedLoanId = loanId;
     }
 
+    // Auto-link active/overdue loan for LEND_REPAYMENT / BORROW_REPAYMENT if not explicitly provided
+    if ((transaction_type === 'LEND_REPAYMENT' || transaction_type === 'BORROW_REPAYMENT') && !linkedLoanId && person_id) {
+      const targetDirection = transaction_type === 'LEND_REPAYMENT' ? 'LENT' : 'BORROWED';
+      const candidateLoan = await client.query(
+        `SELECT l.id
+         FROM ${SCHEMA}.loans l
+         LEFT JOIN (
+           SELECT lr.loan_id, SUM(lr.amount) as total_repaid
+           FROM ${SCHEMA}.loan_repayments lr
+           INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+           GROUP BY lr.loan_id
+         ) repaid ON repaid.loan_id = l.id
+         WHERE l.user_id = $1
+           AND l.person_id = $2
+           AND l.direction = $3
+           AND l.status IN ('ACTIVE', 'OVERDUE')
+           AND (l.principal_amount + l.interest_amount - COALESCE(repaid.total_repaid, 0)) > 0
+         ORDER BY l.start_date ASC
+         LIMIT 1`,
+        [userId, person_id, targetDirection]
+      );
+      if (candidateLoan.rows.length > 0) {
+        linkedLoanId = candidateLoan.rows[0].id;
+      } else {
+        const fallbackLoan = await client.query(
+          `SELECT l.id
+           FROM ${SCHEMA}.loans l
+           WHERE l.user_id = $1
+             AND l.person_id = $2
+             AND l.direction = $3
+           ORDER BY l.start_date DESC
+           LIMIT 1`,
+          [userId, person_id, targetDirection]
+        );
+        if (fallbackLoan.rows.length > 0) {
+          linkedLoanId = fallbackLoan.rows[0].id;
+        }
+      }
+    }
+
     const txResult = await client.query(
       `INSERT INTO ${SCHEMA}.transactions
        (id, user_id, transaction_type, transaction_date, amount, account_id, person_id, category_id, loan_id, description, reference)
@@ -498,13 +538,35 @@ router.post('/', validateBody(createTransactionSchema), async (req: Request, res
     }
 
     if (transaction_type === 'LEND_REPAYMENT' || transaction_type === 'BORROW_REPAYMENT') {
-      if (loan_id) {
+      if (linkedLoanId) {
         const lreId = generateId('loan_repayments');
         await client.query(
           `INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
            VALUES ($1, $2, $3, $4, $5, $6)`,
-          [lreId, loan_id, tx.id, amount, transaction_date, description || null]
+          [lreId, linkedLoanId, tx.id, amount, transaction_date, description || null]
         );
+
+        const checkResult = await client.query(
+          `SELECT l.principal_amount, l.interest_amount, l.status,
+                  COALESCE(SUM(lr.amount), 0) as total_repaid
+           FROM ${SCHEMA}.loans l
+           LEFT JOIN ${SCHEMA}.loan_repayments lr ON lr.loan_id = l.id
+           LEFT JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+           WHERE l.id = $1
+           GROUP BY l.id`,
+          [linkedLoanId]
+        );
+        if (checkResult.rows.length > 0) {
+          const lData = checkResult.rows[0];
+          const totalDue = parseFloat(lData.principal_amount) + parseFloat(lData.interest_amount);
+          const totalRepaid = parseFloat(lData.total_repaid);
+          if (totalRepaid >= totalDue && (lData.status === 'ACTIVE' || lData.status === 'OVERDUE')) {
+            await client.query(
+              `UPDATE ${SCHEMA}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
+              [linkedLoanId]
+            );
+          }
+        }
       }
     }
 
@@ -564,6 +626,7 @@ const updateTransactionSchema = z.object({
   account_id: z.string().optional().nullable(),
   person_id: z.string().optional().nullable(),
   category_id: z.string().optional().nullable(),
+  loan_id: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
   reference: z.string().optional().nullable(),
 });
@@ -631,7 +694,7 @@ router.patch('/:id', validateBody(updateTransactionSchema), async (req: Request,
       }
     }
 
-    const ALLOWED_FIELDS = ['transaction_date', 'amount', 'account_id', 'person_id', 'category_id', 'description', 'reference'];
+    const ALLOWED_FIELDS = ['transaction_date', 'amount', 'account_id', 'person_id', 'category_id', 'loan_id', 'description', 'reference'];
     const fields: string[] = [];
     const values: any[] = [];
     let paramIndex = 1;
@@ -662,48 +725,96 @@ router.patch('/:id', validateBody(updateTransactionSchema), async (req: Request,
       values
     );
 
-    // If this is a loan repayment and amount was changed, sync loan_repayments
+    // If this is a loan repayment, sync loan_repayments
     const tx = existing.rows[0];
-    if ((tx.transaction_type === 'LEND_REPAYMENT' || tx.transaction_type === 'BORROW_REPAYMENT') && req.body.amount !== undefined) {
-      const newAmount = parseFloat(req.body.amount);
-      const oldAmount = parseFloat(tx.amount);
+    if (tx.transaction_type === 'LEND_REPAYMENT' || tx.transaction_type === 'BORROW_REPAYMENT') {
+      const newAmount = req.body.amount !== undefined ? parseFloat(req.body.amount) : parseFloat(tx.amount);
+      const newDate = req.body.transaction_date || tx.transaction_date;
+      const newNotes = req.body.description !== undefined ? req.body.description : tx.description;
 
-      if (newAmount !== oldAmount) {
-        await client.query(
-          `UPDATE ${SCHEMA}.loan_repayments SET amount = $1 WHERE transaction_id = $2`,
-          [newAmount, txId]
+      let targetLoanId = updates.loan_id !== undefined ? updates.loan_id : tx.loan_id;
+
+      // If still missing loan_id, try to auto-link
+      if (!targetLoanId && (updates.person_id || tx.person_id)) {
+        const pId = updates.person_id || tx.person_id;
+        const targetDirection = tx.transaction_type === 'LEND_REPAYMENT' ? 'LENT' : 'BORROWED';
+        const candidateLoan = await client.query(
+          `SELECT l.id
+           FROM ${SCHEMA}.loans l
+           LEFT JOIN (
+             SELECT lr.loan_id, SUM(lr.amount) as total_repaid
+             FROM ${SCHEMA}.loan_repayments lr
+             INNER JOIN ${SCHEMA}.transactions t ON t.id = lr.transaction_id AND t.deleted_at IS NULL
+             GROUP BY lr.loan_id
+           ) repaid ON repaid.loan_id = l.id
+           WHERE l.user_id = $1
+             AND l.person_id = $2
+             AND l.direction = $3
+             AND l.status IN ('ACTIVE', 'OVERDUE')
+             AND (l.principal_amount + l.interest_amount - COALESCE(repaid.total_repaid, 0)) > 0
+           ORDER BY l.start_date ASC
+           LIMIT 1`,
+          [userId, pId, targetDirection]
+        );
+        if (candidateLoan.rows.length > 0) {
+          targetLoanId = candidateLoan.rows[0].id;
+          await client.query(
+            `UPDATE ${SCHEMA}.transactions SET loan_id = $1, updated_at = NOW() WHERE id = $2`,
+            [targetLoanId, txId]
+          );
+        }
+      }
+
+      if (targetLoanId) {
+        const lrCheck = await client.query(
+          `SELECT id FROM ${SCHEMA}.loan_repayments WHERE transaction_id = $1`,
+          [txId]
         );
 
-        if (tx.loan_id) {
-          const loanResult = await client.query(
-            `SELECT l.*,
-                    COALESCE(lr.total_repaid, 0) AS total_repaid
-             FROM ${SCHEMA}.loans l
-             LEFT JOIN (
-               SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
-               FROM ${SCHEMA}.loan_repayments lr2
-               INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
-               GROUP BY lr2.loan_id
-             ) lr ON lr.loan_id = l.id
-             WHERE l.id = $1`,
-            [tx.loan_id]
+        if (lrCheck.rows.length > 0) {
+          await client.query(
+            `UPDATE ${SCHEMA}.loan_repayments 
+             SET amount = $1, repayment_date = $2, notes = $3 
+             WHERE transaction_id = $4`,
+            [newAmount, newDate, newNotes || null, txId]
           );
-          if (loanResult.rows.length > 0) {
-            const loan = loanResult.rows[0];
-            const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
-            const totalRepaid = parseFloat(loan.total_repaid || '0');
-            if (loan.status === 'PAID' && totalRepaid < totalDue) {
-              await client.query(
-                `UPDATE ${SCHEMA}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`,
-                [tx.loan_id]
-              );
-            }
-            if (loan.status === 'ACTIVE' && totalRepaid >= totalDue) {
-              await client.query(
-                `UPDATE ${SCHEMA}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
-                [tx.loan_id]
-              );
-            }
+        } else {
+          const lreId = generateId('loan_repayments');
+          await client.query(
+            `INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, repayment_date, notes)
+             VALUES ($1, $2, $3, $4, $5, $6)`,
+            [lreId, targetLoanId, txId, newAmount, newDate, newNotes || null]
+          );
+        }
+
+        const loanResult = await client.query(
+          `SELECT l.*,
+                  COALESCE(lr.total_repaid, 0) AS total_repaid
+           FROM ${SCHEMA}.loans l
+           LEFT JOIN (
+             SELECT lr2.loan_id, SUM(lr2.amount) as total_repaid
+             FROM ${SCHEMA}.loan_repayments lr2
+             INNER JOIN ${SCHEMA}.transactions t ON t.id = lr2.transaction_id AND t.deleted_at IS NULL
+             GROUP BY lr2.loan_id
+           ) lr ON lr.loan_id = l.id
+           WHERE l.id = $1`,
+          [targetLoanId]
+        );
+        if (loanResult.rows.length > 0) {
+          const loan = loanResult.rows[0];
+          const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+          const totalRepaid = parseFloat(loan.total_repaid || '0');
+          if (loan.status === 'PAID' && totalRepaid < totalDue) {
+            await client.query(
+              `UPDATE ${SCHEMA}.loans SET status = 'ACTIVE', updated_at = NOW() WHERE id = $1`,
+              [targetLoanId]
+            );
+          }
+          if ((loan.status === 'ACTIVE' || loan.status === 'OVERDUE') && totalRepaid >= totalDue) {
+            await client.query(
+              `UPDATE ${SCHEMA}.loans SET status = 'PAID', updated_at = NOW() WHERE id = $1`,
+              [targetLoanId]
+            );
           }
         }
       }

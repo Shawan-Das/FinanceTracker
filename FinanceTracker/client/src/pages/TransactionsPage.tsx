@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { transactionsApi, accountsApi, peopleApi, categoriesApi } from '../api/client';
+import { transactionsApi, accountsApi, peopleApi, categoriesApi, loansApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
 import QueryError from '../components/QueryError';
@@ -10,10 +10,12 @@ import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import VoucherModal, { VoucherReportData } from '../components/VoucherModal';
 import { useAuth } from '../contexts/AuthContext';
-import { formatTxType } from '../utils/format';
+import { formatTxType, formatDateDMY } from '../utils/format';
 import toast from 'react-hot-toast';
 import { Plus, Filter, Trash2, Edit, Download, FileText, Search, X, Check, ArrowLeftRight, Mail } from 'lucide-react';
-import type { Transaction, TransactionType, Account, Person, Category } from '../types';
+import type { Transaction, TransactionType, Account, Person, Category, Loan } from '../types';
+
+const toNum = (v: any): number => (typeof v === 'number' ? v : parseFloat(v) || 0);
 
 const formatCurrency = (amount: number) =>
   `৳${amount.toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -96,6 +98,14 @@ export default function TransactionsPage() {
     staleTime: 120_000,
   });
 
+  const { data: loans } = useQuery({
+    queryKey: ['loans'],
+    queryFn: () => loansApi.list().then((r) => r.data.data),
+    staleTime: 120_000,
+  });
+
+  const [formLoanId, setFormLoanId] = useState('');
+
   const createMutation = useMutation({
     mutationFn: (data: any) => transactionsApi.create(data),
     onSuccess: () => {
@@ -103,6 +113,7 @@ export default function TransactionsPage() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
       toast.success('Transaction record added!');
       resetForm();
       setShowForm(false);
@@ -116,6 +127,7 @@ export default function TransactionsPage() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
       toast.success('Transaction updated');
       resetForm();
       setShowForm(false);
@@ -132,6 +144,7 @@ export default function TransactionsPage() {
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['accounts'] });
       queryClient.invalidateQueries({ queryKey: ['people'] });
+      queryClient.invalidateQueries({ queryKey: ['loans'] });
       toast.success('Transaction removed');
     },
   });
@@ -143,6 +156,7 @@ export default function TransactionsPage() {
     setFormAccountId('');
     setFormToAccountId('');
     setFormPersonId('');
+    setFormLoanId('');
     setFormCategoryId('');
     setFormDescription('');
     setFormReference('');
@@ -159,6 +173,7 @@ export default function TransactionsPage() {
     setFormAccountId(tx.account_id ? String(tx.account_id) : '');
     setFormToAccountId(tx.transfer?.to_account_id ? String(tx.transfer.to_account_id) : '');
     setFormPersonId(tx.person_id ? String(tx.person_id) : '');
+    setFormLoanId(tx.loan_id ? String(tx.loan_id) : '');
     setFormCategoryId(tx.category_id ? String(tx.category_id) : '');
     setFormDescription(tx.description || '');
     setFormReference(tx.reference || '');
@@ -212,6 +227,7 @@ export default function TransactionsPage() {
     if (formAccountId) payload.account_id = formAccountId;
     if (formToAccountId && formType === 'TRANSFER') payload.to_account_id = formToAccountId;
     if (formPersonId) payload.person_id = formPersonId;
+    if (formLoanId) payload.loan_id = formLoanId;
     if (formCategoryId) payload.category_id = formCategoryId;
     if (formSendReceipt && !editingTx) payload.send_receipt = true;
 
@@ -224,6 +240,7 @@ export default function TransactionsPage() {
           account_id: payload.account_id || null,
           person_id: payload.person_id || null,
           category_id: payload.category_id || null,
+          loan_id: payload.loan_id || null,
           description: payload.description,
           reference: payload.reference,
         },
@@ -255,6 +272,12 @@ export default function TransactionsPage() {
   const showToAccount = formType === 'TRANSFER';
   const showCategory = ['INCOME', 'EXPENSE'].includes(formType);
   const showReceiptToggle = !editingTx && ['LEND', 'BORROW', 'LEND_REPAYMENT', 'BORROW_REPAYMENT'].includes(formType);
+
+  const relevantLoans = useMemo(() => {
+    if (!loans || !formPersonId) return [];
+    const targetDir = formType === 'LEND_REPAYMENT' ? 'LENT' : 'BORROWED';
+    return loans.filter((l: Loan) => l.person_id === formPersonId && l.direction === targetDir && l.status !== 'PAID');
+  }, [loans, formPersonId, formType]);
 
   const handleExport = async (format: 'csv' | 'json') => {
     try {
@@ -783,6 +806,33 @@ export default function TransactionsPage() {
               </select>
               {formErrors.personId && (
                 <p className="text-[11px] text-rose-500 mt-1 font-medium">{formErrors.personId}</p>
+              )}
+            </div>
+          )}
+
+          {/* Loan Selector — for Loan Received / Loan Repaid (links repayment to a specific loan) */}
+          {(formType === 'LEND_REPAYMENT' || formType === 'BORROW_REPAYMENT') && formPersonId && (
+            <div>
+              <label className="label">
+                Link to Loan <span className="text-xs text-slate-400 font-normal">(optional — auto-linked if left blank)</span>
+              </label>
+              <select
+                className="input text-xs font-medium"
+                value={formLoanId}
+                onChange={(e) => setFormLoanId(e.target.value)}
+              >
+                <option value="">Auto-detect from active loans</option>
+                {relevantLoans.map((l: Loan) => (
+                  <option key={l.id} value={l.id}>
+                    {l.person_name} — ৳{toNum(l.remaining_amount).toLocaleString('en-BD', { maximumFractionDigits: 0 })} remaining
+                    {l.status === 'OVERDUE' ? ' (Overdue)' : ''}
+                  </option>
+                ))}
+              </select>
+              {relevantLoans.length === 0 && (
+                <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1">
+                  No active loans found for this contact — repayment will be recorded standalone.
+                </p>
               )}
             </div>
           )}

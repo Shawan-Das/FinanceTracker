@@ -1,11 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { db } from '../database/connection';
 import { requireAuth, getUserId } from '../middleware/auth';
+import { syncUnlinkedLoanRepayments } from './loans';
 
 const router = Router();
 const SCHEMA = 'finance_tracker';
 
 router.use(requireAuth);
+
 
 // =============================================================================
 // GET /api/reports/income — Income report
@@ -353,6 +355,9 @@ router.get('/person-statement', async (req: Request, res: Response) => {
     }
 
     const person = pResult.rows[0];
+
+    // Sync any unlinked repayment transactions to loans so remaining amounts are fresh
+    await syncUnlinkedLoanRepayments(userId);
 
     // Date range filtering
     const from = req.query.from as string | undefined;
