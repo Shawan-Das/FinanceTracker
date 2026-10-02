@@ -17,6 +17,7 @@ const LoansPage = lazy(() => import('./pages/LoansPage'));
 const CategoriesPage = lazy(() => import('./pages/CategoriesPage'));
 const ReportsPage = lazy(() => import('./pages/ReportsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const TrashPage = lazy(() => import('./pages/TrashPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -66,6 +67,7 @@ export default function App() {
           <Route path="loans" element={<LoansPage />} />
           <Route path="categories" element={<CategoriesPage />} />
           <Route path="reports" element={<ReportsPage />} />
+          <Route path="trash" element={<TrashPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
 

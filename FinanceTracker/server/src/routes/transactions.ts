@@ -119,6 +119,63 @@ router.get('/', validateQuery(listTransactionsQuery), async (req: Request, res: 
 });
 
 // =============================================================================
+// GET /api/transactions/deleted — List soft-deleted transactions
+// (Must be defined BEFORE /:id so Express doesn't treat 'deleted' as an ID)
+// =============================================================================
+router.get('/deleted', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT t.*,
+              a.name as account_name,
+              p.name as person_name,
+              c.name as category_name
+       FROM ${SCHEMA}.transactions t
+       LEFT JOIN ${SCHEMA}.accounts a ON a.id = t.account_id
+       LEFT JOIN ${SCHEMA}.people p ON p.id = t.person_id
+       LEFT JOIN ${SCHEMA}.categories c ON c.id = t.category_id
+       WHERE t.user_id = $1 AND t.deleted_at IS NOT NULL
+       ORDER BY t.deleted_at DESC, t.transaction_date DESC`,
+      [userId]
+    );
+
+    const transferTxIds = result.rows
+      .filter((tx) => tx.transaction_type === 'TRANSFER')
+      .map((tx) => tx.id);
+
+    const transfersMap = new Map();
+    if (transferTxIds.length > 0) {
+      const transferResult = await db.query(
+        `SELECT tt.*,
+                fa.name as from_account_name,
+                ta.name as to_account_name
+         FROM ${SCHEMA}.transaction_transfers tt
+         JOIN ${SCHEMA}.accounts fa ON fa.id = tt.from_account_id
+         JOIN ${SCHEMA}.accounts ta ON ta.id = tt.to_account_id
+         WHERE tt.transaction_id = ANY($1)`,
+        [transferTxIds]
+      );
+      for (const row of transferResult.rows) {
+        transfersMap.set(row.transaction_id, row);
+      }
+    }
+
+    const data = result.rows.map((tx) => ({
+      ...tx,
+      transfer: transfersMap.get(tx.id) || null,
+    }));
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.error('List deleted transactions error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to load deleted transactions' },
+    });
+  }
+});
+
+// =============================================================================
 // GET /api/transactions/export — Export transactions as CSV or JSON
 // (Must be defined BEFORE /:id so Express doesn't treat 'export' as an ID)
 // =============================================================================
@@ -940,6 +997,88 @@ router.delete('/:id', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to delete transaction' },
+    });
+  } finally {
+    client.release();
+  }
+});
+
+// =============================================================================
+// POST /api/transactions/:id/restore — Restore a soft-deleted transaction
+// =============================================================================
+router.post('/:id/restore', async (req: Request, res: Response) => {
+  const client = await db.getClient();
+  try {
+    const userId = getUserId(req);
+    const txId = req.params.id;
+
+    const existing = await client.query(
+      `SELECT * FROM ${SCHEMA}.transactions
+       WHERE id = $1 AND user_id = $2 AND deleted_at IS NOT NULL`,
+      [txId, userId]
+    );
+
+    if (existing.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Deleted transaction not found' },
+      });
+      return;
+    }
+
+    const tx = existing.rows[0];
+
+    await client.query('BEGIN');
+
+    // Restore the transaction
+    await client.query(
+      `UPDATE ${SCHEMA}.transactions
+       SET deleted_at = NULL, updated_at = NOW()
+       WHERE id = $1`,
+      [txId]
+    );
+
+    // If it was a repayment with loan_id, restore loan_repayments entry if loan still exists
+    if ((tx.transaction_type === 'LEND_REPAYMENT' || tx.transaction_type === 'BORROW_REPAYMENT') && tx.loan_id) {
+      const loanCheck = await client.query(
+        `SELECT id, principal_amount, interest_amount FROM ${SCHEMA}.loans WHERE id = $1`,
+        [tx.loan_id]
+      );
+      if (loanCheck.rows.length > 0) {
+        const repayId = generateId('loan_repayments');
+        await client.query(
+          `INSERT INTO ${SCHEMA}.loan_repayments (id, loan_id, transaction_id, amount, payment_date)
+           VALUES ($1, $2, $3, $4, $5)
+           ON CONFLICT DO NOTHING`,
+          [repayId, tx.loan_id, tx.id, tx.amount, tx.transaction_date]
+        );
+
+        // Update loan status if needed
+        const loan = loanCheck.rows[0];
+        const totalDue = parseFloat(loan.principal_amount) + parseFloat(loan.interest_amount);
+        const sumResult = await client.query(
+          `SELECT COALESCE(SUM(amount), 0) as total_repaid
+           FROM ${SCHEMA}.loan_repayments WHERE loan_id = $1`,
+          [tx.loan_id]
+        );
+        const totalRepaid = parseFloat(sumResult.rows[0].total_repaid || '0');
+        const newStatus = totalRepaid >= totalDue ? 'PAID' : 'ACTIVE';
+        await client.query(
+          `UPDATE ${SCHEMA}.loans SET status = $1, updated_at = NOW() WHERE id = $2`,
+          [newStatus, tx.loan_id]
+        );
+      }
+    }
+
+    await client.query('COMMIT');
+
+    res.json({ success: true, data: { id: txId } });
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('Restore transaction error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to restore transaction' },
     });
   } finally {
     client.release();

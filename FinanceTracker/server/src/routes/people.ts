@@ -37,6 +37,37 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // =============================================================================
+// GET /api/people/deleted — List deleted (inactive) people
+// (Must be defined BEFORE /:id so Express doesn't treat 'deleted' as an ID)
+// =============================================================================
+router.get('/deleted', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT p.*,
+              COALESCE(b.amount_they_owe_you, 0) AS amount_they_owe_you,
+              COALESCE(b.amount_you_owe_them, 0) AS amount_you_owe_them,
+              COALESCE(b.total_lent, 0) AS total_lent,
+              COALESCE(b.total_lent_repaid, 0) AS total_lent_repaid,
+              COALESCE(b.total_borrowed, 0) AS total_borrowed,
+              COALESCE(b.total_borrow_repaid, 0) AS total_borrow_repaid
+       FROM ${SCHEMA}.people p
+       LEFT JOIN ${SCHEMA}.v_person_balances b ON b.person_id = p.id
+       WHERE p.user_id = $1 AND p.is_active = FALSE
+       ORDER BY p.updated_at DESC, p.name ASC`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error('List deleted people error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to load deleted people' },
+    });
+  }
+});
+
+// =============================================================================
 // GET /api/people/:id/summary — Person summary with balance and transaction counts
 // (Must be defined BEFORE /:id so Express doesn't treat 'summary' as an ID)
 // =============================================================================
@@ -239,7 +270,7 @@ router.patch('/:id', validateBody(updatePersonSchema), async (req: Request, res:
 });
 
 // =============================================================================
-// DELETE /api/people/:id — Delete a person
+// DELETE /api/people/:id — Soft-delete a person
 // =============================================================================
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
@@ -260,35 +291,17 @@ router.delete('/:id', async (req: Request, res: Response) => {
           success: false,
           error: {
             code: 'OUTSTANDING_BALANCE',
-            message: 'Cannot delete a person with outstanding balances. Set them inactive instead.',
+            message: 'Cannot delete a person with outstanding balances. Settle debts first.',
           },
         });
         return;
       }
     }
 
-    // Check for existing active transactions referencing this person
-    const txResult = await db.query(
-      `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND person_id = $2 AND deleted_at IS NULL`,
-      [userId, personId]
-    );
-
-    if (parseInt(txResult.rows[0].count) > 0) {
-      res.status(409).json({
-        success: false,
-        error: {
-          code: 'PERSON_HAS_TRANSACTIONS',
-          message: 'Cannot delete a person with existing transactions. Set them inactive instead.',
-        },
-      });
-      return;
-    }
-
     // Check for existing active loans referencing this person
     const loanResult = await db.query(
       `SELECT COUNT(*) as count FROM ${SCHEMA}.loans
-       WHERE user_id = $1 AND person_id = $2`,
+       WHERE user_id = $1 AND person_id = $2 AND status = 'ACTIVE'`,
       [userId, personId]
     );
 
@@ -297,7 +310,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
         success: false,
         error: {
           code: 'PERSON_HAS_LOANS',
-          message: 'Cannot delete a person with existing loans. Set them inactive instead.',
+          message: 'Cannot delete a person with active loans. Settle or cancel loans first.',
         },
       });
       return;
@@ -305,7 +318,7 @@ router.delete('/:id', async (req: Request, res: Response) => {
 
     const result = await db.query(
       `UPDATE ${SCHEMA}.people SET is_active = FALSE, updated_at = NOW()
-       WHERE user_id = $1 AND id = $2
+       WHERE user_id = $1 AND id = $2 AND is_active = TRUE
        RETURNING id`,
       [userId, personId]
     );
@@ -324,6 +337,40 @@ router.delete('/:id', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to delete person' },
+    });
+  }
+});
+
+// =============================================================================
+// POST /api/people/:id/restore — Restore deleted person
+// =============================================================================
+router.post('/:id/restore', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const personId = req.params.id;
+
+    const result = await db.query(
+      `UPDATE ${SCHEMA}.people
+       SET is_active = TRUE, updated_at = NOW()
+       WHERE id = $1 AND user_id = $2 AND is_active = FALSE
+       RETURNING *`,
+      [personId, userId]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Deleted person not found' },
+      });
+      return;
+    }
+
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Restore person error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to restore person' },
     });
   }
 });

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { transactionsApi, accountsApi, peopleApi, categoriesApi, loansApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -362,6 +362,15 @@ export default function TransactionsPage() {
             <Download size={15} />
             <span>CSV Export</span>
           </button>
+
+          <Link
+            to="/trash?tab=transactions"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700"
+            title="View Deleted Transactions in Recycle Bin"
+          >
+            <Trash2 size={14} className="text-slate-500 dark:text-slate-400" />
+            <span>Recycle Bin</span>
+          </Link>
 
           <button
             onClick={() => { resetForm(); setShowForm(true); }}

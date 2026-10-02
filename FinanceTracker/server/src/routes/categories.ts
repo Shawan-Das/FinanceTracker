@@ -36,6 +36,31 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // =============================================================================
+// GET /api/categories/deleted — List deleted (inactive) categories
+// =============================================================================
+router.get('/deleted', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT c.*, COUNT(t.id)::int AS usage_count
+       FROM ${SCHEMA}.categories c
+       LEFT JOIN ${SCHEMA}.transactions t ON t.category_id = c.id
+       WHERE c.user_id = $1 AND c.is_active = FALSE
+       GROUP BY c.id
+       ORDER BY c.updated_at DESC, c.name ASC`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error('List deleted categories error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to load deleted categories' },
+    });
+  }
+});
+
+// =============================================================================
 // POST /api/categories
 // =============================================================================
 const createCategorySchema = z.object({
@@ -141,34 +166,16 @@ router.patch('/:id', validateBody(updateCategorySchema), async (req: Request, re
 });
 
 // =============================================================================
-// DELETE /api/categories/:id
+// DELETE /api/categories/:id — Soft-delete category
 // =============================================================================
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
     const categoryId = req.params.id;
 
-    // Check for existing active transactions referencing this category
-    const txResult = await db.query(
-      `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND category_id = $2 AND deleted_at IS NULL`,
-      [userId, categoryId]
-    );
-
-    if (parseInt(txResult.rows[0].count) > 0) {
-      res.status(409).json({
-        success: false,
-        error: {
-          code: 'CATEGORY_HAS_TRANSACTIONS',
-          message: 'Cannot delete a category with existing transactions. Set it inactive instead.',
-        },
-      });
-      return;
-    }
-
     const result = await db.query(
       `UPDATE ${SCHEMA}.categories SET is_active = FALSE, updated_at = NOW()
-       WHERE user_id = $1 AND id = $2
+       WHERE user_id = $1 AND id = $2 AND is_active = TRUE
        RETURNING id`,
       [userId, categoryId]
     );
@@ -187,6 +194,65 @@ router.delete('/:id', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to delete category' },
+    });
+  }
+});
+
+// =============================================================================
+// POST /api/categories/:id/restore — Restore deleted category
+// =============================================================================
+router.post('/:id/restore', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const categoryId = req.params.id;
+
+    const catResult = await db.query(
+      `SELECT * FROM ${SCHEMA}.categories WHERE id = $1 AND user_id = $2 AND is_active = FALSE`,
+      [categoryId, userId]
+    );
+
+    if (catResult.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Deleted category not found' },
+      });
+      return;
+    }
+
+    const cat = catResult.rows[0];
+
+    // Check if an active category with the same name and type already exists
+    const duplicateCheck = await db.query(
+      `SELECT id FROM ${SCHEMA}.categories
+       WHERE user_id = $1 AND LOWER(name) = LOWER($2) AND type = $3 AND is_active = TRUE`,
+      [userId, cat.name, cat.type]
+    );
+
+    if (duplicateCheck.rows.length > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_CATEGORY',
+          message: `An active ${cat.type.toLowerCase()} category with the name "${cat.name}" already exists.`,
+        },
+      });
+      return;
+    }
+
+    const result = await db.query(
+      `UPDATE ${SCHEMA}.categories
+       SET is_active = TRUE, updated_at = NOW()
+       WHERE id = $1 AND user_id = $2
+       RETURNING *`,
+      [categoryId, userId]
+    );
+
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Restore category error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to restore category' },
     });
   }
 });

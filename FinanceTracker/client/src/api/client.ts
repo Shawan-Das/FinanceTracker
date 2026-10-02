@@ -88,11 +88,13 @@ export const authApi = {
 // Accounts API
 // =============================================================================
 export const accountsApi = {
-  list: () => api.get('/accounts'),
+  list: (params?: any) => api.get('/accounts', { params }),
+  listDeleted: () => api.get('/accounts/deleted'),
   get: (id: string) => api.get(`/accounts/${id}`),
   create: (data: any) => api.post('/accounts', data),
   update: (id: string, data: any) => api.patch(`/accounts/${id}`, data),
   delete: (id: string) => api.delete(`/accounts/${id}`),
+  restore: (id: string) => api.post(`/accounts/${id}/restore`),
   transactions: (id: string, params?: any) => api.get(`/accounts/${id}/transactions`, { params }),
 };
 
@@ -101,10 +103,12 @@ export const accountsApi = {
 // =============================================================================
 export const peopleApi = {
   list: () => api.get('/people'),
+  listDeleted: () => api.get('/people/deleted'),
   get: (id: string) => api.get(`/people/${id}`),
   create: (data: any) => api.post('/people', data),
   update: (id: string, data: any) => api.patch(`/people/${id}`, data),
   delete: (id: string) => api.delete(`/people/${id}`),
+  restore: (id: string) => api.post(`/people/${id}/restore`),
   summary: (id: string) => api.get(`/people/${id}/summary`),
   transactions: (id: string, params?: any) => api.get(`/people/${id}/transactions`, { params }),
 };
@@ -114,9 +118,11 @@ export const peopleApi = {
 // =============================================================================
 export const categoriesApi = {
   list: () => api.get('/categories'),
+  listDeleted: () => api.get('/categories/deleted'),
   create: (data: any) => api.post('/categories', data),
   update: (id: string, data: any) => api.patch(`/categories/${id}`, data),
   delete: (id: string) => api.delete(`/categories/${id}`),
+  restore: (id: string) => api.post(`/categories/${id}/restore`),
 };
 
 // =============================================================================
@@ -124,14 +130,25 @@ export const categoriesApi = {
 // =============================================================================
 export const transactionsApi = {
   list: (params?: any) => api.get('/transactions', { params }),
+  listDeleted: () => api.get('/transactions/deleted'),
   get: (id: string) => api.get(`/transactions/${id}`),
   create: (data: any) => api.post('/transactions', data),
   update: (id: string, data: any) => api.patch(`/transactions/${id}`, data),
   delete: (id: string) => api.delete(`/transactions/${id}`),
+  restore: (id: string) => api.post(`/transactions/${id}/restore`),
   export: (params?: any) => api.get('/transactions/export', { params, responseType: 'blob' }),
   voucher: (id: string, type?: string) => api.get(`/transactions/${id}/voucher`, {
     params: { type: type || 'voucher' },
   }),
+};
+
+// =============================================================================
+// Trash / Recycle Bin API
+// =============================================================================
+export const trashApi = {
+  counts: () => api.get('/trash/counts'),
+  restoreAll: (type: 'transactions' | 'categories' | 'accounts' | 'people') =>
+    api.post(`/trash/restore-all/${type}`),
 };
 
 // =============================================================================

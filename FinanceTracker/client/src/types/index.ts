@@ -68,7 +68,16 @@ export interface Transaction {
   reference: string | null;
   created_at: string;
   updated_at: string;
+  deleted_at?: string | null;
   transfer?: TransferDetail;
+}
+
+export interface TrashCounts {
+  transactions: number;
+  categories: number;
+  accounts: number;
+  people: number;
+  total: number;
 }
 
 export type TransactionType =

@@ -24,6 +24,7 @@ import transactionRoutes from './routes/transactions';
 import loanRoutes from './routes/loans';
 import dashboardRoutes from './routes/dashboard';
 import reportRoutes from './routes/reports';
+import trashRoutes from './routes/trash';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3001', 10);
@@ -87,6 +88,7 @@ app.use('/api/transactions', apiLimiter, transactionRoutes);
 app.use('/api/loans', apiLimiter, loanRoutes);
 app.use('/api/dashboard', apiLimiter, dashboardRoutes);
 app.use('/api/reports', apiLimiter, reportRoutes);
+app.use('/api/trash', apiLimiter, trashRoutes);
 
 // =============================================================================
 // Health check

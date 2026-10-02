@@ -11,14 +11,15 @@ const SCHEMA = 'finance_tracker';
 router.use(requireAuth);
 
 // =============================================================================
-// GET /api/accounts — List all accounts with current balance
+// GET /api/accounts — List all active accounts with current balance
 // =============================================================================
 router.get('/', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
+    const includeInactive = req.query.include_inactive === 'true';
     const result = await db.query(
       `SELECT * FROM ${SCHEMA}.v_account_balances
-       WHERE user_id = $1
+       WHERE user_id = $1 ${includeInactive ? '' : 'AND is_active = TRUE'}
        ORDER BY account_type, account_name`,
       [userId]
     );
@@ -28,6 +29,28 @@ router.get('/', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to load accounts' },
+    });
+  }
+});
+
+// =============================================================================
+// GET /api/accounts/deleted — List deleted (inactive) accounts
+// =============================================================================
+router.get('/deleted', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const result = await db.query(
+      `SELECT * FROM ${SCHEMA}.v_account_balances
+       WHERE user_id = $1 AND is_active = FALSE
+       ORDER BY updated_at DESC, account_name ASC`,
+      [userId]
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    console.error('List deleted accounts error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to load deleted accounts' },
     });
   }
 });
@@ -174,42 +197,17 @@ router.patch('/:id', validateBody(updateAccountSchema), async (req: Request, res
 });
 
 // =============================================================================
-// DELETE /api/accounts/:id — Delete an account
+// DELETE /api/accounts/:id — Soft-delete an account
 // =============================================================================
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const userId = getUserId(req);
     const accountId = req.params.id;
 
-    // Check for transactions referencing this account (directly or via transfers)
-    const txResult = await db.query(
-      `SELECT COUNT(*) as count FROM ${SCHEMA}.transactions
-       WHERE user_id = $1 AND account_id = $2 AND deleted_at IS NULL`,
-      [userId, accountId]
-    );
-
-    const transferResult = await db.query(
-      `SELECT COUNT(*) as count FROM ${SCHEMA}.transaction_transfers tt
-       JOIN ${SCHEMA}.transactions t ON t.id = tt.transaction_id AND t.deleted_at IS NULL
-       WHERE t.user_id = $1 AND (tt.from_account_id = $2 OR tt.to_account_id = $2)`,
-      [userId, accountId]
-    );
-
-    const totalRefs = parseInt(txResult.rows[0].count) + parseInt(transferResult.rows[0].count);
-    if (totalRefs > 0) {
-      res.status(409).json({
-        success: false,
-        error: {
-          code: 'ACCOUNT_HAS_TRANSACTIONS',
-          message: 'Cannot delete an account with existing transactions or transfers. Deactivate it instead.',
-        },
-      });
-      return;
-    }
-
     const result = await db.query(
-      `DELETE FROM ${SCHEMA}.accounts
-       WHERE user_id = $1 AND id = $2
+      `UPDATE ${SCHEMA}.accounts
+       SET is_active = FALSE, updated_at = NOW()
+       WHERE user_id = $1 AND id = $2 AND is_active = TRUE
        RETURNING id`,
       [userId, accountId]
     );
@@ -228,6 +226,63 @@ router.delete('/:id', async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       error: { code: 'SERVER_ERROR', message: 'Failed to delete account' },
+    });
+  }
+});
+
+// =============================================================================
+// POST /api/accounts/:id/restore — Restore deleted account
+// =============================================================================
+router.post('/:id/restore', async (req: Request, res: Response) => {
+  try {
+    const userId = getUserId(req);
+    const accountId = req.params.id;
+
+    const existing = await db.query(
+      `SELECT * FROM ${SCHEMA}.accounts WHERE id = $1 AND user_id = $2 AND is_active = FALSE`,
+      [accountId, userId]
+    );
+
+    if (existing.rows.length === 0) {
+      res.status(404).json({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Deleted account not found' },
+      });
+      return;
+    }
+
+    const acc = existing.rows[0];
+
+    // Check duplicate name among active accounts
+    const dup = await db.query(
+      `SELECT id FROM ${SCHEMA}.accounts WHERE user_id = $1 AND LOWER(name) = LOWER($2) AND is_active = TRUE`,
+      [userId, acc.name]
+    );
+
+    if (dup.rows.length > 0) {
+      res.status(409).json({
+        success: false,
+        error: {
+          code: 'DUPLICATE_ACCOUNT',
+          message: `An active account named "${acc.name}" already exists.`,
+        },
+      });
+      return;
+    }
+
+    const result = await db.query(
+      `UPDATE ${SCHEMA}.accounts SET is_active = TRUE, updated_at = NOW()
+       WHERE user_id = $1 AND id = $2
+       RETURNING *`,
+      [userId, accountId]
+    );
+
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    console.error('Restore account error:', error);
+    res.status(500).json({
+      success: false,
+      error: { code: 'SERVER_ERROR', message: 'Failed to restore account' },
     });
   }
 });

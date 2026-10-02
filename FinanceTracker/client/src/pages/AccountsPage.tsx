@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { accountsApi } from '../api/client';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -138,13 +139,24 @@ export default function AccountsPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => { resetForm(); setShowForm(true); }}
-          className="btn-primary text-xs font-semibold px-3.5 py-2 shadow-sm shadow-brand-500/20"
-        >
-          <Plus size={15} />
-          <span>Add Account</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <Link
+            to="/trash?tab=accounts"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 transition-colors border border-slate-200 dark:border-slate-700"
+            title="View Deleted Accounts in Recycle Bin"
+          >
+            <Trash2 size={14} className="text-slate-500 dark:text-slate-400" />
+            <span>Recycle Bin</span>
+          </Link>
+
+          <button
+            onClick={() => { resetForm(); setShowForm(true); }}
+            className="btn-primary text-xs font-semibold px-3.5 py-2 shadow-sm shadow-brand-500/20"
+          >
+            <Plus size={15} />
+            <span>Add Account</span>
+          </button>
+        </div>
       </div>
 
       {/* Account Cards Grid */}

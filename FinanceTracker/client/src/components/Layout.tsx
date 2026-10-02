@@ -21,10 +21,11 @@ import {
   ShieldCheck,
   MoreHorizontal,
   Keyboard,
+  Trash2,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { dashboardApi } from '../api/client';
+import { dashboardApi, trashApi } from '../api/client';
 import GlobalSearchModal from './GlobalSearchModal';
 import QuickTransactionModal from './QuickTransactionModal';
 import KeyboardShortcutsModal from './KeyboardShortcutsModal';
@@ -37,6 +38,7 @@ const navItems = [
   { to: '/loans', icon: CreditCard, label: 'Loans' },
   { to: '/categories', icon: Tag, label: 'Categories' },
   { to: '/reports', icon: BarChart3, label: 'Reports' },
+  { to: '/trash', icon: Trash2, label: 'Recycle Bin' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -54,6 +56,7 @@ const bottomNavMore = [
   { to: '/accounts', icon: Wallet, label: 'Accounts' },
   { to: '/people', icon: Users, label: 'People' },
   { to: '/categories', icon: Tag, label: 'Categories' },
+  { to: '/trash', icon: Trash2, label: 'Recycle Bin' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
@@ -72,6 +75,13 @@ export default function Layout() {
     queryKey: ['dashboard', 'loans'],
     queryFn: () => dashboardApi.loanSummary().then((r) => r.data.data),
     staleTime: 120_000,
+  });
+
+  // Fetch trash counts for Recycle Bin badge
+  const { data: trashCounts } = useQuery({
+    queryKey: ['trash', 'counts'],
+    queryFn: () => trashApi.counts().then((r) => r.data.data),
+    staleTime: 30_000,
   });
 
   const overdueCount = (loanSummary as any[])?.filter((loan: any) => {
@@ -213,7 +223,20 @@ export default function Layout() {
                       />
                       <span>{label}</span>
                     </div>
-                    {isActive && <ChevronRight size={14} className="opacity-70" />}
+                    <div className="flex items-center gap-1.5">
+                      {to === '/trash' && trashCounts && trashCounts.total > 0 && (
+                        <span
+                          className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
+                          }`}
+                        >
+                          {trashCounts.total}
+                        </span>
+                      )}
+                      {isActive && <ChevronRight size={14} className="opacity-70" />}
+                    </div>
                   </>
                 )}
               </NavLink>
@@ -419,7 +442,7 @@ export default function Layout() {
               <X size={16} />
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-5 gap-2">
             {bottomNavMore.map(({ to, icon: Icon, label }) => (
               <NavLink
                 key={to}
